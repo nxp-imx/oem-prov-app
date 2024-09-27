@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.13)
+
+project(oem-prov-app VERSION 0.1 LANGUAGES C CXX)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(GNUInstallDirs)
+set(CMAKE_INSTALL_PREFIX /usr)
+
+if(VERBOSE)
+    if(NOT VERBOSE MATCHES "^[0-9]$")
+        message(FATAL_ERROR, "VERBOSE must be an integer")
+    endif()
+
+    if (VERBOSE GREATER 0)
+        add_definitions(-DENABLE_VERBOSE)
+    endif()
+
+    if (VERBOSE GREATER 4)
+        message(WARNING, "Verbose values should be less than 5, setting the VERBOSE to 4")
+        set(VERBOSE 4)
+    endif()
+
+    add_definitions(-DVERBOSE_LEVEL=${VERBOSE})
+else()
+    set(VERBOSE 0)
+endif()
+
+include_directories(include)
+add_subdirectory(src)
+
