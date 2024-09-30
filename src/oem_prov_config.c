@@ -1,0 +1,108 @@
+// SPDX-License-Identifier: BSD-3-Clause
+/*
+ * Copyright 2024 NXP
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <cyaml/cyaml.h>
+#include <unistd.h>
+#include <getopt.h>
+#include <string.h>
+
+#include "oem_prov_status.h"
+#include "oem_prov_debug_info.h"
+
+struct oem_prov_online {
+	char *hostname;
+	char *port;
+	unsigned int close;
+};
+
+struct oem_prov_indirect {
+	char *json_file;
+};
+
+struct oem_prov_config {
+	struct oem_prov_online *online;
+	struct oem_prov_indirect *indirect;
+};
+
+static const cyaml_schema_field_t online_schema[] = {
+	CYAML_FIELD_STRING_PTR("hostname", CYAML_FLAG_POINTER,
+			       struct oem_prov_online, hostname, 0,
+			       CYAML_UNLIMITED),
+
+	CYAML_FIELD_STRING_PTR("port", CYAML_FLAG_POINTER,
+			       struct oem_prov_online, port, 0,
+			       CYAML_UNLIMITED),
+
+	CYAML_FIELD_INT("close", CYAML_FLAG_DEFAULT, struct oem_prov_online,
+			close),
+
+	CYAML_FIELD_END
+
+};
+
+static const cyaml_schema_field_t indirect_schema[] = {
+	CYAML_FIELD_STRING_PTR("json_file", CYAML_FLAG_POINTER,
+			       struct oem_prov_indirect, json_file, 0,
+			       CYAML_UNLIMITED),
+	CYAML_FIELD_END
+
+};
+
+static const cyaml_schema_field_t oem_prov_config_fields_schema[] = {
+
+	CYAML_FIELD_MAPPING_PTR("online", CYAML_FLAG_POINTER,
+				struct oem_prov_config, online, online_schema),
+
+	CYAML_FIELD_MAPPING_PTR("indirect", CYAML_FLAG_POINTER,
+				struct oem_prov_config, indirect,
+				indirect_schema),
+	CYAML_FIELD_END
+};
+
+static const cyaml_schema_value_t oem_prov_config_schema = {
+	CYAML_VALUE_MAPPING(CYAML_FLAG_POINTER, struct oem_prov_config,
+			    oem_prov_config_fields_schema)
+};
+
+static const cyaml_config_t config = {
+	.log_fn = cyaml_log,		/* Use the default logging function. */
+	.mem_fn = cyaml_mem,		/* Use the default memory allocator. */
+	.log_level = CYAML_LOG_WARNING, /* Logging errors and warnings only. */
+};
+
+static struct oem_prov_config *oem_config;
+
+int oem_load_config_file(const char *filename)
+{
+	cyaml_err_t err;
+
+	OEM_PROV_DBG_PRINTF(VERBOSE, "Loading config file %s\n", filename);
+
+	/* Load input files */
+	err = cyaml_load_file(filename, &config, &oem_prov_config_schema,
+			      (void **)&oem_config, NULL);
+
+	if (err != CYAML_OK) {
+		OEM_PROV_DBG_PRINTF(ERROR, "ERROR: %s\n", cyaml_strerror(err));
+		return OEM_PROV_STATUS_INVALID_FILE;
+	}
+
+	OEM_PROV_DBG_PRINTF(INFO, "Using host %s[%s]\n",
+			    oem_config->online->hostname,
+			    oem_config->online->port);
+	OEM_PROV_DBG_PRINTF(INFO, "Close the board after provisioning %d\n",
+			    oem_config->online->close);
+	OEM_PROV_DBG_PRINTF(INFO, "Assets filename %s\n",
+			    oem_config->indirect->json_file);
+
+	return OEM_PROV_STATUS_OK;
+}
+
+void oem_unload_config(void)
+{
+	cyaml_free(&config, &oem_prov_config_schema, oem_config, 0);
+}

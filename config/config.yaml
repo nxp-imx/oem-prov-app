@@ -1,0 +1,17 @@
+#online flow configuration
+online:
+#The hostname used for the connection with EdgeLock 2GO server.
+#It can be obtained from the GUI interface of the EdgeLock 2GO server:
+#Admin Settings->Services
+  hostname: "https://your-instance.edgelock2go.com"
+#The port used for the communication with EdgeLock 2GO server. The
+#current value to be used is 443
+  port: "EdgeLock 2GO port"
+#Indicates if the device will be closed after provisioning.
+#Default is no. The device can be closed later using a command
+#line argument
+  close: 0/1
+#indirect flow configuration
+indirect:
+#File containing the security assets to be provisioned
+  json_file: "Json file containing the security assets"

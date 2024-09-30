@@ -9,6 +9,7 @@
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
 #include "oem_prov.h"
+#include "oem_prov_config.h"
 
 #define MAX_FILE_SIZE_NAME 256
 
@@ -154,6 +155,11 @@ int main(int argc, char *argv[])
 
 	if (online) {
 		OEM_PROV_DBG_PRINTF(INFO, "Selecting online provisioning\n");
+		status = oem_load_config_file(config_file_name);
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
+
+		oem_unload_config();
 		OEM_PROV_DBG_PRINTF(ERROR,
 				    "Online option is not yet supported\n");
 	}
