@@ -8,6 +8,7 @@
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
+#include "oem_prov.h"
 
 #define MAX_FILE_SIZE_NAME 256
 
@@ -132,10 +133,15 @@ int main(int argc, char *argv[])
 		goto exit;
 	}
 
+	status = oem_prov_init_smw();
+	if (status != OEM_PROV_STATUS_OK)
+		goto exit;
+
 	if (uuid) {
 		OEM_PROV_DBG_PRINTF(INFO, "Selecting UUID inject option\n");
-		OEM_PROV_DBG_PRINTF(
-			ERROR, "UUID inject option is not yet supported\n");
+		status = oem_prov_get_uuid();
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
 	}
 
 	if (claim_code) {
