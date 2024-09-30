@@ -147,8 +147,9 @@ int main(int argc, char *argv[])
 	if (claim_code) {
 		OEM_PROV_DBG_PRINTF(INFO,
 				    "Selecting claim code inject option\n");
-		OEM_PROV_DBG_PRINTF(ERROR,
-				    "Claim code option is not yet supported\n");
+		status = oem_prov_inject_claimcode(cc_file_name);
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
 	}
 
 	if (online) {

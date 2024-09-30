@@ -28,4 +28,15 @@ int oem_prov_get_uuid(void);
  */
 int oem_prov_init_smw(void);
 
+/**
+ * oem_prov_inject_claimcode() - Injects the claim code in the device
+ *
+ * @filename: The file name where the claim code is stored. The claim code is
+ * in base64 format as it is exported by the EdgeLock 2GO server.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_inject_claimcode(const char *filename);
+
 #endif /* __OEM_PROV_H__ */

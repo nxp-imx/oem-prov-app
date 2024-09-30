@@ -7,7 +7,8 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 target_sources(${PROJECT_NAME} PRIVATE
                oem_prov_app_main.c
                oem_prov_utils.c
-               oem_prov_setup.c)
+               oem_prov_setup.c
+               oem_prov_claim_code.c)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
                            ${INCLUDE_DIR})
