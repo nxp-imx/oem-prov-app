@@ -159,9 +159,10 @@ int main(int argc, char *argv[])
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 
+		status = oem_prov_online();
 		oem_unload_config();
-		OEM_PROV_DBG_PRINTF(ERROR,
-				    "Online option is not yet supported\n");
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
 	}
 
 	if (indirect) {

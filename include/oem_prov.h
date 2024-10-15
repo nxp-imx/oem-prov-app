@@ -39,4 +39,16 @@ int oem_prov_init_smw(void);
  */
 int oem_prov_inject_claimcode(const char *filename);
 
+/**
+ * oem_prov_online() - Runs the OEM Provisioning Application in online mode.
+ *
+ * This function uses the EdgeLock 2GO Agent libraries to connect to EdgeLock 2GO server,
+ * to download the security assets and to provision the device with the downloaded security
+ * assets.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_online(void);
+
 #endif /* __OEM_PROV_H__ */

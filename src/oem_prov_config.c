@@ -102,6 +102,13 @@ int oem_load_config_file(const char *filename)
 	return OEM_PROV_STATUS_OK;
 }
 
+void oem_config_set_host_and_port(void)
+{
+	setenv("EDGELOCK2GO_PORT", oem_config->online->port, 1);
+	setenv("EDGELOCK2GO_HOSTNAME", oem_config->online->hostname,
+	       1);
+}
+
 void oem_unload_config(void)
 {
 	cyaml_free(&config, &oem_prov_config_schema, oem_config, 0);
