@@ -29,6 +29,10 @@ int oem_prov_online(void)
 	nxp_iot_UpdateStatusReport status_report =
 		nxp_iot_UpdateStatusReport_init_default;
 
+	/* Perform platform related initializations. It will initialize the
+	 * SMW library. The library will not be re-initialized if already
+	 * initialized.
+	 */
 	OEM_PROV_DBG_PRINTF(VERBOSE, "IOT agent platform init\n");
 	agent_status =
 		iot_agent_platform_init(0, NULL, &iot_agent_platform_context);
@@ -61,6 +65,9 @@ int oem_prov_online(void)
 		goto exit;
 	}
 
+	/* This data store holds connection information about how to connect
+	 * to the EdgeLock 2GO server: server URL, port, server certificate, etc.
+	 */
 	OEM_PROV_DBG_PRINTF(VERBOSE, "agent datastore plain init\n");
 	agent_status = iot_agent_datastore_init(&el2go_data,
 						DATASTORE_EDGELOCK2GO_ID, el2go_datastore,
@@ -70,6 +77,9 @@ int oem_prov_online(void)
 		goto exit;
 	}
 
+	/* Configure the connection information. The server URL and port are taken
+	 * from the configuration file. Currently the server certificate is hardcoded.
+	 */
 	oem_config_set_host_and_port();
 	agent_status = iot_agent_utils_configure_edgelock2go_datastore(&keystore,
 								       &el2go_data,
@@ -79,6 +89,7 @@ int oem_prov_online(void)
 		goto exit;
 	}
 
+	/* Register the data store holding the connection information */
 	OEM_PROV_DBG_PRINTF(VERBOSE, "Set el2go datastore\n");
 	agent_status = iot_agent_set_edgelock2go_datastore(&iot_agent_context,
 							   &el2go_data);
@@ -87,6 +98,7 @@ int oem_prov_online(void)
 		goto exit;
 	}
 
+	/* Check for new security assets */
 	OEM_PROV_DBG_PRINTF(VERBOSE, "Checking for new secure objects\n");
 	agent_status = iot_agent_update_device_configuration(&iot_agent_context,
 							     &status_report);
