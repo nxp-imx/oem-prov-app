@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/*
+ * Copyright 2024 NXP
+ */
+
+#ifndef __OEM_PROV_VERSION_H__
+#define __OEM_PROV_VERSION_H__
+
+#define OEM_PROV_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define OEM_PROV_VERSION_MINOR @PROJECT_VERSION_MINOR@
+
+#endif /* __OEM_PROV_VERSION_H__ */

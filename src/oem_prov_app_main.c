@@ -10,6 +10,7 @@
 #include "oem_prov_debug_info.h"
 #include "oem_prov.h"
 #include "oem_prov_config.h"
+#include "oem_prov_version.h"
 
 #define MAX_FILE_SIZE_NAME 256
 
@@ -31,6 +32,9 @@ static void usage(const char *prg)
 
 	OEM_PROV_PRINTF("%-30s", "--close,-c");
 	OEM_PROV_PRINTF("%s", "Closes the device\n");
+
+	OEM_PROV_PRINTF("%-30s", "--version,-v");
+	OEM_PROV_PRINTF("%s", "Version information\n");
 }
 
 static inline int validate_filename(const char *filename)
@@ -64,6 +68,7 @@ int main(int argc, char *argv[])
 			{ "close", no_argument, 0, 'c' },
 			{ "claim-code", required_argument, 0, 'C' },
 			{ "uuid", no_argument, 0, 'u' },
+			{ "version", no_argument, 0, 'v' },
 			{ "help", no_argument, 0, 'h' },
 			{ 0, 0, 0, 0 }
 		};
@@ -72,7 +77,7 @@ int main(int argc, char *argv[])
 		if (argc <= 1)
 			usage(argv[0]);
 
-		c = getopt_long(argc, argv, "i:o:cC:hu", long_options,
+		c = getopt_long(argc, argv, "i:o:cC:huv", long_options,
 				&option_index);
 
 		if (c == -1) {
@@ -113,6 +118,11 @@ int main(int argc, char *argv[])
 			break;
 		case 'u':
 			uuid = 1;
+			break;
+		case 'v':
+			OEM_PROV_PRINTF("Version: %d.%d\n",
+					OEM_PROV_VERSION_MAJOR,
+					OEM_PROV_VERSION_MINOR);
 			break;
 		case '?':
 			usage(argv[0]);

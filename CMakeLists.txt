@@ -26,6 +26,10 @@ else()
     set(VERBOSE 0)
 endif()
 
-include_directories(include)
+# Create the version file
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/oem_prov_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/oem_prov_version.h)
+
+include_directories(include
+                    ${CMAKE_CURRENT_BINARY_DIR}/include)
 add_subdirectory(src)
 
