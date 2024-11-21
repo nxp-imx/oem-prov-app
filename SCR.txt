@@ -10,4 +10,3 @@ Description and comments: OEM Provisioning Application
 Release Location:         https://github.com/nxp-imx/oem-prov-app
 Version:                  0.1
 Origin:                   NXP (BSD-3-clause)
-                          Mbed-TLS(Apache-2.0) - https://github.com/Mbed-TLS/mbedtls

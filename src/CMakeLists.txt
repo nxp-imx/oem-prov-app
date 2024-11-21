@@ -1,6 +1,5 @@
 find_package(NXP_SMW CONFIG REQUIRED)
 find_package(Cyaml REQUIRED)
-find_package(MbedTLS CONFIG REQUIRED)
 find_package(EL2GOAgent REQUIRED)
 
 add_executable(${PROJECT_NAME} "")
@@ -22,9 +21,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
                       NXP_SMW::smw
                       LIBCYAML::cyaml
-                      ${EL2GOAgent_LIBRARIES}
-                      MbedTLS::mbedtls
-                      MbedTLS::mbedx509
-                      MbedTLS::mbedcrypto)
+                      ${EL2GOAgent_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} RUNTIME)
