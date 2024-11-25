@@ -181,8 +181,16 @@ int main(int argc, char *argv[])
 
 	if (indirect) {
 		OEM_PROV_DBG_PRINTF(INFO, "Selecting indirect provisioning\n");
+		status = oem_load_config_file(config_file_name,
+					      OEM_PROV_INDIRECT);
+		if (status != OEM_PROV_STATUS_OK) {
+			OEM_PROV_DBG_PRINTF(ERROR,
+					    "Invalid configuration file!\n");
+			goto exit;
+		}
 		OEM_PROV_DBG_PRINTF(ERROR,
 				    "Indirect option is not yet supported\n");
+		oem_unload_config();
 	}
 
 	if (close) {

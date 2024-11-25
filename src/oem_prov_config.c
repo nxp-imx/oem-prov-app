@@ -21,9 +21,12 @@ struct oem_prov_online {
 };
 
 struct oem_prov_indirect {
-	char *json_file;
+	char *partition;
+	char *type;
+	char *mount_point;
+	char *file_name;
+	unsigned int close;
 };
-
 struct oem_prov_config {
 	struct oem_prov_online *online;
 	struct oem_prov_indirect *indirect;
@@ -46,9 +49,20 @@ static const cyaml_schema_field_t online_schema[] = {
 };
 
 static const cyaml_schema_field_t indirect_schema[] = {
-	CYAML_FIELD_STRING_PTR("json_file", CYAML_FLAG_POINTER,
-			       struct oem_prov_indirect, json_file, 0,
+	CYAML_FIELD_STRING_PTR("partition", CYAML_FLAG_POINTER,
+			       struct oem_prov_indirect, partition, 0,
 			       CYAML_UNLIMITED),
+	CYAML_FIELD_STRING_PTR("type", CYAML_FLAG_POINTER,
+			       struct oem_prov_indirect, type, 0,
+			       CYAML_UNLIMITED),
+	CYAML_FIELD_STRING_PTR("mount_point", CYAML_FLAG_POINTER,
+			       struct oem_prov_indirect, mount_point, 0,
+			       CYAML_UNLIMITED),
+	CYAML_FIELD_STRING_PTR("file_name", CYAML_FLAG_POINTER,
+			       struct oem_prov_indirect, file_name, 0,
+			       CYAML_UNLIMITED),
+	CYAML_FIELD_INT("close", CYAML_FLAG_DEFAULT, struct oem_prov_indirect,
+			close),
 	CYAML_FIELD_END
 
 };
@@ -97,18 +111,26 @@ static int oem_prov_validate_option(int option)
 	case OEM_PROV_ONLINE:
 		if (!oem_config->online)
 			return OEM_PROV_STATUS_ONLINE_OPT_MISSING;
-		OEM_PROV_DBG_PRINTF(INFO, "Using host %s[%s]\n",
+		OEM_PROV_DBG_PRINTF(INFO, "Using host: %s[%s]\n",
 				    oem_config->online->hostname,
 				    oem_config->online->port);
 		OEM_PROV_DBG_PRINTF(INFO,
-				    "Close the board after provisioning %d\n",
+				    "Close the board after provisioning: %d\n",
 				    oem_config->online->close);
 		break;
 	case OEM_PROV_INDIRECT:
 		if (!oem_config->indirect)
 			return OEM_PROV_STATUS_INDIRECT_OPT_MISSING;
-		OEM_PROV_DBG_PRINTF(INFO, "Assets filename %s\n",
-				    oem_config->indirect->json_file);
+		OEM_PROV_DBG_PRINTF(INFO, "partition: %s\n",
+				    oem_config->indirect->partition);
+		OEM_PROV_DBG_PRINTF(INFO, "type: %s\n",
+				    oem_config->indirect->type);
+		OEM_PROV_DBG_PRINTF(INFO, "mount_point: %s\n",
+				    oem_config->indirect->mount_point);
+		OEM_PROV_DBG_PRINTF(INFO, "file_name: %s\n",
+				    oem_config->indirect->file_name);
+		OEM_PROV_DBG_PRINTF(INFO, "close: %d\n",
+				    oem_config->indirect->close);
 		break;
 	}
 	return OEM_PROV_STATUS_OK;
