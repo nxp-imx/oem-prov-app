@@ -6,8 +6,17 @@
 #define __OEM_PROV_CONFIG_H__
 
 /**
+ * enum oem_prov_config_options - OEM Provisioning Application modes
+ *
+ * @OEM_PROV_ONLINE: Online mode, the provisioning is done through EdgeLock 2GO server
+ * @OEM_PROV_INDIRECT: Indirect mode, the provisioning is done without EdgeLock 2Go server
+ */
+enum oem_prov_config_options { OEM_PROV_ONLINE, OEM_PROV_INDIRECT };
+
+/**
  * oem_load_config_file() - Loads the configuration file by the Cyaml library
  * @filename: The configuration file name
+ * @option: Indicates if the user has selected online or indirect flow
  *
  * This function opens the configuration file and loads it into the Cyaml internal
  * structures.
@@ -15,7 +24,7 @@
  * Return:
  * error code
  */
-int oem_load_config_file(const char *filename);
+int oem_load_config_file(const char *filename, int option);
 
 /**
  * oem_unload_config() - Unloads the configuration file
@@ -38,6 +47,5 @@ void oem_unload_config(void);
  * none
  */
 void oem_config_set_host_and_port(void);
-
 
 #endif /* __OEM_PROV_CONFIG_H__ */

@@ -12,6 +12,7 @@
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
+#include "oem_prov_config.h"
 
 struct oem_prov_online {
 	char *hostname;
@@ -52,12 +53,14 @@ static const cyaml_schema_field_t indirect_schema[] = {
 
 };
 
+#define CYMAL_FLAG_OPTIONAL_POINTER (CYAML_FLAG_POINTER | CYAML_FLAG_OPTIONAL)
+
 static const cyaml_schema_field_t oem_prov_config_fields_schema[] = {
 
-	CYAML_FIELD_MAPPING_PTR("online", CYAML_FLAG_POINTER,
+	CYAML_FIELD_MAPPING_PTR("online", CYMAL_FLAG_OPTIONAL_POINTER,
 				struct oem_prov_config, online, online_schema),
 
-	CYAML_FIELD_MAPPING_PTR("indirect", CYAML_FLAG_POINTER,
+	CYAML_FIELD_MAPPING_PTR("indirect", CYMAL_FLAG_OPTIONAL_POINTER,
 				struct oem_prov_config, indirect,
 				indirect_schema),
 	CYAML_FIELD_END
@@ -76,9 +79,45 @@ static const cyaml_config_t config = {
 
 static struct oem_prov_config *oem_config;
 
-int oem_load_config_file(const char *filename)
+/**
+ * oem_prov_validate_option() - Validates the configuration file
+ *
+ * This function validates if the selected command line option has
+ * the needed options in the configuration file.
+ *
+ * Return:
+ * error code
+ */
+static int oem_prov_validate_option(int option)
+{
+	if (!oem_config)
+		return OEM_PROV_STATUS_EMPTY_FILE;
+
+	switch (option) {
+	case OEM_PROV_ONLINE:
+		if (!oem_config->online)
+			return OEM_PROV_STATUS_ONLINE_OPT_MISSING;
+		OEM_PROV_DBG_PRINTF(INFO, "Using host %s[%s]\n",
+				    oem_config->online->hostname,
+				    oem_config->online->port);
+		OEM_PROV_DBG_PRINTF(INFO,
+				    "Close the board after provisioning %d\n",
+				    oem_config->online->close);
+		break;
+	case OEM_PROV_INDIRECT:
+		if (!oem_config->indirect)
+			return OEM_PROV_STATUS_INDIRECT_OPT_MISSING;
+		OEM_PROV_DBG_PRINTF(INFO, "Assets filename %s\n",
+				    oem_config->indirect->json_file);
+		break;
+	}
+	return OEM_PROV_STATUS_OK;
+}
+
+int oem_load_config_file(const char *filename, int option)
 {
 	cyaml_err_t err;
+	int status = OEM_PROV_STATUS_OK;
 
 	OEM_PROV_DBG_PRINTF(VERBOSE, "Loading config file %s\n", filename);
 
@@ -90,16 +129,9 @@ int oem_load_config_file(const char *filename)
 		OEM_PROV_DBG_PRINTF(ERROR, "ERROR: %s\n", cyaml_strerror(err));
 		return OEM_PROV_STATUS_INVALID_FILE;
 	}
+	status = oem_prov_validate_option(option);
 
-	OEM_PROV_DBG_PRINTF(INFO, "Using host %s[%s]\n",
-			    oem_config->online->hostname,
-			    oem_config->online->port);
-	OEM_PROV_DBG_PRINTF(INFO, "Close the board after provisioning %d\n",
-			    oem_config->online->close);
-	OEM_PROV_DBG_PRINTF(INFO, "Assets filename %s\n",
-			    oem_config->indirect->json_file);
-
-	return OEM_PROV_STATUS_OK;
+	return status;
 }
 
 void oem_config_set_host_and_port(void)
