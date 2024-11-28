@@ -2,16 +2,25 @@
 /*
  * Copyright 2024 NXP
  */
-#ifndef __OEM_PROV_CONFIG_H__
-#define __OEM_PROV_CONFIG_H__
+#ifndef __OEM_PROV_OS_H__
+#define __OEM_PROV_OS_H__
 
 /**
- * enum oem_prov_config_options - OEM Provisioning Application modes
+ * get_buffer_from_file() - Reads the data from a file
  *
- * @OEM_PROV_ONLINE: Online mode, the provisioning is done through EdgeLock 2GO server
- * @OEM_PROV_INDIRECT: Indirect mode, the provisioning is done without EdgeLock 2Go server
+ * This function reads the claim code from a file. The function trims any
+ * trailing spaces and line separators.
+ *
+ * @file_name: The file name where the claim code is.
+ * @buffer: The buffer where the claim code data is stored. The buffer is allocated
+ *          by this function and it should be freed by the caller.
+ * @length: The size of the buffer. This is an output parameter, this function sets it.
+ *
+ * Return:
+ * none
  */
-enum oem_prov_config_options { OEM_PROV_ONLINE, OEM_PROV_INDIRECT };
+int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
+				  size_t *length);
 
 /**
  * oem_load_config_file() - Loads the configuration file by the Cyaml library
@@ -24,7 +33,7 @@ enum oem_prov_config_options { OEM_PROV_ONLINE, OEM_PROV_INDIRECT };
  * Return:
  * error code
  */
-int oem_load_config_file(const char *filename, int option);
+int oem_prov_load_config(const char *filename, int option);
 
 /**
  * oem_unload_config() - Unloads the configuration file
@@ -34,7 +43,7 @@ int oem_load_config_file(const char *filename, int option);
  * Return:
  * none
  */
-void oem_unload_config(void);
+void oem_prov_unload_config(void);
 
 /**
  * oem_config_set_host_and_port() - Sets EdgeLock 2GO server hostname and port
@@ -46,6 +55,6 @@ void oem_unload_config(void);
  * Return:
  * none
  */
-void oem_config_set_host_and_port(void);
+void oem_prov_set_host_and_port(void);
 
-#endif /* __OEM_PROV_CONFIG_H__ */
+#endif /* __OEM_PROV_OS_H__ */

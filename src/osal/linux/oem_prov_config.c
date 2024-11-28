@@ -12,25 +12,9 @@
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
-#include "oem_prov_config.h"
-
-struct oem_prov_online {
-	char *hostname;
-	char *port;
-	unsigned int close;
-};
-
-struct oem_prov_indirect {
-	char *partition;
-	char *type;
-	char *mount_point;
-	char *file_name;
-	unsigned int close;
-};
-struct oem_prov_config {
-	struct oem_prov_online *online;
-	struct oem_prov_indirect *indirect;
-};
+#include "oem_prov_os.h"
+#include "oem_prov_internal.h"
+#include "oem_prov_common.h"
 
 static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_STRING_PTR("hostname", CYAML_FLAG_POINTER,
@@ -86,12 +70,10 @@ static const cyaml_schema_value_t oem_prov_config_schema = {
 };
 
 static const cyaml_config_t config = {
-	.log_fn = cyaml_log,		/* Use the default logging function. */
-	.mem_fn = cyaml_mem,		/* Use the default memory allocator. */
+	.log_fn = cyaml_log,            /* Use the default logging function. */
+	.mem_fn = cyaml_mem,            /* Use the default memory allocator. */
 	.log_level = CYAML_LOG_WARNING, /* Logging errors and warnings only. */
 };
-
-static struct oem_prov_config *oem_config;
 
 /**
  * oem_prov_validate_option() - Validates the configuration file
@@ -102,7 +84,8 @@ static struct oem_prov_config *oem_config;
  * Return:
  * error code
  */
-static int oem_prov_validate_option(int option)
+static int oem_prov_validate_option(int option,
+				    struct oem_prov_config *oem_config)
 {
 	if (!oem_config)
 		return OEM_PROV_STATUS_EMPTY_FILE;
@@ -136,34 +119,35 @@ static int oem_prov_validate_option(int option)
 	return OEM_PROV_STATUS_OK;
 }
 
-int oem_load_config_file(const char *filename, int option)
+int oem_prov_load_config(const char *filename, int option)
 {
 	cyaml_err_t err;
 	int status = OEM_PROV_STATUS_OK;
+	struct oem_prov_os_ctx *os_ctx;
+
+	os_ctx = oem_prov_get_os_ctx();
 
 	OEM_PROV_DBG_PRINTF(VERBOSE, "Loading config file %s\n", filename);
 
 	/* Load input files */
 	err = cyaml_load_file(filename, &config, &oem_prov_config_schema,
-			      (void **)&oem_config, NULL);
+			      (void **)&os_ctx->oem_config, NULL);
 
 	if (err != CYAML_OK) {
 		OEM_PROV_DBG_PRINTF(ERROR, "ERROR: %s\n", cyaml_strerror(err));
 		return OEM_PROV_STATUS_INVALID_FILE;
 	}
-	status = oem_prov_validate_option(option);
+	status = oem_prov_validate_option(option, os_ctx->oem_config);
 
 	return status;
 }
 
-void oem_config_set_host_and_port(void)
+void oem_prov_unload_config(void)
 {
-	setenv("EDGELOCK2GO_PORT", oem_config->online->port, 1);
-	setenv("EDGELOCK2GO_HOSTNAME", oem_config->online->hostname,
-	       1);
-}
+	struct oem_prov_os_ctx *os_ctx;
+	struct oem_prov_config *oem_config;
 
-void oem_unload_config(void)
-{
-	cyaml_free(&config, &oem_prov_config_schema, oem_config, 0);
+	os_ctx = oem_prov_get_os_ctx();
+
+	cyaml_free(&config, &oem_prov_config_schema, os_ctx->oem_config, 0);
 }

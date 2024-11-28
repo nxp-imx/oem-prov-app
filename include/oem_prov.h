@@ -37,11 +37,12 @@ int oem_prov_init_smw(void);
  * Return:
  * error code
  */
-int oem_prov_inject_claimcode(const char *filename);
+int oem_prov_inject_claimcode(const char *config_filename);
 
 /**
  * oem_prov_online() - Runs the OEM Provisioning Application in online mode.
  *
+ * @filename: Config file name
  * This function uses the EdgeLock 2GO Agent libraries to connect to EdgeLock 2GO server,
  * to download the security assets and to provision the device with the downloaded security
  * assets.
@@ -49,6 +50,21 @@ int oem_prov_inject_claimcode(const char *filename);
  * Return:
  * error code
  */
-int oem_prov_online(void);
+int oem_prov_online(const char *config_filename);
+
+/**
+ * oem_prov_indirect() -  Runs the OEM Provisioning Application in indirect mode.
+ *
+ * @filename: Config file name
+ *
+ * This function reads the security assets file located in a configurable location (in a
+ * vfat partition) and provisions them into the Secure Enclave using crypto psa API from
++* SMW library.
+
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_indirect(const char *config_filename);
 
 #endif /* __OEM_PROV_H__ */

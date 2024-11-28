@@ -3,11 +3,6 @@
  * Copyright 2024 NXP
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
 #include <smw_storage.h>
 #include <smw_keymgr.h>
 #include <smw_status.h>
@@ -15,79 +10,16 @@
 #include "oem_prov.h"
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
+#include "oem_prov_os.h"
 
 #define OEM_PROV_CLAIM_CODE_ID	       0xF00000E0
 #define OEM_PROV_CLAIM_ENC_KEY_ID      0x7FFF8171
 #define OEM_PROV_CLAIM_AUTH_KEY_ID     0x7FFF8172
 
-/**
- * get_buffer_from_file() - Reads the data from a file
- *
- * This function reads the claim code from a file. The function trims any
- * trailing spaces and line separators.
- *
- * @file_name: The file name where the claim code is.
- * @buffer: The buffer where the claim code data is stored. The buffer is allocated
- *          by this function and it should be freed by the caller.
- * @length: The size of the buffer. This is an output parameter, this function sets it.
- *
- * Return:
- * none
- */
-static int get_buffer_from_file(const char *file_name, unsigned char **buffer,
-				size_t *length)
-{
-	int res = OEM_PROV_STATUS_OK;
-	int fd;
-	struct stat st;
-	size_t file_size;
-	int i;
-
-	fd = open(file_name, O_RDONLY);
-	if (fd == -1)
-		return OEM_PROV_STATUS_INVALID_FILE;
-
-	if (((fstat(fd, &st) != 0)) || (!S_ISREG(st.st_mode))) {
-		close(fd);
-		return OEM_PROV_STATUS_INVALID_FILE;
-	}
-
-	file_size = st.st_size;
-	*buffer = (char *)malloc(file_size);
-	if (*buffer == NULL) {
-		res = OEM_PROV_STATUS_ALLOCATION_ERROR;
-		goto exit;
-	}
-
-	if (file_size != pread(fd, *buffer, file_size, 0)) {
-		free(*buffer);
-		*buffer = NULL;
-		res = OEM_PROV_STATUS_INVALID_FILE;
-		goto exit;
-	}
-
-	/* trim any trailing characters */
-	for (i = file_size - 1; i >= 0; i--) {
-		if ((*buffer)[i] == ' ' || (*buffer)[i] == '\r' ||
-		    (*buffer)[i] == '\n') {
-			continue;
-		} else {
-			break;
-		}
-	}
-	*length = i + 1;
-	(*buffer)[*length] = '\0';
-
-exit:
-	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, res);
-	close(fd);
-	return res;
-}
-
 int oem_prov_inject_claimcode(const char *filename)
 {
 	int status = OEM_PROV_STATUS_OK;
-	unsigned char *cc;
+	unsigned char *cc = NULL;
 	size_t buffer_length;
 	enum smw_status_code smw_status;
 
@@ -101,7 +33,7 @@ int oem_prov_inject_claimcode(const char *filename)
 	struct smw_key_descriptor *encr_key_ptr = &encr_key;
 	struct smw_key_descriptor sign_key = { 0 };
 
-	status = get_buffer_from_file(filename, &cc, &buffer_length);
+	status = oem_prov_get_buffer_from_file(filename, &cc, &buffer_length);
 	if (status != OEM_PROV_STATUS_OK) {
 		OEM_PROV_DBG_PRINTF(ERROR, "Config file read failed %d\n",
 				    status);

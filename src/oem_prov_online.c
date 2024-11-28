@@ -9,16 +9,17 @@
 #include <nxp_iot_agent_utils.h>
 
 #include "oem_prov.h"
-#include "oem_prov_config.h"
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
+#include "oem_prov_os.h"
+#include "oem_prov_common.h"
 
 #define DATASTORE_EDGELOCK2GO_ID \
 	nxp_iot_DatastoreIdentifiers_DATASTORE_EDGELOCK2GO_ID
 
 const char *el2go_datastore = "edgelock2go_datastore.bin";
 
-int oem_prov_online(void)
+int oem_prov_online(const char *config_filename)
 {
 	int status = OEM_PROV_STATUS_OK;
 	iot_agent_status_t agent_status = IOT_AGENT_FAILURE;
@@ -28,6 +29,12 @@ int oem_prov_online(void)
 	iot_agent_platform_context_t iot_agent_platform_context = { 0 };
 	nxp_iot_UpdateStatusReport status_report =
 		nxp_iot_UpdateStatusReport_init_default;
+
+	status = oem_prov_load_config(config_filename, OEM_PROV_ONLINE);
+	if (status != OEM_PROV_STATUS_OK) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Invalid configuration file!\n");
+		return status;
+	}
 
 	/* Perform platform related initializations. It will initialize the
 	 * SMW library. The library will not be re-initialized if already
@@ -80,7 +87,7 @@ int oem_prov_online(void)
 	/* Configure the connection information. The server URL and port are taken
 	 * from the configuration file. Currently the server certificate is hardcoded.
 	 */
-	oem_config_set_host_and_port();
+	oem_prov_set_host_and_port();
 	agent_status = iot_agent_utils_configure_edgelock2go_datastore(&keystore,
 								       &el2go_data,
 								       0, NULL);
@@ -112,6 +119,7 @@ int oem_prov_online(void)
 	}
 
 exit:
+	oem_prov_unload_config();
 	iot_agent_keystore_close_session(&keystore);
 	iot_agent_free_update_status_report(&status_report);
 	iot_agent_datastore_free(&el2go_data);

@@ -9,7 +9,6 @@
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
 #include "oem_prov.h"
-#include "oem_prov_config.h"
 #include "oem_prov_version.h"
 
 #define MAX_FILE_SIZE_NAME 256
@@ -165,32 +164,16 @@ int main(int argc, char *argv[])
 
 	if (online) {
 		OEM_PROV_DBG_PRINTF(INFO, "Selecting online provisioning\n");
-		status =
-			oem_load_config_file(config_file_name, OEM_PROV_ONLINE);
-		if (status != OEM_PROV_STATUS_OK) {
-			OEM_PROV_DBG_PRINTF(ERROR,
-					    "Invalid configuration file!\n");
-			goto exit;
-		}
-
-		status = oem_prov_online();
-		oem_unload_config();
+		status = oem_prov_online(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
 	if (indirect) {
 		OEM_PROV_DBG_PRINTF(INFO, "Selecting indirect provisioning\n");
-		status = oem_load_config_file(config_file_name,
-					      OEM_PROV_INDIRECT);
-		if (status != OEM_PROV_STATUS_OK) {
-			OEM_PROV_DBG_PRINTF(ERROR,
-					    "Invalid configuration file!\n");
+		status = oem_prov_indirect(config_file_name);
+		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
-		}
-		OEM_PROV_DBG_PRINTF(ERROR,
-				    "Indirect option is not yet supported\n");
-		oem_unload_config();
 	}
 
 	if (close) {

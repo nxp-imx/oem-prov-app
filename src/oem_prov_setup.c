@@ -3,8 +3,6 @@
  * Copyright 2023-2024 NXP
  */
 
-#include <string.h>
-
 #include <smw_osal.h>
 
 #include "oem_prov.h"
