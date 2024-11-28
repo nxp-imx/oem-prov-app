@@ -15,6 +15,8 @@
 #define OEM_PROV_DBG_LEVEL_DEBUG   3 /* Second level of debuggin information */
 #define OEM_PROV_DBG_LEVEL_VERBOSE 4 /* Maximum level of debugging information */
 
+#define OEM_PROV_FLUSH fflush
+
 #if defined(ENABLE_VERBOSE)
 #define OEM_PROV_DBG_PRINTF(level, ...)                                        \
 	do {                                                                   \
@@ -22,8 +24,21 @@
 			printf(__VA_ARGS__);                                   \
 	} while (0)
 
+#define OEM_PROV_DBG_ASSERT(exp)                                       \
+	do {                                                           \
+		if ((exp))                                             \
+			break;                                         \
+		OEM_PROV_DBG_PRINTF(ERROR,                             \
+				    "Assertion \"%s\" failed: in file" \
+				    "\"%s\":%d\n",                     \
+				    #exp, __FILE__, __LINE__);         \
+		OEM_PROV_FLUSH(stdout);                                \
+		exit(EXIT_FAILURE);                                    \
+	} while (0)
+
 #else
 #define OEM_PROV_DBG_PRINTF(level, ...)
+#define OEM_PROV_DBG_ASSERT(exp)
 #endif /* ENABLE_VERBOSE */
 
 #define OEM_PROV_PRINTF(...)                                                   \

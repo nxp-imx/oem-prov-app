@@ -129,6 +129,7 @@ int oem_prov_load_config(const char *filename, int option)
 
 	OEM_PROV_DBG_PRINTF(VERBOSE, "Loading config file %s\n", filename);
 
+	OEM_PROV_DBG_ASSERT(os_ctx);
 	/* Load input files */
 	err = cyaml_load_file(filename, &config, &oem_prov_config_schema,
 			      (void **)&os_ctx->oem_config, NULL);
@@ -149,5 +150,6 @@ void oem_prov_unload_config(void)
 
 	os_ctx = oem_prov_get_os_ctx();
 
+	OEM_PROV_DBG_ASSERT(os_ctx);
 	cyaml_free(&config, &oem_prov_config_schema, os_ctx->oem_config, 0);
 }

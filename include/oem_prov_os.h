@@ -8,11 +8,11 @@
 /**
  * get_buffer_from_file() - Reads the data from a file
  *
- * This function reads the claim code from a file. The function trims any
+ * This function reads the content of a text file in a buffer. The function trims any
  * trailing spaces and line separators.
  *
- * @file_name: The file name where the claim code is.
- * @buffer: The buffer where the claim code data is stored. The buffer is allocated
+ * @file_name: The file name
+ * @buffer: The buffer where the data is stored. The buffer is allocated
  *          by this function and it should be freed by the caller.
  * @length: The size of the buffer. This is an output parameter, this function sets it.
  *
@@ -56,5 +56,17 @@ void oem_prov_unload_config(void);
  * none
  */
 void oem_prov_set_host_and_port(void);
+
+/**
+ * oem_prov_parse_objects() - Parse the objects file for the indirect flow
+ *
+ * The security assets are located in a binary file on the filesystem. The
+ * function takes the file, read it's content, parses the objects and calls
+ * the psa crypto API to import the security objects in the Secure Enclave.
+ *
+ * Return:
+ * none
+ */
+int oem_prov_parse_objects(void);
 
 #endif /* __OEM_PROV_OS_H__ */
