@@ -18,11 +18,6 @@ To build and run the OEM Provisioning Application additional headers and librari
 </thead>
 <tbody>
 <tr>
-	<td>Yaml library</td>
-	<td>shared library</td>
-	<td>A C library for parsing and emmiting YAML: libyaml.so</td>
-</tr>
-<tr>
 	<td>CYaml library</td>
 	<td>shared library</td>
 	<td>Schema-based YAML parsing: libcyaml.so
@@ -38,17 +33,8 @@ To build and run the OEM Provisioning Application additional headers and librari
 </tr>
 <tr>
 	<td>EdgeLock 2GO Agent libraries</td>
-	<td>static libraries</td>
-	<td>The EdgeLock 2GO Agent libraries handles the communication with EdgeLock 2GO server and downloading and dispatching the messages from the EdgeLock 2GO Server. There are two static libraries: libnxp_iot_agent_common.a and libnxp_iot_agent.a</td>
-</tr>
-<tr>
-	<td>MbedTLS</td>
-	<td>static library</td>
-	<td>Mbed TLS is a C library that implements cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols. 
-	<div class="alert">
-			<strong>Note</strong> The library used by the OEM Provisioning tool is a static library, with some customizations.
-		</div>
-	</td>
+	<td>shared libraries</td>
+	<td>The EdgeLock 2GO Agent libraries handles the communication with EdgeLock 2GO server and downloading and dispatching the messages from the EdgeLock 2GO Server. There are two shared libraries: libnxp_iot_agent.so and libnxp_iot_agent_common.so </td>
 </tr>
 </tbody>
 </table>
@@ -92,20 +78,9 @@ The following build environment options are available:
 	<td>Path to the folder where to search for config-file packages for the SMW library.</td>
 </tr>
 <tr>
-	<td>MbedTLS_DIR</td>
-	<td>-DDMbedTLS_DIR=[/path/to/config]</td>
-	<td>Path to the folder where to search for config-file packages for the MBedTLS library.</td>
-</tr>
-<tr>
 	<td>EL2GOAGENT_ROOT</td>
 	<td>-DDEL2GOAGENT_ROOT=[/path/to/export]</td>
 	<td>Path to the folder where EdgeLock 2GO Agent headers and libraries are located.
-	</td>
-</tr>
-<tr>
-	<td>YAML_ROOT</td>
-	<td>-DYAML_ROOT=[/path/to/export]</td>
-	<td>Path to the folder where Yaml headers and library are located.
 	</td>
 </tr>
 <tr>
@@ -155,7 +130,7 @@ The possible options are presented in the <a href="#table-oem-prov-options">OEM 
 </tr>
 <tr>
 	<td>--indirect, -i config_file</td>
-	<td>The OEM Provisioning application runs in the indirect mode. In this mode, it downloads the security assets from the external memory (or it takes them from a file) and provision the device.</td>
+	<td>The OEM Provisioning application runs in the indirect mode. In this mode, it takes the provisioning assets from a file and provisions the device.</td>
 	<td>Not supported yet</td>
 </tr>
 <tr>
@@ -195,6 +170,20 @@ online:
   close: 0/1
 #indirect flow configuration
 indirect:
-#File containing the security assets to be provisioned
-  json_file: "Json file containing the security assets"
+#partition where the security assets file is located. If the partition is already
+#mounted the file is searched within the mount point. If the partition is not
+#mounted, the application will mount it.
+  partition: "/dev/mmcblk0p1"
+#type of partition. Although the partition filesystem type is transparent for
+#the application, currently the software that is loading the security assets
+#in the partition is supporting only FAT32 partitions.
+  type: "vfat"
+#in case that the partition is not mounted, it will be mounted in this location
+  mount_point: "/run/media/boot-mmcblk0p1"
+#the file name containing the security assets in binary format
+  file_name: "assets.bin"
+#Indicates if the device will be closed after provisioning.
+#Default is no. The device can be closed later using a command
+#line argument
+  close: 0/1
   ```
