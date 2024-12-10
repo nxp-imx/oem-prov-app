@@ -119,7 +119,7 @@ static int oem_prov_validate_option(int option,
 		close = oem_config->online->close;
 		commit_storage = oem_config->online->commit_storage;
 
-		OEM_PROV_DBG_PRINTF(INFO, "Using host: %s[%s]\n",
+		OEM_PROV_DBG_PRINTF(INFO, "\tHost: %s[%s]\n",
 				    oem_config->online->hostname,
 				    oem_config->online->port);
 		break;
@@ -129,24 +129,24 @@ static int oem_prov_validate_option(int option,
 		close = oem_config->indirect->close;
 		commit_storage = oem_config->indirect->commit_storage;
 
-		OEM_PROV_DBG_PRINTF(INFO, "partition: %s\n",
+		OEM_PROV_DBG_PRINTF(INFO, "\tPartition: %s\n",
 				    oem_config->indirect->partition);
-		OEM_PROV_DBG_PRINTF(INFO, "type: %s\n",
+		OEM_PROV_DBG_PRINTF(INFO, "\tType: %s\n",
 				    oem_config->indirect->type);
-		OEM_PROV_DBG_PRINTF(INFO, "mount_point: %s\n",
+		OEM_PROV_DBG_PRINTF(INFO, "\tMount_point: %s\n",
 				    oem_config->indirect->mount_point);
-		OEM_PROV_DBG_PRINTF(INFO, "file_name: %s\n",
+		OEM_PROV_DBG_PRINTF(INFO, "\tFile_name: %s\n",
 				    oem_config->indirect->file_name);
 		break;
 	}
 
 	if (commit_storage) {
-		OEM_PROV_DBG_PRINTF(INFO, "Commit storage: %d\n",
+		OEM_PROV_DBG_PRINTF(INFO, "\tCommit storage: %d\n",
 				    commit_storage);
 	}
 
 	if (close)
-		OEM_PROV_DBG_PRINTF(INFO, "Close: %d\n", close);
+		OEM_PROV_DBG_PRINTF(INFO, "\tClose: %d\n", close);
 
 	return OEM_PROV_STATUS_OK;
 }

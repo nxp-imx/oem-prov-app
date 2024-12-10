@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 #ifndef __OEM_PROV_DEBUG_INFO_H__
 #define __OEM_PROV_DEBUG_INFO_H__
@@ -12,7 +12,7 @@
 #define OEM_PROV_DBG_LEVEL_NONE    0 /* No debug information */
 #define OEM_PROV_DBG_LEVEL_ERROR   1 /* Important error for the user*/
 #define OEM_PROV_DBG_LEVEL_INFO    2 /* First level of debugging information */
-#define OEM_PROV_DBG_LEVEL_DEBUG   3 /* Second level of debuggin information */
+#define OEM_PROV_DBG_LEVEL_DEBUG   3 /* Second level of debugging information */
 #define OEM_PROV_DBG_LEVEL_VERBOSE 4 /* Maximum level of debugging information */
 
 #define OEM_PROV_FLUSH fflush

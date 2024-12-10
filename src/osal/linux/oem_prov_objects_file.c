@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
@@ -14,7 +14,7 @@ int oem_prov_parse_objects(void)
 	status = oem_prov_load_assets_file(&assets_file);
 	if (status != OEM_PROV_STATUS_OK)
 		return status;
-	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n", assets_file);
+	OEM_PROV_DBG_PRINTF(VERBOSE, "Assets file is %s\n", assets_file);
 
 	/* for testing purpose only - to be removed when assets parsing is implemented */
 	FILE *fp = fopen(assets_file, "r");

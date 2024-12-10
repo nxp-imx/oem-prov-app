@@ -13,7 +13,6 @@ int oem_prov_indirect(const char *config_filename)
 	int status = OEM_PROV_STATUS_OK;
 	int close_option = 0;
 
-	OEM_PROV_DBG_PRINTF(INFO, "Selecting indirect provisioning\n");
 	OEM_PROV_DBG_PRINTF(ERROR, "Indirect option is not yet supported\n");
 
 	status = oem_prov_load_config(config_filename, OEM_PROV_INDIRECT);

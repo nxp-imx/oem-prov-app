@@ -179,35 +179,34 @@ int main(int argc, char *argv[])
 		goto exit;
 
 	if (uuid) {
-		OEM_PROV_DBG_PRINTF(INFO, "Selecting UUID inject option\n");
+		OEM_PROV_DBG_PRINTF(INFO, "UUID read option\n");
 		status = oem_prov_get_uuid();
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
 	if (claim_code) {
-		OEM_PROV_DBG_PRINTF(INFO,
-				    "Selecting claim code inject option\n");
+		OEM_PROV_DBG_PRINTF(INFO, "Claim code inject option\n");
 		status = oem_prov_inject_claimcode(cc_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
 	if (online) {
-		OEM_PROV_DBG_PRINTF(INFO, "Selecting online provisioning\n");
+		OEM_PROV_DBG_PRINTF(INFO, "Online provisioning\n");
 		status = oem_prov_online(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
 	if (indirect) {
-		OEM_PROV_DBG_PRINTF(INFO, "Selecting indirect provisioning\n");
+		OEM_PROV_DBG_PRINTF(INFO, "Indirect provisioning\n");
 		status = oem_prov_indirect(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 	if (commit_storage) {
-		OEM_PROV_DBG_PRINTF(INFO, "Selecting commit storage option\n");
+		OEM_PROV_DBG_PRINTF(INFO, "Commit storage option\n");
 		status = oem_prov_commit_key_storage();
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
@@ -215,7 +214,7 @@ int main(int argc, char *argv[])
 	if (close) {
 		int option = validate_and_convert_life_cycle(close_option);
 
-		OEM_PROV_DBG_PRINTF(INFO, "Selecting close device option\n");
+		OEM_PROV_DBG_PRINTF(INFO, "Close device option\n");
 
 		if (option == OEM_PROV_LC_NONE) {
 			OEM_PROV_DBG_PRINTF(ERROR, "Invalid option %s\n",
