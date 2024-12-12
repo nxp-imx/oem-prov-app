@@ -6,7 +6,7 @@
 #define __OEM_PROV_OS_H__
 
 /**
- * get_buffer_from_file() - Reads the data from a file
+ * oem_prov_get_buffer_from_file() - Reads the data from a file
  *
  * This function reads the content of a text file in a buffer. The function trims any
  * trailing spaces and line separators.
@@ -23,8 +23,8 @@ int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
 				  size_t *length);
 
 /**
- * oem_load_config_file() - Loads the configuration file by the Cyaml library
- * @filename: The configuration file name
+ * oem_prov_load_config_file() - Loads the configuration file by the Cyaml library
+ * @file_name: The configuration file name
  * @option: Indicates if the user has selected online or indirect flow
  *
  * This function opens the configuration file and loads it into the Cyaml internal
@@ -33,10 +33,10 @@ int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
  * Return:
  * error code
  */
-int oem_prov_load_config(const char *filename, int option);
+int oem_prov_load_config(const char *file_name, int option);
 
 /**
- * oem_unload_config() - Unloads the configuration file
+ * oem_prov_unload_config() - Unloads the configuration file
  *
  * This functions frees the internal structures used by the Cyaml library.
  *
@@ -46,7 +46,7 @@ int oem_prov_load_config(const char *filename, int option);
 void oem_prov_unload_config(void);
 
 /**
- * oem_config_set_host_and_port() - Sets EdgeLock 2GO server hostname and port
+ * oem_prov_config_set_host_and_port() - Sets EdgeLock 2GO server hostname and port
  *
  * This function sets the environment variables EDGELOCK2GO_HOSTNAME and
  * EDGELOCK2GO_PORT. The environment variables are used by the EdgeLock 2GO
@@ -58,16 +58,63 @@ void oem_prov_unload_config(void);
 void oem_prov_set_host_and_port(void);
 
 /**
- * oem_prov_parse_objects() - Parse the objects file for the indirect flow
- *
- * The security assets are located in a binary file on the filesystem. The
- * function takes the file, read it's content, parses the objects and calls
- * the psa crypto API to import the security objects in the Secure Enclave.
+ * oem_prov_load_assets() - Returns a stream associated with the security assets
+ * @stream: Pointer to the stream (file or memory buffer) associated with the
+ * security assets. This is used to read the content of security assets. This is
+ * an output parameter, this function sets it.
  *
  * Return:
- * none
+ * error code
  */
-int oem_prov_parse_objects(void);
+int oem_prov_load_assets(void **stream);
+
+/**
+ * oem_prov_unload_assets() - Cleanup any allocated resources
+ * @stream: The stream (file or memory buffer) associated with the security assets
+ *
+ * This function cleanup all resources of the stream associated with the
+ * security assets.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_unload_assets(void *stream);
+
+/**
+ * oem_prov_read_data() - Reads data from a stream
+ * @buffer: Address of the buffer where the read data will be stored.
+ * @size: Size of each element to be read.
+ * @nmemb: Number of elements to be read.
+ * @stream: Pointer to the stream (file or memory buffer) from which data is read.
+ * The actual type of stream is determined by the implementation.
+ *
+ * Return:
+ * The total number of elements successfully read.
+ */
+size_t oem_prov_read_data(void *buffer, size_t size, size_t nmemb,
+			  void *stream);
+
+/**
+ * oem_prov_set_offset() - Moves the stream position indicator for a stream
+ * @stream: Pointer to the stream (file or memory buffer) for which the position
+ * is set. The actual type of stream is determined by the implementation.
+ * @offset: Offset in bytes relative to the whence parameter.
+ * @whence: The reference point for the offset.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_set_offset(void *stream, long offset, int whence);
+
+/**
+ * oem_prov_get_offset() - Gets the stream position indicator of a stream
+ * @stream: Pointer to the stream (file or memory buffer) for which the position
+ * is set. The actual type of stream is determined by the implementation.
+ *
+ * Return:
+ * The current position in the stream . Returns -1 if an error occurs.
+ */
+long oem_prov_get_offset(void *stream);
 
 /**
  * oem_prov_get_lc_option() - Get the configuration options for the device lifecycle

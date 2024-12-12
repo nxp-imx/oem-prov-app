@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 
 #include <mntent.h>
@@ -27,7 +27,7 @@
  */
 static int is_device_mounted(const char *device_name, char **mount_point)
 {
-	struct mntent *mnt;
+	struct mntent *mnt = NULL;
 	FILE *f = NULL;
 	int status = OEM_PROV_STATUS_OK;
 	*mount_point = NULL;
@@ -38,11 +38,11 @@ static int is_device_mounted(const char *device_name, char **mount_point)
 				    MOUNT_FILE, strerror(errno));
 		return OEM_PROV_STATUS_INVALID_FILE;
 	}
+
 	while ((mnt = getmntent(f)) != NULL) {
 		if (strcmp(device_name, mnt->mnt_fsname) == 0) {
-			int len;
+			int len = strlen(mnt->mnt_dir);
 
-			len = strlen(mnt->mnt_dir);
 			*mount_point = malloc(len + 1);
 			if (!(*mount_point)) {
 				status = OEM_PROV_STATUS_ALLOCATION_ERROR;
@@ -52,13 +52,14 @@ static int is_device_mounted(const char *device_name, char **mount_point)
 			(*mount_point)[len] = '\0';
 		}
 	}
+
 exit:
 	endmntent(f);
 	return status;
 }
 
 /**
- * mount_device() - Check if the device is mounted
+ * mount_device() - Mounts the device
  * @device: the device name as seen by the fdisk utility
  * @mount_point: the mount point
  * @fs_type: file system type
@@ -71,7 +72,7 @@ static int mount_device(const char *device, const char *mount_point,
 			const char *fs_type)
 {
 	int status = OEM_PROV_STATUS_OK;
-	struct stat st;
+	struct stat st = { 0 };
 
 	/* Attempt to create the directory */
 	if (mkdir(mount_point, 0755) != 0) {
@@ -84,6 +85,7 @@ static int mount_device(const char *device, const char *mount_point,
 			goto exit;
 		}
 	}
+
 	if (!stat(mount_point, &st)) {
 		if (!S_ISDIR(st.st_mode)) {
 			/* if the file exists, but is not a directory */
@@ -91,6 +93,7 @@ static int mount_device(const char *device, const char *mount_point,
 			goto exit;
 		}
 	}
+
 	status = mount(device, mount_point, fs_type, 0, NULL);
 	if (status != 0) {
 		OEM_PROV_DBG_PRINTF(ERROR, "Mount returned %s for device %s\n",
@@ -98,22 +101,24 @@ static int mount_device(const char *device, const char *mount_point,
 		status = OEM_PROV_STATUS_MOUNT_ERROR;
 		goto exit;
 	}
+
 exit:
 	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	return status;
 }
 
-int oem_prov_load_assets_file(char **file_path)
+int oem_prov_load_assets(void **stream)
 {
 	int status = OEM_PROV_STATUS_OK;
 	char *mount_point = NULL;
 	int total_len = 0;
 	char *mount_point_ptr = NULL;
-	struct oem_prov_os_ctx *os_ctx;
-	struct oem_prov_indirect *assets;
+	struct oem_prov_os_ctx *os_ctx = NULL;
+	struct oem_prov_indirect *assets = NULL;
+	char *file_path = NULL;
+	FILE *fp = NULL;
 
 	os_ctx = oem_prov_get_os_ctx();
-
 	OEM_PROV_DBG_ASSERT(os_ctx && os_ctx->oem_config &&
 			    os_ctx->oem_config->indirect);
 	assets = os_ctx->oem_config->indirect;
@@ -129,35 +134,63 @@ int oem_prov_load_assets_file(char **file_path)
 				      assets->type);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
+
 		/* the device was mounted by the application, flag the necessity
 		 * of unmounting it
 		 */
 		os_ctx->needs_unmount = 1;
 		mount_point_ptr = assets->mount_point;
 	}
+
 	/* path + file name + '/' + '\0' */
 	total_len = strlen(assets->file_name) + strlen(mount_point_ptr) + 2;
-	*file_path = malloc(total_len);
-	snprintf(*file_path, total_len, "%s/%s", mount_point_ptr,
+	file_path = malloc(total_len);
+	snprintf(file_path, total_len, "%s/%s", mount_point_ptr,
 		 assets->file_name);
+
 	/* if the device was already mounted, free the allocated mount point */
 	if (mount_point)
 		free(mount_point);
 
+	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n", file_path);
+	fp = fopen(file_path, "rb");
+	if (!fp) {
+		status = OEM_PROV_STATUS_INVALID_FILE;
+		OEM_PROV_DBG_PRINTF(ERROR, "Error opening file %s\n",
+				    file_path);
+		if (os_ctx->needs_unmount) {
+			if (umount(assets->mount_point)) {
+				OEM_PROV_DBG_PRINTF(ERROR,
+						    "Umount returned %s for %s\n",
+						    strerror(errno),
+						    assets->mount_point);
+				status = OEM_PROV_STATUS_UMOUNT_ERROR;
+			}
+		}
+		goto exit;
+	}
+	*stream = fp;
+
 exit:
+	free(file_path);
 	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	return status;
 }
 
-int oem_prov_unload_assets_file(void)
+int oem_prov_unload_assets(void *stream)
 {
-	struct oem_prov_indirect *assets;
-	struct oem_prov_os_ctx *os_ctx;
+	int status = OEM_PROV_STATUS_OK;
+	struct oem_prov_indirect *assets = NULL;
+	struct oem_prov_os_ctx *os_ctx = NULL;
+	FILE *fp = (FILE *)stream;
 
 	os_ctx = oem_prov_get_os_ctx();
 	OEM_PROV_DBG_ASSERT(os_ctx && os_ctx->oem_config &&
 			    os_ctx->oem_config->indirect);
 	assets = os_ctx->oem_config->indirect;
+
+	if (fclose(fp))
+		status = OEM_PROV_STATUS_INVALID_FILE;
 
 	if (os_ctx->needs_unmount) {
 		if (umount(assets->mount_point)) {
@@ -165,8 +198,9 @@ int oem_prov_unload_assets_file(void)
 					    "Umount returned %s for %s\n",
 					    strerror(errno),
 					    assets->mount_point);
-			return OEM_PROV_STATUS_UMOUNT_ERROR;
+			status = OEM_PROV_STATUS_UMOUNT_ERROR;
 		}
 	}
-	return OEM_PROV_STATUS_OK;
+
+	return status;
 }

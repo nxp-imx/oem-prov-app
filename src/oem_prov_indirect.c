@@ -3,17 +3,55 @@
  * Copyright 2023-2025 NXP
  */
 #include "oem_prov.h"
+#include "oem_prov_blob.h"
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
 #include "oem_prov_os.h"
 #include "oem_prov_common.h"
 
+/**
+ * parse_objects() - Parses the stream containing the security assets,
+ *			extracts them and imports them into ELE
+ *
+ * If there is an asset containing SRKH, it is imported first. SRKH is used by
+ * ELE to derive keys that are further used for provisioning the other assets.
+ * Therefore is mandatory to be imported first.
+ *
+ * Return:
+ * error code
+ */
+static int parse_objects(void)
+{
+	int status = OEM_PROV_STATUS_OK;
+	struct oem_prov_list metadata_list = { 0 };
+	void *stream = NULL;
+
+	status = oem_prov_load_assets(&stream);
+	if (status != OEM_PROV_STATUS_OK)
+		return status;
+
+	status = oem_prov_extract_blobs_metadata(stream, &metadata_list);
+	if (status != OEM_PROV_STATUS_OK)
+		goto exit;
+
+	status = oem_prov_import_blob_by_id(stream, metadata_list, SRKH_KEY_ID);
+	if (status != OEM_PROV_STATUS_OK)
+		goto exit;
+
+	status = oem_prov_import_all_blobs(stream, metadata_list);
+	oem_prov_list_destroy(&metadata_list);
+
+exit:
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
+	oem_prov_unload_assets(stream);
+	return status;
+}
+
 int oem_prov_indirect(const char *config_filename)
 {
 	int status = OEM_PROV_STATUS_OK;
 	int close_option = 0;
-
-	OEM_PROV_DBG_PRINTF(ERROR, "Indirect option is not yet supported\n");
+	psa_status_t psa_status = PSA_SUCCESS;
 
 	status = oem_prov_load_config(config_filename, OEM_PROV_INDIRECT);
 	if (status != OEM_PROV_STATUS_OK) {
@@ -21,7 +59,14 @@ int oem_prov_indirect(const char *config_filename)
 		return status;
 	}
 
-	status = oem_prov_parse_objects();
+	OEM_PROV_DBG_PRINTF(VERBOSE, "PSA crypto initialization\n");
+	psa_status = psa_crypto_init();
+	if (psa_status != PSA_SUCCESS) {
+		status = OEM_PROV_STATUS_PSA_ERROR;
+		goto exit;
+	}
+
+	status = parse_objects();
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
 
@@ -38,7 +83,7 @@ int oem_prov_indirect(const char *config_filename)
 		status = oem_prov_set_lifecycle(close_option);
 
 exit:
-	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	oem_prov_unload_config();
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	return status;
 }

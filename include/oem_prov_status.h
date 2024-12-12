@@ -26,6 +26,9 @@
  * @OEM_PROV_STATUS_MKDIR_ERROR: The mkdir returned an error
  * @OEM_PROV_STATUS_MOUNT_ERROR: The mount operation failed
  * @OEM_PROV_STATUS_UMOUNT_ERROR: The unmount operation failed
+ *
+ * @OEM_PROV_STATUS_INCOMPLETE_DATA: The data in the file does not respect the expected format
+ * @OEM_PROV_STATUS_PSA_ERROR: A function in the PSA API returned an error
  */
 enum oem_prov_status_code {
 	OEM_PROV_STATUS_OK = 0,
@@ -42,7 +45,9 @@ enum oem_prov_status_code {
 	OEM_PROV_STATUS_EL2GO_AGENT_ERROR,
 	OEM_PROV_STATUS_MKDIR_ERROR,
 	OEM_PROV_STATUS_MOUNT_ERROR,
-	OEM_PROV_STATUS_UMOUNT_ERROR
+	OEM_PROV_STATUS_UMOUNT_ERROR,
+	OEM_PROV_STATUS_INCOMPLETE_DATA,
+	OEM_PROV_STATUS_PSA_ERROR
 };
 
 #endif /* __OEM_PROV_STATUS_H__ */

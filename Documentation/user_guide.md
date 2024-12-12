@@ -137,7 +137,7 @@ The possible options are presented in the <a href="#table-oem-prov-options">OEM 
 <tr>
 	<td>--indirect, -i config_file</td>
 	<td>The OEM Provisioning application runs in the indirect mode. In this mode, it takes the provisioning assets from a file and provisions the device.</td>
-	<td>Not supported yet</td>
+	<td></td>
 </tr>
 <tr>
 	<td>--claim-code, -C claimcode_file</td>

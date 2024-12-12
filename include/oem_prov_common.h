@@ -20,4 +20,20 @@ enum oem_prov_lc_options {
 	OEM_PROV_LC_CLOSED_LOCKED
 };
 
+/**
+ * oem_prov_get_uint_be() - Extracts a big-endian unsigned integer
+ *
+ * This function takes an address and reads a given number of consecutive bytes, treating
+ * them as a big-endian integer. The first byte is the most significant byte, and the last
+ * is the least significant byte.
+ *
+ * @buffer: The buffer containing the bytes.
+ * @bytes: The number of consecutive bytes.
+ *
+ * Return:
+ * An unsigned integer representing the big-endian value read from the buffer.
+ */
+unsigned int oem_prov_get_uint_be(const unsigned char *buffer,
+				  unsigned int bytes);
+
 #endif /* __OEM_PROV_COMMON_H__ */
