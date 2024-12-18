@@ -49,7 +49,7 @@ static int is_device_mounted(const char *device_name, char **mount_point)
 				goto exit;
 			}
 			strncpy(*mount_point, mnt->mnt_dir, len);
-			mount_point[len] = '\0';
+			(*mount_point)[len] = '\0';
 		}
 	}
 exit:
