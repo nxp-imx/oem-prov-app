@@ -82,4 +82,17 @@ int oem_prov_indirect(const char *config_filename);
  */
 int oem_prov_set_lifecycle(int option);
 
+/**
+ * oem_prov_commit_key_storage() - Commit the active non-volatile key storage
+ *
+ *
+ * This function ensures that the active non-volatile key storage opened by
+ * application (by the underlying software layers) is pushed into the physical
+ * and the associated anti-rollback hardware counter is incremented.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_commit_key_storage(void);
+
 #endif /* __OEM_PROV_H__ */

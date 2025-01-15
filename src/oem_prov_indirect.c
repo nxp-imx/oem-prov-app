@@ -26,6 +26,13 @@ int oem_prov_indirect(const char *config_filename)
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
 
+	/* check if the key storage should be committed */
+	if (oem_prov_get_commit_storage(OEM_PROV_INDIRECT)) {
+		status = oem_prov_commit_key_storage();
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
+	}
+
 	/* check if the device needs to be closed */
 	close_option = oem_prov_get_lc_option(OEM_PROV_INDIRECT);
 	if (close_option)

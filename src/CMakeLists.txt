@@ -14,8 +14,8 @@ target_sources(${PROJECT_NAME} PRIVATE
                oem_prov_claim_code.c
                oem_prov_online.c
                oem_prov_indirect.c
-               oem_prov_dev_mgr.c)
-
+               oem_prov_dev_mgr.c
+               oem_prov_storage.c)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
                            ${INCLUDE_DIR}

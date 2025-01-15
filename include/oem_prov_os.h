@@ -82,4 +82,20 @@ int oem_prov_parse_objects(void);
  */
 int oem_prov_get_lc_option(unsigned int mode);
 
+/**
+ * oem_prov_get_commit_storage() - Returns the user option for commit_storage
+ *
+ * After the provisioning is done (either online, indirect or batch mode),
+ * the non-volatile key storage can be committed into the physical memory.
+ * The configuration file has an option to indicate if the storage is to be
+ * committed immediately after provisioning. This can be also done at a later stage
+ * using a command line argument.
+ *
+ * @mode: the provisioning flow type: online, indirect or batch flow
+ *
+ * Return:
+ * the option from the configuration file
+ */
+int oem_prov_get_commit_storage(unsigned int mode);
+
 #endif /* __OEM_PROV_OS_H__ */

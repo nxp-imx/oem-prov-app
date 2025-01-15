@@ -31,6 +31,9 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("%-30s", "--uuid,-u");
 	OEM_PROV_PRINTF("%s", "Prints the device UUID in hex format\n");
 
+	OEM_PROV_PRINTF("%-30s", "--commit-storage,-s");
+	OEM_PROV_PRINTF("%s", "Commit the secure storage\n");
+
 	OEM_PROV_PRINTF("%-30s", "--life-cycle,-l closed/closed-locked");
 	OEM_PROV_PRINTF("%s", "Closes the device\n");
 
@@ -67,6 +70,7 @@ int main(int argc, char *argv[])
 	unsigned int close = 0;
 	unsigned int claim_code = 0;
 	unsigned int uuid = 0;
+	unsigned int commit_storage = 0;
 	int c;
 	char config_file_name[MAX_FILE_SIZE_NAME];
 	char cc_file_name[MAX_FILE_SIZE_NAME];
@@ -79,6 +83,7 @@ int main(int argc, char *argv[])
 			{ "online", required_argument, 0, 'o' },
 			{ "indirect", required_argument, 0, 'i' },
 			{ "life-cycle", required_argument, 0, 'l' },
+			{ "commit-storage", required_argument, 0, 's' },
 			{ "claim-code", required_argument, 0, 'C' },
 			{ "uuid", no_argument, 0, 'u' },
 			{ "version", no_argument, 0, 'v' },
@@ -90,7 +95,7 @@ int main(int argc, char *argv[])
 		if (argc <= 1)
 			usage(argv[0]);
 
-		c = getopt_long(argc, argv, "i:o:cC:huvl:", long_options,
+		c = getopt_long(argc, argv, "i:o:cC:huvsl:", long_options,
 				&option_index);
 
 		if (c == -1) {
@@ -140,6 +145,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'u':
 			uuid = 1;
+			break;
+		case 's':
+			commit_storage = 1;
 			break;
 		case 'v':
 			OEM_PROV_PRINTF("Version: %d.%d\n",
@@ -198,7 +206,12 @@ int main(int argc, char *argv[])
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
-
+	if (commit_storage) {
+		OEM_PROV_DBG_PRINTF(INFO, "Selecting commit storage option\n");
+		status = oem_prov_commit_key_storage();
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
+	}
 	if (close) {
 		int option = validate_and_convert_life_cycle(close_option);
 

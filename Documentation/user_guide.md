@@ -152,6 +152,10 @@ The possible options are presented in the <a href="#table-oem-prov-options">OEM 
 <tr>
 	<td>--lifecycle, -l option</td>
 	<td>The OEM Provisioning Application changes the device cycle to option (closed/closed-locked). The operation is irreversible and after the change the device will boot signed images only. </td>
+<tr>
+	<td>--commit-storage, -s</td>
+	<td>The OEM Provisioning application commits the non-volatile key storage to physical memory and increments the hardware anti-rollback counter. Incrementing the rollback counter implies reloading the key storage saved when the counter was incremented.</td>
+	<td></td>
 </tr>
 </tbody>
 </table>
@@ -172,6 +176,17 @@ online:
 # The port used for the communication with EdgeLock 2GO server. The
 # current value to be used is 443
   port: "EdgeLock 2GO port"
+
+# [optional]
+# If set to "yes" the non-volatile key storage is committed in the physical
+# memory and the hardware anti-rollback counter is incremented after the
+# provisioning is done. If the option is not present in the configuration
+# file, the key storage is not committed.
+# !!! The option has side effects, the key-storage file saved when the
+# hardware counter was incremented must be present in the file system
+# Uncomment the option if you want to commit the key storage
+
+#  commit-storage: "yes"/"Yes"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.
@@ -202,6 +217,17 @@ indirect:
 
 # the file name containing the security assets in binary format
   file_name: "assets.bin"
+
+# [optional]
+# If set to "yes" the non-volatile key storage is committed in the physical
+# memory and the hardware anti-rollback counter is incremented after the
+# provisioning is done. If the option is not present in the configuration
+# file, the key storage is not committed.
+# !!! The option has side effects, the key-storage file saved when the
+# hardware counter was incremented must be present in the file system
+# Uncomment the option if you want to commit the key storage
+
+#  commit-storage: "yes"/"Yes"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.

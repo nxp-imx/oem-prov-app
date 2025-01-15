@@ -10,6 +10,7 @@ struct oem_prov_online {
 	char *hostname;
 	char *port;
 	int close;
+	int commit_storage;
 };
 
 struct oem_prov_indirect {
@@ -18,6 +19,7 @@ struct oem_prov_indirect {
 	char *mount_point;
 	char *file_name;
 	int close;
+	int commit_storage;
 };
 
 struct oem_prov_config {

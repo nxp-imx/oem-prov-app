@@ -23,17 +23,25 @@ static const cyaml_strval_t lc_strings[] = {
 	{ "closed-locked", OEM_PROV_LC_CLOSED_LOCKED },
 };
 
+#define CS_ENABLE 1
+static const cyaml_strval_t cs_strings[] = {
+	{ "Yes", CS_ENABLE },
+	{ "yes", CS_ENABLE },
+};
+
 static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_STRING_PTR("hostname", CYAML_FLAG_POINTER,
 			       struct oem_prov_online, hostname, 0,
 			       CYAML_UNLIMITED),
-
 	CYAML_FIELD_STRING_PTR("port", CYAML_FLAG_POINTER,
 			       struct oem_prov_online, port, 0,
 			       CYAML_UNLIMITED),
 	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_online, close, lc_strings,
 			 CYAML_ARRAY_LEN(lc_strings)),
+	CYAML_FIELD_ENUM("commit_storage", CYAML_FLAG_OPTIONAL,
+			 struct oem_prov_online, commit_storage, cs_strings,
+			 CYAML_ARRAY_LEN(cs_strings)),
 
 	CYAML_FIELD_END
 
@@ -55,6 +63,10 @@ static const cyaml_schema_field_t indirect_schema[] = {
 	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_indirect, close, lc_strings,
 			 CYAML_ARRAY_LEN(lc_strings)),
+	CYAML_FIELD_ENUM("commit_storage", CYAML_FLAG_OPTIONAL,
+			 struct oem_prov_indirect, commit_storage, cs_strings,
+			 CYAML_ARRAY_LEN(cs_strings)),
+
 	CYAML_FIELD_END
 
 };
@@ -95,6 +107,7 @@ static int oem_prov_validate_option(int option,
 {
 	int status = OEM_PROV_STATUS_OK;
 	int close = 0;
+	int commit_storage = 0;
 
 	if (!oem_config)
 		return OEM_PROV_STATUS_EMPTY_FILE;
@@ -104,6 +117,7 @@ static int oem_prov_validate_option(int option,
 		if (!oem_config->online)
 			return OEM_PROV_STATUS_ONLINE_OPT_MISSING;
 		close = oem_config->online->close;
+		commit_storage = oem_config->online->commit_storage;
 
 		OEM_PROV_DBG_PRINTF(INFO, "Using host: %s[%s]\n",
 				    oem_config->online->hostname,
@@ -113,6 +127,7 @@ static int oem_prov_validate_option(int option,
 		if (!oem_config->indirect)
 			return OEM_PROV_STATUS_INDIRECT_OPT_MISSING;
 		close = oem_config->indirect->close;
+		commit_storage = oem_config->indirect->commit_storage;
 
 		OEM_PROV_DBG_PRINTF(INFO, "partition: %s\n",
 				    oem_config->indirect->partition);
@@ -123,6 +138,11 @@ static int oem_prov_validate_option(int option,
 		OEM_PROV_DBG_PRINTF(INFO, "file_name: %s\n",
 				    oem_config->indirect->file_name);
 		break;
+	}
+
+	if (commit_storage) {
+		OEM_PROV_DBG_PRINTF(INFO, "Commit storage: %d\n",
+				    commit_storage);
 	}
 
 	if (close)
@@ -177,6 +197,22 @@ int oem_prov_get_lc_option(unsigned int mode)
 		return os_ctx->oem_config->online->close;
 	case OEM_PROV_INDIRECT:
 		return os_ctx->oem_config->indirect->close;
+	}
+
+	return 0;
+}
+
+int oem_prov_get_commit_storage(unsigned int mode)
+{
+	struct oem_prov_os_ctx *os_ctx = NULL;
+
+	os_ctx = oem_prov_get_os_ctx();
+
+	switch (mode) {
+	case OEM_PROV_ONLINE:
+		return os_ctx->oem_config->online->commit_storage;
+	case OEM_PROV_INDIRECT:
+		return os_ctx->oem_config->indirect->commit_storage;
 	}
 
 	return 0;

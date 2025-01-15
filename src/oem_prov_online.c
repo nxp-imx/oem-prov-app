@@ -119,6 +119,13 @@ int oem_prov_online(const char *config_filename)
 		goto exit;
 	}
 
+	/* check if the key storage should be committed */
+	if (oem_prov_get_commit_storage(OEM_PROV_ONLINE)) {
+		status = oem_prov_commit_key_storage();
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
+	}
+
 	/* check if the device needs to be closed */
 	close_option = oem_prov_get_lc_option(OEM_PROV_ONLINE);
 	if (close_option)
@@ -131,5 +138,5 @@ exit:
 	iot_agent_datastore_free(&el2go_data);
 	iot_agent_keystore_free(&keystore);
 
-	return agent_status;
+	return status;
 }
