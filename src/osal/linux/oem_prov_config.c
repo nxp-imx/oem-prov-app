@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 
 #include <stdlib.h>
@@ -16,6 +16,13 @@
 #include "oem_prov_internal.h"
 #include "oem_prov_common.h"
 
+#define CYMAL_FLAG_OPTIONAL_POINTER (CYAML_FLAG_POINTER | CYAML_FLAG_OPTIONAL)
+
+static const cyaml_strval_t lc_strings[] = {
+	{ "closed", OEM_PROV_LC_CLOSED },
+	{ "closed-locked", OEM_PROV_LC_CLOSED_LOCKED },
+};
+
 static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_STRING_PTR("hostname", CYAML_FLAG_POINTER,
 			       struct oem_prov_online, hostname, 0,
@@ -24,9 +31,9 @@ static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_STRING_PTR("port", CYAML_FLAG_POINTER,
 			       struct oem_prov_online, port, 0,
 			       CYAML_UNLIMITED),
-
-	CYAML_FIELD_INT("close", CYAML_FLAG_DEFAULT, struct oem_prov_online,
-			close),
+	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
+			 struct oem_prov_online, close, lc_strings,
+			 CYAML_ARRAY_LEN(lc_strings)),
 
 	CYAML_FIELD_END
 
@@ -45,13 +52,12 @@ static const cyaml_schema_field_t indirect_schema[] = {
 	CYAML_FIELD_STRING_PTR("file_name", CYAML_FLAG_POINTER,
 			       struct oem_prov_indirect, file_name, 0,
 			       CYAML_UNLIMITED),
-	CYAML_FIELD_INT("close", CYAML_FLAG_DEFAULT, struct oem_prov_indirect,
-			close),
+	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
+			 struct oem_prov_indirect, close, lc_strings,
+			 CYAML_ARRAY_LEN(lc_strings)),
 	CYAML_FIELD_END
 
 };
-
-#define CYMAL_FLAG_OPTIONAL_POINTER (CYAML_FLAG_POINTER | CYAML_FLAG_OPTIONAL)
 
 static const cyaml_schema_field_t oem_prov_config_fields_schema[] = {
 
@@ -87,6 +93,9 @@ static const cyaml_config_t config = {
 static int oem_prov_validate_option(int option,
 				    struct oem_prov_config *oem_config)
 {
+	int status = OEM_PROV_STATUS_OK;
+	int close = 0;
+
 	if (!oem_config)
 		return OEM_PROV_STATUS_EMPTY_FILE;
 
@@ -94,16 +103,17 @@ static int oem_prov_validate_option(int option,
 	case OEM_PROV_ONLINE:
 		if (!oem_config->online)
 			return OEM_PROV_STATUS_ONLINE_OPT_MISSING;
+		close = oem_config->online->close;
+
 		OEM_PROV_DBG_PRINTF(INFO, "Using host: %s[%s]\n",
 				    oem_config->online->hostname,
 				    oem_config->online->port);
-		OEM_PROV_DBG_PRINTF(INFO,
-				    "Close the board after provisioning: %d\n",
-				    oem_config->online->close);
 		break;
 	case OEM_PROV_INDIRECT:
 		if (!oem_config->indirect)
 			return OEM_PROV_STATUS_INDIRECT_OPT_MISSING;
+		close = oem_config->indirect->close;
+
 		OEM_PROV_DBG_PRINTF(INFO, "partition: %s\n",
 				    oem_config->indirect->partition);
 		OEM_PROV_DBG_PRINTF(INFO, "type: %s\n",
@@ -112,10 +122,12 @@ static int oem_prov_validate_option(int option,
 				    oem_config->indirect->mount_point);
 		OEM_PROV_DBG_PRINTF(INFO, "file_name: %s\n",
 				    oem_config->indirect->file_name);
-		OEM_PROV_DBG_PRINTF(INFO, "close: %d\n",
-				    oem_config->indirect->close);
 		break;
 	}
+
+	if (close)
+		OEM_PROV_DBG_PRINTF(INFO, "Close: %d\n", close);
+
 	return OEM_PROV_STATUS_OK;
 }
 
@@ -152,4 +164,20 @@ void oem_prov_unload_config(void)
 
 	OEM_PROV_DBG_ASSERT(os_ctx);
 	cyaml_free(&config, &oem_prov_config_schema, os_ctx->oem_config, 0);
+}
+
+int oem_prov_get_lc_option(unsigned int mode)
+{
+	struct oem_prov_os_ctx *os_ctx = NULL;
+
+	os_ctx = oem_prov_get_os_ctx();
+
+	switch (mode) {
+	case OEM_PROV_ONLINE:
+		return os_ctx->oem_config->online->close;
+	case OEM_PROV_INDIRECT:
+		return os_ctx->oem_config->indirect->close;
+	}
+
+	return 0;
 }

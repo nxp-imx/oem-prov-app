@@ -26,6 +26,14 @@ else()
     set(VERBOSE 0)
 endif()
 
+# used for testing purposes only
+# Commit storage and close operations have irreversible side effects
+# This define can be use for interface testing, but omitting the irreversible
+# operations.
+if (CLOSE_COMMIT_DRY_RUN)
+	add_definitions(-DOEM_PROV_DRY_RUN)
+endif()
+
 # Create the version file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/oem_prov_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/oem_prov_version.h)
 

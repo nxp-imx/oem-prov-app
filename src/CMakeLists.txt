@@ -1,5 +1,4 @@
 find_package(NXP_SMW CONFIG REQUIRED)
-find_package(Cyaml REQUIRED)
 find_package(EL2GOAgent REQUIRED)
 
 add_executable(${PROJECT_NAME} "")
@@ -14,7 +13,9 @@ target_sources(${PROJECT_NAME} PRIVATE
                oem_prov_setup.c
                oem_prov_claim_code.c
                oem_prov_online.c
-               oem_prov_indirect.c)
+               oem_prov_indirect.c
+               oem_prov_dev_mgr.c)
+
 
 target_include_directories(${PROJECT_NAME} PRIVATE
                            ${INCLUDE_DIR}
@@ -22,7 +23,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
                       NXP_SMW::smw
-                      LIBCYAML::cyaml
+                      ${EXT_LIBS}
                       ${EL2GOAgent_LIBRARIES}
                       osal)
 

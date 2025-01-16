@@ -95,6 +95,12 @@ The following build environment options are available:
 	<td>Define the cmake project install prefix directory when executing <em>make install</em>. Default value is /usr/local.
 	</td>
 </tr>
+<tr>
+	<td>CLOSE_COMMIT_DRY_RUN</td>
+	<td>-DCLOSE_COMMIT_DRY_RUN=ON</td>
+	<td> Testing purpose only. Committing non-volatile key storage and closing the device have side effects and are irreversible operations. It is not feasible during interface testing to run these operations. This option disables the call to SMW library which is performing the operation. All other steps are implemented, only the last step is missed. This allows for interface testing without side effects.
+	</td>
+</tr>
 </tbody>
 </table>
 
@@ -144,9 +150,8 @@ The possible options are presented in the <a href="#table-oem-prov-options">OEM 
 	<td></td>
 </tr>
 <tr>
-	<td>--close, -c</td>
-	<td>The OEM Provisioning Application changes the device cycle to CLOSED</td>
-	<td>Not implemented yet</td>
+	<td>--lifecycle, -l option</td>
+	<td>The OEM Provisioning Application changes the device cycle to option (closed/closed-locked). The operation is irreversible and after the change the device will boot signed images only. </td>
 </tr>
 </tbody>
 </table>
@@ -155,35 +160,56 @@ The possible options are presented in the <a href="#table-oem-prov-options">OEM 
 The OEM Configuration Provisioning Application uses a configuration file in yaml format:
 
 ```
-#online flow configuration
+# ==========================================================================
+#                              Online flow
+# ==========================================================================
 online:
-#The hostname used for the connection with EdgeLock 2GO server.
-#It can be obtained from the GUI interface of the EdgeLock 2GO server:
-#Admin Settings->Services
+# The hostname used for the connection with EdgeLock 2GO server.
+# It can be obtained from the GUI interface of the EdgeLock 2GO server:
+# Admin Settings->Services
   hostname: "https://your-instance.edgelock2go.com"
-#The port used for the communication with EdgeLock 2GO server. The
-#current value to be used is 443
+
+# The port used for the communication with EdgeLock 2GO server. The
+# current value to be used is 443
   port: "EdgeLock 2GO port"
-#Indicates if the device will be closed after provisioning.
-#Default is no. The device can be closed later using a command
-#line argument
-  close: 0/1
-#indirect flow configuration
+
+# [optional]
+# Indicates if the device will be closed after provisioning.
+# If the option is missing, the device is not closed. It can be
+# later closed using a command line argument
+# !!! The action is irreversible and if the device is closed, the device
+# will boot signed images only.
+# Uncomment the option if you want to change the lifecycle
+
+#  lifecycle: "closed"/"closed-locked"
+
+# ==========================================================================
+#                              Indirect flow
+# ==========================================================================
 indirect:
-#partition where the security assets file is located. If the partition is already
-#mounted the file is searched within the mount point. If the partition is not
-#mounted, the application will mount it.
+# partition where the security assets file is located. If the partition is already
+# mounted the file is searched within the mount point. If the partition is not
+# mounted, the application will mount it.
   partition: "/dev/mmcblk0p1"
-#type of partition. Although the partition filesystem type is transparent for
-#the application, currently the software that is loading the security assets
-#in the partition is supporting only FAT32 partitions.
+
+# type of partition. Although the partition filesystem type is transparent for
+# the application, currently the software that is loading the security assets
+# in the partition is supporting only FAT32 partitions.
   type: "vfat"
-#in case that the partition is not mounted, it will be mounted in this location
+
+# in case that the partition is not mounted, it will be mounted in this location
   mount_point: "/run/media/boot-mmcblk0p1"
-#the file name containing the security assets in binary format
+
+# the file name containing the security assets in binary format
   file_name: "assets.bin"
-#Indicates if the device will be closed after provisioning.
-#Default is no. The device can be closed later using a command
-#line argument
-  close: 0/1
-  ```
+
+# [optional]
+# Indicates if the device will be closed after provisioning.
+# If the option is missing, the device is not closed. It can be
+# later closed using a command line argument
+# !!! The action is irreversible and if the device is closed, the device
+# will boot signed images only.
+# Uncomment the option if you want to change the lifecycle
+
+#  lifecycle: "closed"/"closed-locked"
+```

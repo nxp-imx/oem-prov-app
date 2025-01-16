@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 #ifndef __OEM_PROV_OS_H__
 #define __OEM_PROV_OS_H__
@@ -68,5 +68,18 @@ void oem_prov_set_host_and_port(void);
  * none
  */
 int oem_prov_parse_objects(void);
+
+/**
+ * oem_prov_get_lc_option() - Get the configuration options for the device lifecycle
+ *
+ * @mode: The current flow: online, indirect, etc.
+ *
+ * Return:
+ * Returns the setting from the configuration file. After the provisioning is done,
+ * there is an option to close the device. If the setting is missing from the
+ * configuration file, no action is taken.
+ *
+ */
+int oem_prov_get_lc_option(unsigned int mode);
 
 #endif /* __OEM_PROV_OS_H__ */

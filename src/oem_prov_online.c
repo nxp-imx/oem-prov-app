@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2023-2024 NXP
+ * Copyright 2023-2025 NXP
  */
 
 #include <nxp_iot_agent.h>
@@ -29,6 +29,7 @@ int oem_prov_online(const char *config_filename)
 	iot_agent_platform_context_t iot_agent_platform_context = { 0 };
 	nxp_iot_UpdateStatusReport status_report =
 		nxp_iot_UpdateStatusReport_init_default;
+	int close_option = 0;
 
 	status = oem_prov_load_config(config_filename, OEM_PROV_ONLINE);
 	if (status != OEM_PROV_STATUS_OK) {
@@ -117,6 +118,11 @@ int oem_prov_online(const char *config_filename)
 		status = OEM_PROV_STATUS_EL2GO_AGENT_ERROR;
 		goto exit;
 	}
+
+	/* check if the device needs to be closed */
+	close_option = oem_prov_get_lc_option(OEM_PROV_ONLINE);
+	if (close_option)
+		status = oem_prov_set_lifecycle(close_option);
 
 exit:
 	oem_prov_unload_config();

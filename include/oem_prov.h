@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 
 #ifndef __OEM_PROV_H__
@@ -59,12 +59,27 @@ int oem_prov_online(const char *config_filename);
  *
  * This function reads the security assets file located in a configurable location (in a
  * vfat partition) and provisions them into the Secure Enclave using crypto psa API from
-+* SMW library.
-
+ * SMW library.
  *
  * Return:
  * error code
  */
 int oem_prov_indirect(const char *config_filename);
+
+/**
+ * oem_prov_set_lifecycle() -  Sets the lifecycle of a device.
+ *
+ * @option: lifecycle: closed, closed-locked
+ *
+ * After the provisioning is done there is the option to close the
+ * device. If the "lifecycle" option is present in the configuration
+ * file, the device will be closed at the end of provisioning. However
+ * the user may opt not to close the device at the end of provisioning.
+ * It can close it later using a command line option.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_set_lifecycle(int option);
 
 #endif /* __OEM_PROV_H__ */

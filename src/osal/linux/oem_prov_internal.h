@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 
-#ifndef __OEM_PROV_LOCAL_H__
-#define __OEM_PROV_LOCAL_H__
+#ifndef __OEM_PROV_INTERNAL_H__
+#define __OEM_PROV_INTERNAL_H__
 
 struct oem_prov_online {
 	char *hostname;
 	char *port;
-	unsigned int close;
+	int close;
 };
 
 struct oem_prov_indirect {
@@ -17,7 +17,7 @@ struct oem_prov_indirect {
 	char *type;
 	char *mount_point;
 	char *file_name;
-	unsigned int close;
+	int close;
 };
 
 struct oem_prov_config {
@@ -65,4 +65,4 @@ int oem_prov_load_assets_file(char **file_path);
  */
 int oem_prov_unload_assets_file(void);
 
-#endif /* __OEM_PROV_LOCAL_H__ */
+#endif /* __OEM_PROV_INTERNAL_H__ */
