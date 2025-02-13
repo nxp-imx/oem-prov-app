@@ -1,0 +1,12 @@
+[Unit]
+Description=OEM Provisioning App service
+After=sysinit.target
+Requires=sysinit.target
+
+[Service]
+User=root
+ExecStartPre=systemctl start nvm_daemon
+ExecStart=/usr/bin/oem-prov-app -i /etc/opt/oem-prov-app/config.yaml
+
+[Install]
+WantedBy=multi-user.target

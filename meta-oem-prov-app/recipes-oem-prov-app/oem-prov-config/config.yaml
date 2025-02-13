@@ -1,0 +1,75 @@
+# ==========================================================================
+#                              Online flow
+# ==========================================================================
+online:
+# The hostname used for the connection with EdgeLock 2GO server.
+# It can be obtained from the GUI interface of the EdgeLock 2GO server:
+# Admin Settings->Services
+  hostname: "https://your-instance.edgelock2go.com"
+
+# The port used for the communication with EdgeLock 2GO server. The
+# current value to be used is 443
+  port: "EdgeLock 2GO port"
+
+# [optional]
+# If set to "yes" the non-volatile key storage is committed in the physical
+# memory and the hardware anti-rollback counter is incremented after the
+# provisioning is done. If the option is not present in the configuration
+# file, the key storage is not committed.
+# !!! The option has side effects, the key-storage file saved when the
+# hardware counter was incremented must be present in the file system
+# Uncomment the option if you want to commit the key storage
+
+#  commit-storage: "yes"/"Yes"
+
+# [optional]
+# Indicates if the device will be closed after provisioning.
+# If the option is missing, the device is not closed. It can be
+# later closed using a command line argument
+# !!! The action is irreversible and if the device is closed, the device
+# will boot signed images only.
+# Uncomment the option if you want to change the lifecycle
+
+#  lifecycle: "closed"/"closed-locked"
+
+# ==========================================================================
+#                              Indirect flow
+# ==========================================================================
+indirect:
+# partition where the security assets file is located. If the partition is already
+# mounted the file is searched within the mount point. If the partition is not
+# mounted, the application will mount it.
+  partition: "/dev/mmcblk0p1"
+
+# type of partition. Although the partition filesystem type is transparent for
+# the application, currently the software that is loading the security assets
+# in the partition is supporting only FAT32 partitions.
+  type: "vfat"
+
+# in case that the partition is not mounted, it will be mounted in this location
+  mount_point: "/tmp/oem-prov-app"
+
+# the file name containing the security assets in binary format
+  file_name: "assets.bin"
+
+# [optional]
+# If set to "yes" the non-volatile key storage is committed in the physical
+# memory and the hardware anti-rollback counter is incremented after the
+# provisioning is done. If the option is not present in the configuration
+# file, the key storage is not committed.
+# !!! The option has side effects, the key-storage file saved when the
+# hardware counter was incremented must be present in the file system
+# Uncomment the option if you want to commit the key storage
+
+#  commit-storage: "yes"/"Yes"
+
+# [optional]
+# Indicates if the device will be closed after provisioning.
+# If the option is missing, the device is not closed. It can be
+# later closed using a command line argument
+# !!! The action is irreversible and if the device is closed, the device
+# will boot signed images only.
+# Uncomment the option if you want to change the lifecycle
+
+#  lifecycle: "closed"/"closed-locked"
+

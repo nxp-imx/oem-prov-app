@@ -33,7 +33,7 @@ Project installation guide can be found in the [Installation Guide](./Documentat
 Project user guide can be found in the [User Guide](./Documentation/user_guide.md)
 
 ## Yocto layer
-A yocto layer used to build/configure OEM Provisioning Application can be found in [Yocto layer](./meta-oem-prov-app/README).
+A yocto layer used to build/configure OEM Provisioning Application can be found in [Yocto layer](./meta-oem-prov-app/README.md).
 
 ## List of changes
 The list of changes can be found in the [Change Log](./CHANGELOG.md)
