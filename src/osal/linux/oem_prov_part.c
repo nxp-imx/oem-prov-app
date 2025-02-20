@@ -8,6 +8,9 @@
 #include <sys/mount.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <limits.h>
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
@@ -59,6 +62,76 @@ exit:
 }
 
 /**
+ * mkdir_p() - Creates a directory and all necessary parent directories
+ * @path: The directory path to create
+ * @mode: The permissions to set on created directory
+ *
+ * The function recursively creates a directory and all parent directories if
+ * they do not exist.
+ * Return:
+ * error code
+ */
+static int mkdir_p(const char *path, unsigned int mode)
+{
+	size_t path_len = strlen(path);
+	int status = OEM_PROV_STATUS_OK, ret = 0;
+	char *copy_path = NULL, *ptr = NULL;
+
+	if (path_len == 0 || path_len > PATH_MAX - 1) {
+		status = OEM_PROV_STATUS_INVALID_FILE;
+		goto exit;
+	}
+
+	copy_path = (char *)malloc(path_len + 2);
+	if (!copy_path) {
+		status = OEM_PROV_STATUS_ALLOCATION_ERROR;
+		goto exit;
+	}
+
+	strcpy(copy_path, path);
+	if (copy_path[path_len - 1] != '/') {
+		copy_path[path_len] = '/';
+		copy_path[path_len + 1] = '\0';
+	}
+
+	for (ptr = copy_path + 1; *ptr; ptr++) {
+		if (*ptr == '/') {
+			*ptr = '\0';
+			ret = mkdir(copy_path, 0755);
+			/* Check if the error is due to folder already existing */
+			if (ret && (errno != EEXIST)) {
+				OEM_PROV_DBG_PRINTF(ERROR,
+						    "mkdir returned %s for dir %s\n",
+						    strerror(errno), copy_path);
+				status = OEM_PROV_STATUS_MKDIR_ERROR;
+				*ptr = '/';
+				goto close;
+			}
+
+			/* Check if the path exists, but is not a directory */
+			ret = open(copy_path,
+				   O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
+			if (ret == -1) {
+				OEM_PROV_DBG_PRINTF(ERROR,
+						    "%s already exists, but is not a directory\n",
+						    copy_path);
+				status = OEM_PROV_STATUS_MKDIR_ERROR;
+				*ptr = '/';
+				goto close;
+			}
+			close(ret);
+			*ptr = '/';
+		}
+	}
+
+close:
+	free(copy_path);
+exit:
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
+	return status;
+}
+
+/**
  * mount_device() - Mounts the device
  * @device: the device name as seen by the fdisk utility
  * @mount_point: the mount point
@@ -72,27 +145,10 @@ static int mount_device(const char *device, const char *mount_point,
 			const char *fs_type)
 {
 	int status = OEM_PROV_STATUS_OK;
-	struct stat st = { 0 };
 
-	/* Attempt to create the directory */
-	if (mkdir(mount_point, 0755) != 0) {
-		/* check if the error is due to folder already existing */
-		if (errno != EEXIST) {
-			OEM_PROV_DBG_PRINTF(ERROR,
-					    "Mkdir returned %s for dir %s\n",
-					    strerror(errno), mount_point);
-			status = OEM_PROV_STATUS_MKDIR_ERROR;
-			goto exit;
-		}
-	}
-
-	if (!stat(mount_point, &st)) {
-		if (!S_ISDIR(st.st_mode)) {
-			/* if the file exists, but is not a directory */
-			status = OEM_PROV_STATUS_MKDIR_ERROR;
-			goto exit;
-		}
-	}
+	status = mkdir_p(mount_point, 0755);
+	if (status != OEM_PROV_STATUS_OK)
+		goto exit;
 
 	status = mount(device, mount_point, fs_type, 0, NULL);
 	if (status != 0) {
