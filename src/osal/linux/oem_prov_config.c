@@ -153,9 +153,9 @@ static int oem_prov_validate_option(int option,
 
 int oem_prov_load_config(const char *filename, int option)
 {
-	cyaml_err_t err;
+	cyaml_err_t err = CYAML_OK;
 	int status = OEM_PROV_STATUS_OK;
-	struct oem_prov_os_ctx *os_ctx;
+	struct oem_prov_os_ctx *os_ctx = NULL;
 
 	os_ctx = oem_prov_get_os_ctx();
 
@@ -177,8 +177,8 @@ int oem_prov_load_config(const char *filename, int option)
 
 void oem_prov_unload_config(void)
 {
-	struct oem_prov_os_ctx *os_ctx;
-	struct oem_prov_config *oem_config;
+	struct oem_prov_os_ctx *os_ctx = NULL;
+	struct oem_prov_config *oem_config = NULL;
 
 	os_ctx = oem_prov_get_os_ctx();
 

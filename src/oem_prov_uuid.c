@@ -12,9 +12,8 @@
 
 int oem_prov_get_uuid(void)
 {
-	int res;
 	int status = OEM_PROV_STATUS_OK;
-	enum smw_status_code smw_status;
+	enum smw_status_code smw_status = SMW_STATUS_OK;
 	unsigned char buffer[OEM_PROV_MAX_UUID_LEN];
 
 	struct smw_device_uuid_args smw_args = { 0 };

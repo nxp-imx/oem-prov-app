@@ -71,9 +71,9 @@ int main(int argc, char *argv[])
 	unsigned int claim_code = 0;
 	unsigned int uuid = 0;
 	unsigned int commit_storage = 0;
-	int c;
-	char config_file_name[MAX_FILE_SIZE_NAME];
-	char cc_file_name[MAX_FILE_SIZE_NAME];
+	int c = 0;
+	char config_file_name[MAX_FILE_SIZE_NAME] = { 0 };
+	char cc_file_name[MAX_FILE_SIZE_NAME] = { 0 };
 	char *close_option = NULL;
 	int status = OEM_PROV_STATUS_OK;
 	int status_main = 1;

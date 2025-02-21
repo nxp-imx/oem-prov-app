@@ -8,7 +8,7 @@
 
 static struct node *create_node(void *data)
 {
-	struct node *node;
+	struct node *node = NULL;
 
 	node = (struct node *)malloc(sizeof(struct node));
 	if (node) {
@@ -35,7 +35,7 @@ void oem_prov_list_init(struct oem_prov_list *list)
 
 void oem_prov_list_destroy(struct oem_prov_list *list)
 {
-	struct node *next, *node;
+	struct node *next = NULL, *node = NULL;
 
 	node = list->first;
 	while (node) {
@@ -49,7 +49,7 @@ void oem_prov_list_destroy(struct oem_prov_list *list)
 
 int oem_prov_list_insert_last(struct oem_prov_list *list, void *data)
 {
-	struct node *node;
+	struct node *node = NULL;
 
 	node = create_node(data);
 	if (!node)

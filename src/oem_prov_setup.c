@@ -11,7 +11,7 @@
 
 int oem_prov_init_smw(void)
 {
-	int res;
+	int res = SMW_STATUS_OK;
 	int status = OEM_PROV_STATUS_OK;
 
 	res = smw_osal_lib_init();

@@ -20,8 +20,8 @@ int oem_prov_inject_claimcode(const char *filename)
 {
 	int status = OEM_PROV_STATUS_OK;
 	unsigned char *cc = NULL;
-	size_t buffer_length;
-	enum smw_status_code smw_status;
+	size_t buffer_length = 0;
+	enum smw_status_code smw_status = SMW_STATUS_OK;
 
 	struct smw_store_data_args args = { 0 };
 	struct smw_data_descriptor data_descriptor = { 0 };

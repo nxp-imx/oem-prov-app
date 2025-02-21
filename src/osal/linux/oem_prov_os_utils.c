@@ -30,10 +30,10 @@ int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
 				  size_t *length)
 {
 	int res = OEM_PROV_STATUS_OK;
-	int fd;
-	struct stat st;
-	size_t file_size;
-	int i;
+	int fd = 0;
+	struct stat st = { 0 };
+	size_t file_size = 0;
+	int i = 0;
 
 	fd = open(file_name, O_RDONLY);
 	if (fd == -1)
