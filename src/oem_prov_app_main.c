@@ -43,7 +43,7 @@ static void usage(const char *prg)
 
 static inline int validate_string(const char *string_value, int max_size)
 {
-	if (strlen(string_value) > max_size) {
+	if (strlen(string_value) >= max_size) {
 		OEM_PROV_PRINTF("The option is too long\n");
 		return OEM_PROV_STATUS_INVALID_STRING;
 	}
@@ -108,6 +108,10 @@ int main(int argc, char *argv[])
 
 		switch (c) {
 		case 'o':
+			if (online) {
+				usage(argv[0]);
+				goto exit;
+			}
 			online = 1;
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {
@@ -117,6 +121,10 @@ int main(int argc, char *argv[])
 			strcpy(config_file_name, optarg);
 			break;
 		case 'i':
+			if (indirect) {
+				usage(argv[0]);
+				goto exit;
+			}
 			indirect = 1;
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {
@@ -126,15 +134,28 @@ int main(int argc, char *argv[])
 			strcpy(config_file_name, optarg);
 			break;
 		case 'l':
+			if (close) {
+				usage(argv[0]);
+				goto exit;
+			}
 			close = 1;
 			if (validate_string(optarg, MAX_CLOSE_OPTION)) {
 				usage(argv[0]);
 				goto exit;
 			}
 			close_option = malloc(strlen(optarg) + 1);
+			if (!close_option) {
+				OEM_PROV_DBG_PRINTF(ERROR,
+						    "Allocation error\n");
+				goto exit;
+			}
 			strcpy(close_option, optarg);
 			break;
 		case 'c':
+			if (claim_code) {
+				usage(argv[0]);
+				goto exit;
+			}
 			claim_code = 1;
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {
@@ -144,9 +165,17 @@ int main(int argc, char *argv[])
 			strcpy(cc_file_name, optarg);
 			break;
 		case 'u':
+			if (uuid) {
+				usage(argv[0]);
+				goto exit;
+			}
 			uuid = 1;
 			break;
 		case 's':
+			if (commit_storage) {
+				usage(argv[0]);
+				goto exit;
+			}
 			commit_storage = 1;
 			break;
 		case 'v':
