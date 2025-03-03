@@ -22,7 +22,7 @@ const char *el2go_datastore = "edgelock2go_datastore.bin";
 int oem_prov_online(const char *config_filename)
 {
 	int status = OEM_PROV_STATUS_OK;
-	iot_agent_status_t agent_status = IOT_AGENT_FAILURE;
+	iot_agent_status_t agent_status = IOT_AGENT_SUCCESS;
 	iot_agent_context_t iot_agent_context = { 0 };
 	iot_agent_keystore_t keystore = { 0 };
 	iot_agent_datastore_t el2go_data = { 0 };

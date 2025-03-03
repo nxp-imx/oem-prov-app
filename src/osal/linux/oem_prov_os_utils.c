@@ -27,13 +27,14 @@
  * none
  */
 int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
-				  size_t *length)
+				  unsigned int *length)
 {
 	int res = OEM_PROV_STATUS_OK;
 	int fd = 0;
 	struct stat st = { 0 };
-	size_t file_size = 0;
-	int i = 0;
+	unsigned int file_size = 0;
+	unsigned int i = 0;
+	long pread_bytes = 0;
 
 	fd = open(file_name, O_RDONLY);
 	if (fd == -1)
@@ -43,36 +44,40 @@ int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
 		close(fd);
 		return OEM_PROV_STATUS_INVALID_FILE;
 	}
-
-	file_size = st.st_size;
+	if (st.st_size < 0) {
+		res = OEM_PROV_STATUS_INVALID_FILE;
+		goto exit;
+	}
+	file_size = (unsigned int)(st.st_size);
 
 	if (*buffer) {
 		res = OEM_PROV_STATUS_INVALID_POINTER;
 		goto exit;
 	}
-	*buffer = (char *)malloc(file_size);
+	*buffer = (char *)malloc(file_size + 1);
 	if (!(*buffer)) {
 		res = OEM_PROV_STATUS_ALLOCATION_ERROR;
 		goto exit;
 	}
 
-	if (file_size != pread(fd, *buffer, file_size, 0)) {
+	pread_bytes = pread(fd, *buffer, file_size, 0);
+
+	if (pread_bytes < file_size) {
 		free(*buffer);
 		*buffer = NULL;
 		res = OEM_PROV_STATUS_INVALID_FILE;
 		goto exit;
 	}
 
-	/* trim any trailing characters */
-	for (i = file_size - 1; i >= 0; i--) {
-		if ((*buffer)[i] == ' ' || (*buffer)[i] == '\r' ||
-		    (*buffer)[i] == '\n') {
+	for (i = file_size; i > 0; i--) {
+		if ((*buffer)[i - 1] == ' ' || (*buffer)[i - 1] == '\r' ||
+		    (*buffer)[i - 1] == '\n') {
 			continue;
 		} else {
 			break;
 		}
 	}
-	*length = i + 1;
+	*length = i;
 	(*buffer)[*length] = '\0';
 
 exit:

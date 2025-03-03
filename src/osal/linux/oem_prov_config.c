@@ -8,7 +8,6 @@
 #include <cyaml/cyaml.h>
 #include <unistd.h>
 #include <getopt.h>
-#include <string.h>
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
@@ -105,7 +104,6 @@ static const cyaml_config_t config = {
 static int oem_prov_validate_option(int option,
 				    struct oem_prov_config *oem_config)
 {
-	int status = OEM_PROV_STATUS_OK;
 	int close = 0;
 	int commit_storage = 0;
 
@@ -178,7 +176,6 @@ int oem_prov_load_config(const char *filename, int option)
 void oem_prov_unload_config(void)
 {
 	struct oem_prov_os_ctx *os_ctx = NULL;
-	struct oem_prov_config *oem_config = NULL;
 
 	os_ctx = oem_prov_get_os_ctx();
 

@@ -20,7 +20,7 @@ int oem_prov_inject_claimcode(const char *filename)
 {
 	int status = OEM_PROV_STATUS_OK;
 	unsigned char *cc = NULL;
-	size_t buffer_length = 0;
+	unsigned int buffer_length = 0;
 	enum smw_status_code smw_status = SMW_STATUS_OK;
 
 	struct smw_store_data_args args = { 0 };
@@ -77,6 +77,7 @@ exit:
 	if (cc != NULL)
 		free(cc);
 	/* remove the file from the disk */
-	remove(filename);
+	if (remove(filename) < 0)
+		status = OEM_PROV_STATUS_INVALID_FILE;
 	return status;
 }

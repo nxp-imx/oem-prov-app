@@ -11,8 +11,6 @@
 int oem_prov_commit_key_storage(void)
 {
 	int status = OEM_PROV_STATUS_OK;
-	struct smw_commit_key_storage_args smw_args = { 0 };
-	int res = SMW_STATUS_OK;
 
 /*
  * If the OEM_PROV_DRY_RUN is set, do not call the smw function. This is used for testing
@@ -22,6 +20,10 @@ int oem_prov_commit_key_storage(void)
 #if defined(OEM_PROV_DRY_RUN)
 	OEM_PROV_PRINTF("Commit storage\n");
 #else
+
+	struct smw_commit_key_storage_args smw_args = { 0 };
+	int res = SMW_STATUS_OK;
+
 	smw_args.subsystem_name = SMW_SUBSYSTEM_NAME_ELE;
 	res = smw_commit_key_storage(&smw_args);
 	if (res != SMW_STATUS_OK) {

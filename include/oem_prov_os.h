@@ -20,7 +20,7 @@
  * none
  */
 int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
-				  size_t *length);
+				  unsigned int *length);
 
 /**
  * oem_prov_load_config_file() - Loads the configuration file by the Cyaml library

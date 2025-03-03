@@ -41,7 +41,7 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("%s", "Version information\n");
 }
 
-static inline int validate_string(const char *string_value, int max_size)
+static inline int validate_string(const char *string_value, size_t max_size)
 {
 	if (strlen(string_value) >= max_size) {
 		OEM_PROV_PRINTF("The option is too long\n");

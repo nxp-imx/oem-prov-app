@@ -24,8 +24,6 @@ int oem_prov_set_lifecycle(enum oem_prov_lc_options option)
 {
 	int status = OEM_PROV_STATUS_OK;
 	int close_option = 0;
-	struct smw_device_lifecycle_args smw_args = { 0 };
-	int res = SMW_STATUS_OK;
 
 	close_option = convert_option(option);
 	if (close_option == SMW_LIFECYCLE_NAME_CURRENT) {
@@ -43,6 +41,9 @@ int oem_prov_set_lifecycle(enum oem_prov_lc_options option)
 	OEM_PROV_PRINTF("Lifecycle: Close option translates to %d\n",
 			close_option);
 #else
+	struct smw_device_lifecycle_args smw_args = { 0 };
+	int res = SMW_STATUS_OK;
+
 	smw_args.subsystem_name = SMW_SUBSYSTEM_NAME_ELE;
 	smw_args.lifecycle_name = close_option;
 
