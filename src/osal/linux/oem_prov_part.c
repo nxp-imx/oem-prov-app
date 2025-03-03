@@ -44,7 +44,7 @@ static int is_device_mounted(const char *device_name, char **mount_point)
 
 	while ((mnt = getmntent(f)) != NULL) {
 		if (strcmp(device_name, mnt->mnt_fsname) == 0) {
-			int len = strlen(mnt->mnt_dir);
+			size_t len = strlen(mnt->mnt_dir);
 
 			*mount_point = malloc(len + 1);
 			if (!(*mount_point)) {
@@ -53,6 +53,7 @@ static int is_device_mounted(const char *device_name, char **mount_point)
 			}
 			strncpy(*mount_point, mnt->mnt_dir, len);
 			(*mount_point)[len] = '\0';
+			break;
 		}
 	}
 
@@ -163,16 +164,32 @@ exit:
 	return status;
 }
 
+static inline int unmount_device(struct oem_prov_os_ctx *os_ctx,
+				 char *mount_point)
+{
+	if (os_ctx->needs_unmount) {
+		if (umount(mount_point)) {
+			OEM_PROV_DBG_PRINTF(ERROR,
+					    "Umount returned %s for %s\n",
+					    strerror(errno), mount_point);
+			return OEM_PROV_STATUS_UMOUNT_ERROR;
+		}
+	}
+	return OEM_PROV_STATUS_OK;
+}
+
 int oem_prov_load_assets(void **stream)
 {
 	int status = OEM_PROV_STATUS_OK;
 	char *mount_point = NULL;
-	int total_len = 0;
+	size_t total_len = 0;
+	int chars_written = 0;
 	char *mount_point_ptr = NULL;
 	struct oem_prov_os_ctx *os_ctx = NULL;
 	struct oem_prov_indirect *assets = NULL;
 	char *file_path = NULL;
 	FILE *fp = NULL;
+	int test_unmount = 1;
 
 	os_ctx = oem_prov_get_os_ctx();
 	OEM_PROV_DBG_ASSERT(os_ctx && os_ctx->oem_config &&
@@ -201,33 +218,30 @@ int oem_prov_load_assets(void **stream)
 	/* path + file name + '/' + '\0' */
 	total_len = strlen(assets->file_name) + strlen(mount_point_ptr) + 2;
 	file_path = malloc(total_len);
-	snprintf(file_path, total_len, "%s/%s", mount_point_ptr,
-		 assets->file_name);
+	if (!file_path)
+		goto exit;
 
+	chars_written = snprintf(file_path, total_len, "%s/%s", mount_point_ptr,
+				 assets->file_name);
+
+	if (chars_written < total_len - 1)
+		goto exit;
+
+	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n", file_path);
+	fp = fopen(file_path, "rb");
+	if (!fp)
+		goto exit;
+
+	*stream = fp;
+	test_unmount = 0;
+exit:
 	/* if the device was already mounted, free the allocated mount point */
 	if (mount_point)
 		free(mount_point);
 
-	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n", file_path);
-	fp = fopen(file_path, "rb");
-	if (!fp) {
-		status = OEM_PROV_STATUS_INVALID_FILE;
-		OEM_PROV_DBG_PRINTF(ERROR, "Error opening file %s\n",
-				    file_path);
-		if (os_ctx->needs_unmount) {
-			if (umount(assets->mount_point)) {
-				OEM_PROV_DBG_PRINTF(ERROR,
-						    "Umount returned %s for %s\n",
-						    strerror(errno),
-						    assets->mount_point);
-				status = OEM_PROV_STATUS_UMOUNT_ERROR;
-			}
-		}
-		goto exit;
-	}
-	*stream = fp;
+	if (test_unmount)
+		unmount_device(os_ctx, assets->mount_point);
 
-exit:
 	free(file_path);
 	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	return status;
@@ -249,13 +263,7 @@ int oem_prov_unload_assets(void *stream)
 		status = OEM_PROV_STATUS_INVALID_FILE;
 
 	if (os_ctx->needs_unmount) {
-		if (umount(assets->mount_point)) {
-			OEM_PROV_DBG_PRINTF(ERROR,
-					    "Umount returned %s for %s\n",
-					    strerror(errno),
-					    assets->mount_point);
-			status = OEM_PROV_STATUS_UMOUNT_ERROR;
-		}
+		status = unmount_device(os_ctx, assets->mount_point);
 	}
 
 	return status;
