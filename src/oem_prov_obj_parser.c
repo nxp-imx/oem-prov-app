@@ -3,6 +3,7 @@
  * Copyright 2024-2025 NXP
  */
 #include <string.h>
+#include <limits.h>
 
 #include "oem_prov_blob.h"
 #include "oem_prov_status.h"
@@ -25,9 +26,11 @@
 #define LENGTH_MAGIC 0x0BU
 
 #define MAX_LLENGTH 0x03U
-#define LLENGTH_MAGIC 0x01U
+#define LLENGTH_MAGIC 0x01
 
-#define LAST_N_BITS(X, N) ((X) & ((1UL << (N)) - 1))
+#define LSB_MASK(N) ((1UL << (N)) - 1)
+#define LSB_BITS(X, N) ((X) & LSB_MASK(N))
+#define BYTES_TO_BITS(N) ((N) << 3)
 
 #define VALUE_MAGIC "edgelock2go"
 
@@ -46,7 +49,7 @@
 struct oem_prov_blob_metadata {
 	psa_key_attributes_t attributes;
 	unsigned int length;
-	unsigned int offset;
+	long offset;
 	unsigned char imported;
 };
 
@@ -69,7 +72,7 @@ struct oem_prov_blob_metadata {
  * If everything goes well, this function returns a positive value representing
  * the size of the length of the field. If not, returns a negative error code.
  */
-static int read_length(void *stream, size_t *length)
+static int read_length(void *stream, unsigned int *length)
 {
 	int llength = 0;
 	size_t ret = 0;
@@ -79,7 +82,7 @@ static int read_length(void *stream, size_t *length)
 		return -OEM_PROV_STATUS_INCOMPLETE_DATA;
 
 	if (*length > 0x80) {
-		llength = LAST_N_BITS(*length, 7);
+		llength = LSB_BITS(*length, 7);
 		if (!llength || (llength > MAX_LLENGTH))
 			return -OEM_PROV_STATUS_INCOMPLETE_DATA;
 
@@ -110,7 +113,7 @@ static int read_length(void *stream, size_t *length)
  * Return:
  * error code
  */
-static int read_data(void *stream, unsigned char **data, size_t length)
+static int read_data(void *stream, unsigned char **data, unsigned int length)
 {
 	size_t ret = 0;
 
@@ -139,10 +142,10 @@ static int read_data(void *stream, unsigned char **data, size_t length)
  * @length: The size of the value.
  *
  * Return:
- * none
+ * error code
  */
-static void add_attribute(psa_key_attributes_t *attributes, unsigned char tag,
-			  unsigned char *value, unsigned int length)
+static int add_attribute(psa_key_attributes_t *attributes, unsigned char tag,
+			 unsigned char *value, unsigned int length)
 {
 	switch (tag) {
 	case TAG_KEY_ID:
@@ -157,9 +160,11 @@ static void add_attribute(psa_key_attributes_t *attributes, unsigned char tag,
 					oem_prov_get_uint_be(value, length));
 		break;
 	case TAG_KEY_TYPE:
-		psa_set_key_type(attributes,
-				 (unsigned short)oem_prov_get_uint_be(value,
-								      length));
+		unsigned int data = oem_prov_get_uint_be(value, length);
+
+		if (data > USHRT_MAX)
+			return OEM_PROV_STATUS_INCOMPLETE_DATA;
+		psa_set_key_type(attributes, (unsigned short)data);
 		break;
 	case TAG_KEY_BITS:
 		psa_set_key_bits(attributes,
@@ -172,6 +177,7 @@ static void add_attribute(psa_key_attributes_t *attributes, unsigned char tag,
 	default:
 		break;
 	}
+	return OEM_PROV_STATUS_OK;
 }
 
 /**
@@ -191,7 +197,7 @@ static void add_attribute(psa_key_attributes_t *attributes, unsigned char tag,
 static int is_field_magic(void *stream)
 {
 	int status = OEM_PROV_STATUS_OK;
-	size_t field_length = 0;
+	unsigned int field_length = 0;
 	int llength = 0;
 	unsigned char *value = NULL;
 
@@ -208,6 +214,27 @@ static int is_field_magic(void *stream)
 	return status;
 }
 
+/**
+ * safe_add() - Safely adds a value to an unsigned integer
+ *
+ * The function adds a value to an unsigned integer, but first checks if the result
+ * would exceed the maximum limit of an unsigned integer.
+ *
+ * @out: Pointer to the variable where the addition is performed.
+ * @add_value: The value to be added.
+ *
+ * Return:
+ * error code
+ */
+static inline int safe_add(unsigned int *out, unsigned int add_value)
+{
+	if (*out > UINT_MAX - add_value)
+		return OEM_PROV_STATUS_INCOMPLETE_DATA;
+	*out += add_value;
+
+	return OEM_PROV_STATUS_OK;
+}
+
 int oem_prov_extract_blobs_metadata(void *stream,
 				    struct oem_prov_list *metadata_list)
 {
@@ -215,11 +242,12 @@ int oem_prov_extract_blobs_metadata(void *stream,
 	unsigned int count = 0;
 	unsigned char tag = 0;
 	unsigned char *value = NULL;
-	size_t field_length = 0, blob_length = 0, ret = 0;
+	unsigned int field_length = 0;
+	unsigned int blob_length = 0;
+	size_t ret = 0;
 	int llength = 0;
 	psa_key_attributes_t attributes = psa_key_attributes_init();
 	struct oem_prov_blob_metadata *blob = NULL;
-	struct node *next = NULL;
 
 	oem_prov_list_init(metadata_list);
 
@@ -241,6 +269,10 @@ int oem_prov_extract_blobs_metadata(void *stream,
 				int size =
 					sizeof(struct oem_prov_blob_metadata);
 				blob = (struct oem_prov_blob_metadata *)malloc(size);
+				if (!blob) {
+					status = OEM_PROV_STATUS_ALLOCATION_ERROR;
+					goto exit;
+				}
 
 				blob->attributes = attributes;
 				blob->length = blob_length;
@@ -259,17 +291,22 @@ int oem_prov_extract_blobs_metadata(void *stream,
 			blob_length = LENGTH_TAG + LLENGTH_MAGIC + LENGTH_MAGIC;
 			continue;
 		} else {
-			blob_length++;
+			status = safe_add(&blob_length, 1);
+			if (status != OEM_PROV_STATUS_OK)
+				goto exit;
 		}
 
 		field_length = 0;
 		llength = read_length(stream, &field_length);
-		if (llength < 0) {
+		if (llength < 0 || field_length == 0 ||
+		    field_length > LSB_MASK(BYTES_TO_BITS(llength))) {
 			status = OEM_PROV_STATUS_INCOMPLETE_DATA;
 			goto exit;
 		}
 
-		blob_length += llength;
+		status = safe_add(&blob_length, llength);
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
 
 		status = read_data(stream, &value, field_length);
 		if (status != OEM_PROV_STATUS_OK) {
@@ -278,16 +315,20 @@ int oem_prov_extract_blobs_metadata(void *stream,
 		}
 
 		OEM_PROV_DBG_PRINTF(DEBUG,
-				    "[tag: %x, length: %lx]\nvalue: ", tag,
+				    "[tag: %x, length: %x]\nvalue: ", tag,
 				    field_length);
 		for (int i = 0; i < field_length; i++)
 			OEM_PROV_DBG_PRINTF(DEBUG, "%02x", value[i]);
 		OEM_PROV_DBG_PRINTF(DEBUG, "\n\n");
 
-		add_attribute(&attributes, tag, value, field_length);
+		status = add_attribute(&attributes, tag, value, field_length);
 		free(value);
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
 
-		blob_length += field_length;
+		status = safe_add(&blob_length, field_length);
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
 	}
 
 exit:

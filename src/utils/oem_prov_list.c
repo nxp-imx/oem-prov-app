@@ -60,8 +60,10 @@ int oem_prov_list_insert_last(struct oem_prov_list *list, void *data)
 		node->prev = list->last;
 		list->last = node;
 	} else {
-		if (list->first)
+		if (list->first) {
+			free(node);
 			return 1;
+		}
 		list->first = node;
 		list->last = node;
 	}
