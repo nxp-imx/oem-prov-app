@@ -25,7 +25,7 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("%-30s", "--indirect,-i file_name");
 	OEM_PROV_PRINTF("%s", "Runs the application for the indirect mode\n");
 
-	OEM_PROV_PRINTF("%-30s", "--claim-code,-C file_name");
+	OEM_PROV_PRINTF("%-30s", "--claim-code,-c file_name");
 	OEM_PROV_PRINTF("%s", "Injects the claim code from the <file_name>\n");
 
 	OEM_PROV_PRINTF("%-30s", "--uuid,-u");
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 			{ "indirect", required_argument, 0, 'i' },
 			{ "life-cycle", required_argument, 0, 'l' },
 			{ "commit-storage", required_argument, 0, 's' },
-			{ "claim-code", required_argument, 0, 'C' },
+			{ "claim-code", required_argument, 0, 'c' },
 			{ "uuid", no_argument, 0, 'u' },
 			{ "version", no_argument, 0, 'v' },
 			{ "help", no_argument, 0, 'h' },
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 		if (argc <= 1)
 			usage(argv[0]);
 
-		c = getopt_long(argc, argv, "i:o:cC:huvsl:", long_options,
+		c = getopt_long(argc, argv, "i:o:c:huvsl:", long_options,
 				&option_index);
 
 		if (c == -1) {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 			close_option = malloc(strlen(optarg) + 1);
 			strcpy(close_option, optarg);
 			break;
-		case 'C':
+		case 'c':
 			claim_code = 1;
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {

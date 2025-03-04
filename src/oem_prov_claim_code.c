@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 
 #include <smw_storage.h>
@@ -35,8 +35,7 @@ int oem_prov_inject_claimcode(const char *filename)
 
 	status = oem_prov_get_buffer_from_file(filename, &cc, &buffer_length);
 	if (status != OEM_PROV_STATUS_OK) {
-		OEM_PROV_DBG_PRINTF(ERROR, "Config file read failed %d\n",
-				    status);
+		OEM_PROV_DBG_PRINTF(ERROR, "Invalid configuration file!\n");
 		goto exit;
 	}
 

@@ -140,7 +140,7 @@ The possible options are presented in the <a href="#table-oem-prov-options">OEM 
 	<td></td>
 </tr>
 <tr>
-	<td>--claim-code, -C claimcode_file</td>
+	<td>--claim-code, -c claimcode_file</td>
 	<td>The OEM Provisioning Application takes the claim code from the claimcode_file in base64 format and injects it into the device.</td>
 	<td></td>
 </tr>
