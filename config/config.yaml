@@ -12,7 +12,7 @@ online:
   port: "EdgeLock 2GO port"
 
 # [optional]
-# Indicates if the non-volatile key storage is committed in the physical
+# If set to "commit" the non-volatile key storage is committed in the physical
 # memory and the hardware anti-rollback counter is incremented after the
 # provisioning is done. If the option is not present in the configuration
 # file, the key storage is not committed.
@@ -20,7 +20,7 @@ online:
 # hardware counter was incremented must be present in the file system
 # Uncomment the option if you want to commit the key storage
 
-#  storage: "commit"
+# storage: "commit"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.
@@ -47,13 +47,13 @@ indirect:
   type: "vfat"
 
 # in case that the partition is not mounted, it will be mounted in this location
-  mount_point: "/run/media/boot-mmcblk0p1"
+  mount_point: "/run/oem-prov-app"
 
 # the file name containing the security assets in binary format
   file_name: "assets.bin"
 
 # [optional]
-# Indicates if the non-volatile key storage is committed in the physical
+# If set to "commit" the non-volatile key storage is committed in the physical
 # memory and the hardware anti-rollback counter is incremented after the
 # provisioning is done. If the option is not present in the configuration
 # file, the key storage is not committed.
