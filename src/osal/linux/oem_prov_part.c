@@ -218,20 +218,27 @@ int oem_prov_load_assets(void **stream)
 	/* path + file name + '/' + '\0' */
 	total_len = strlen(assets->file_name) + strlen(mount_point_ptr) + 2;
 	file_path = malloc(total_len);
-	if (!file_path)
+	if (!file_path) {
+		status = OEM_PROV_STATUS_ALLOCATION_ERROR;
 		goto exit;
+	}
 
 	chars_written = snprintf(file_path, total_len, "%s/%s", mount_point_ptr,
 				 assets->file_name);
 
-	if (chars_written < total_len - 1)
+	if (chars_written < total_len - 1) {
+		status = OEM_PROV_STATUS_INCOMPLETE_DATA;
 		goto exit;
+	}
 
 	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n", file_path);
 	fp = fopen(file_path, "rb");
-	if (!fp)
+	if (!fp) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Error opening file %s\n",
+				    file_path);
+		status = OEM_PROV_STATUS_INVALID_FILE;
 		goto exit;
-
+	}
 	*stream = fp;
 	test_unmount = 0;
 exit:
