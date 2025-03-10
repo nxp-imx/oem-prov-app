@@ -120,7 +120,7 @@ int oem_prov_online(const char *config_filename)
 	}
 
 	/* check if the key storage should be committed */
-	if (oem_prov_get_commit_storage(OEM_PROV_ONLINE)) {
+	if (oem_prov_get_storage(OEM_PROV_ONLINE)) {
 		status = oem_prov_commit_key_storage();
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;

@@ -12,7 +12,7 @@ online:
   port: "EdgeLock 2GO port"
 
 # [optional]
-# If set to "yes" the non-volatile key storage is committed in the physical
+# Indicates if the non-volatile key storage is committed in the physical
 # memory and the hardware anti-rollback counter is incremented after the
 # provisioning is done. If the option is not present in the configuration
 # file, the key storage is not committed.
@@ -20,7 +20,7 @@ online:
 # hardware counter was incremented must be present in the file system
 # Uncomment the option if you want to commit the key storage
 
-#  commit-storage: "yes"/"Yes"
+#  storage: "commit"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.
@@ -53,7 +53,7 @@ indirect:
   file_name: "assets.bin"
 
 # [optional]
-# If set to "yes" the non-volatile key storage is committed in the physical
+# Indicates if the non-volatile key storage is committed in the physical
 # memory and the hardware anti-rollback counter is incremented after the
 # provisioning is done. If the option is not present in the configuration
 # file, the key storage is not committed.
@@ -61,7 +61,7 @@ indirect:
 # hardware counter was incremented must be present in the file system
 # Uncomment the option if you want to commit the key storage
 
-#  commit-storage: "yes"/"Yes"
+#  storage: "commit"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.

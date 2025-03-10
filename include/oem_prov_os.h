@@ -130,7 +130,7 @@ long oem_prov_get_offset(void *stream);
 int oem_prov_get_lc_option(unsigned int mode);
 
 /**
- * oem_prov_get_commit_storage() - Returns the user option for commit_storage
+ * oem_prov_get_storage() - Returns the user option for commit_storage
  *
  * After the provisioning is done (either online, indirect or batch mode),
  * the non-volatile key storage can be committed into the physical memory.
@@ -143,6 +143,6 @@ int oem_prov_get_lc_option(unsigned int mode);
  * Return:
  * the option from the configuration file
  */
-int oem_prov_get_commit_storage(unsigned int mode);
+int oem_prov_get_storage(unsigned int mode);
 
 #endif /* __OEM_PROV_OS_H__ */

@@ -20,6 +20,11 @@ enum oem_prov_lc_options {
 	OEM_PROV_LC_CLOSED_LOCKED
 };
 
+enum oem_prov_storage_options {
+	OEM_PROV_S_NONE = 0,
+	OEM_PROV_S_COMMIT
+};
+
 /**
  * oem_prov_get_uint_be() - Extracts a big-endian unsigned integer
  *

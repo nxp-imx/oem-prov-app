@@ -22,10 +22,8 @@ static const cyaml_strval_t lc_strings[] = {
 	{ "closed-locked", OEM_PROV_LC_CLOSED_LOCKED },
 };
 
-#define CS_ENABLE 1
 static const cyaml_strval_t cs_strings[] = {
-	{ "Yes", CS_ENABLE },
-	{ "yes", CS_ENABLE },
+	{ "commit", OEM_PROV_S_COMMIT },
 };
 
 static const cyaml_schema_field_t online_schema[] = {
@@ -38,7 +36,7 @@ static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_online, close, lc_strings,
 			 CYAML_ARRAY_LEN(lc_strings)),
-	CYAML_FIELD_ENUM("commit_storage", CYAML_FLAG_OPTIONAL,
+	CYAML_FIELD_ENUM("storage", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_online, commit_storage, cs_strings,
 			 CYAML_ARRAY_LEN(cs_strings)),
 
@@ -62,7 +60,7 @@ static const cyaml_schema_field_t indirect_schema[] = {
 	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_indirect, close, lc_strings,
 			 CYAML_ARRAY_LEN(lc_strings)),
-	CYAML_FIELD_ENUM("commit_storage", CYAML_FLAG_OPTIONAL,
+	CYAML_FIELD_ENUM("storage", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_indirect, commit_storage, cs_strings,
 			 CYAML_ARRAY_LEN(cs_strings)),
 
@@ -199,7 +197,7 @@ int oem_prov_get_lc_option(unsigned int mode)
 	return 0;
 }
 
-int oem_prov_get_commit_storage(unsigned int mode)
+int oem_prov_get_storage(unsigned int mode)
 {
 	struct oem_prov_os_ctx *os_ctx = NULL;
 

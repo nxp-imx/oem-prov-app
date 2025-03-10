@@ -71,7 +71,7 @@ int oem_prov_indirect(const char *config_filename)
 		goto exit;
 
 	/* check if the key storage should be committed */
-	if (oem_prov_get_commit_storage(OEM_PROV_INDIRECT)) {
+	if (oem_prov_get_storage(OEM_PROV_INDIRECT)) {
 		status = oem_prov_commit_key_storage();
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
