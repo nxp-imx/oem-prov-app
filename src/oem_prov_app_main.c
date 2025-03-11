@@ -285,6 +285,10 @@ int main(int argc, char *argv[])
 	status_main = 0;
 
 exit:
+	if (!status_main)
+		OEM_PROV_DBG_PRINTF(INFO, "Status(%s): SUCCESS\n", argv[0]);
+	else
+		OEM_PROV_DBG_PRINTF(INFO, "Status(%s): FAILURE\n", argv[0]);
 	if (close_option)
 		free(close_option);
 	if (storage_option)

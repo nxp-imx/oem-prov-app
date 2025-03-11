@@ -68,7 +68,7 @@ int oem_prov_inject_claimcode(const char *filename)
 
 	smw_status = smw_store_data(&args);
 	if (smw_status != SMW_STATUS_OK) {
-		OEM_PROV_DBG_PRINTF(ERROR, "SMW store failed %d\n", status);
+		OEM_PROV_DBG_PRINTF(ERROR, "SMW store failed %d\n", smw_status);
 		status = OEM_PROV_STATUS_SMW_ERROR;
 	}
 
