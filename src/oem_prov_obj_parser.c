@@ -74,27 +74,29 @@ struct oem_prov_blob_metadata {
  */
 static int read_length(void *stream, unsigned int *length)
 {
-	int llength = 0;
+	int llength = 1;
 	size_t ret = 0;
+	unsigned char buffer[MAX_LLENGTH] = { 0 };
 
-	ret = oem_prov_read_data(length, sizeof(unsigned char), 1, stream);
+	ret = oem_prov_read_data(&buffer[0], sizeof(unsigned char), 1, stream);
 	if (ret != 1)
 		return -OEM_PROV_STATUS_INCOMPLETE_DATA;
 
-	if (*length > 0x80) {
-		llength = LSB_BITS(*length, 7);
-		if (!llength || (llength > MAX_LLENGTH))
-			return -OEM_PROV_STATUS_INCOMPLETE_DATA;
-
-		unsigned char data[MAX_LLENGTH] = { 0 };
-
-		ret = oem_prov_read_data(data, sizeof(unsigned char), llength,
-					 stream);
-		if (ret != llength)
-			return -OEM_PROV_STATUS_INCOMPLETE_DATA;
-		*length = oem_prov_get_uint_be(data, llength);
+	if (buffer[0] < 0x80) {
+		*length = buffer[0];
+		return llength;
 	}
 
+	llength = LSB_BITS(buffer[0], 7);
+	if (!llength || (llength > MAX_LLENGTH))
+		return -OEM_PROV_STATUS_INCOMPLETE_DATA;
+
+	ret = oem_prov_read_data(buffer, sizeof(unsigned char), llength,
+				 stream);
+	if (ret != llength)
+		return -OEM_PROV_STATUS_INCOMPLETE_DATA;
+
+	*length = oem_prov_get_uint_be(buffer, llength);
 	return llength + 1;
 }
 
