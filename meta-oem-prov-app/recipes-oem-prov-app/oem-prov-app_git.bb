@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=526003fe435291c11167e5ec08a53268"
 DEPENDS = "cyaml smw el2go-agent"
 
 SRC_URI = "${PROVAPP_SRC};branch=${PROVAPP_SRCBRANCH};name=oem-prov-app"
-PROVAPP_SRC ?= "https://github.com/nxp-imx/oem-prov-app.git;protocol=https"
+PROVAPP_SRC ?= "git://github.com/nxp-imx/oem-prov-app.git;protocol=https"
 PROVAPP_SRCBRANCH = "release/version_1.x"
 
 SRCREV = "release_1.0"
