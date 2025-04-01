@@ -19,25 +19,25 @@ static void usage(const char *prg)
 {
 	OEM_PROV_PRINTF("Usage: %s [OPTION]...\n", prg);
 	OEM_PROV_PRINTF("OEM provisioning application\n");
-	OEM_PROV_PRINTF("%-30s", "--online,-o file_name");
-	OEM_PROV_PRINTF("%s", "Runs the application for the online mode\n");
+	OEM_PROV_PRINTF("%-40s", "--online,-o file_name");
+	OEM_PROV_PRINTF("%s", "Runs the application in the online mode\n");
 
-	OEM_PROV_PRINTF("%-30s", "--indirect,-i file_name");
-	OEM_PROV_PRINTF("%s", "Runs the application for the indirect mode\n");
+	OEM_PROV_PRINTF("%-40s", "--indirect,-i file_name");
+	OEM_PROV_PRINTF("%s", "Runs the application in the indirect mode\n");
 
-	OEM_PROV_PRINTF("%-30s", "--claim-code,-c file_name");
+	OEM_PROV_PRINTF("%-40s", "--claim-code,-c file_name");
 	OEM_PROV_PRINTF("%s", "Injects the claim code from the <file_name>\n");
 
-	OEM_PROV_PRINTF("%-30s", "--uuid,-u");
+	OEM_PROV_PRINTF("%-40s", "--uuid,-u");
 	OEM_PROV_PRINTF("%s", "Prints the device UUID in hex format\n");
 
-	OEM_PROV_PRINTF("%-30s", "--storage,-s commit");
-	OEM_PROV_PRINTF("%s", "Commit the secure storage\n");
+	OEM_PROV_PRINTF("%-40s", "--storage,-s commit");
+	OEM_PROV_PRINTF("%s", "Commits the secure storage\n");
 
-	OEM_PROV_PRINTF("%-30s", "--life-cycle,-l closed/closed-locked");
+	OEM_PROV_PRINTF("%-40s", "--life-cycle,-l closed/closed-locked");
 	OEM_PROV_PRINTF("%s", "Closes the device\n");
 
-	OEM_PROV_PRINTF("%-30s", "--version,-v");
+	OEM_PROV_PRINTF("%-40s", "--version,-v");
 	OEM_PROV_PRINTF("%s", "Version information\n");
 }
 
