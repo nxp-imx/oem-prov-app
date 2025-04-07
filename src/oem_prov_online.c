@@ -56,7 +56,7 @@ int oem_prov_online(const char *config_filename)
 		goto exit;
 	}
 
-	OEM_PROV_DBG_PRINTF(VERBOSE, "keystore psa init\n");
+	OEM_PROV_DBG_PRINTF(VERBOSE, "Keystore PSA init\n");
 	agent_status = iot_agent_keystore_init(&keystore,
 					       EDGELOCK2GO_KEYSTORE_ID,
 					       &iot_agent_platform_context);
@@ -76,7 +76,7 @@ int oem_prov_online(const char *config_filename)
 	/* This data store holds connection information about how to connect
 	 * to the EdgeLock 2GO server: server URL, port, server certificate, etc.
 	 */
-	OEM_PROV_DBG_PRINTF(VERBOSE, "agent datastore plain init\n");
+	OEM_PROV_DBG_PRINTF(VERBOSE, "Agent datastore plain init\n");
 	agent_status = iot_agent_datastore_init(&el2go_data,
 						DATASTORE_EDGELOCK2GO_ID, el2go_datastore,
 						&iot_agent_service_is_configuration_data_valid);
@@ -135,8 +135,14 @@ exit:
 	oem_prov_unload_config();
 	iot_agent_keystore_close_session(&keystore);
 	iot_agent_free_update_status_report(&status_report);
-	iot_agent_datastore_free(&el2go_data);
-	iot_agent_keystore_free(&keystore);
+	agent_status = iot_agent_datastore_free(&el2go_data);
+	if (agent_status != IOT_AGENT_SUCCESS)
+		status = OEM_PROV_STATUS_EL2GO_AGENT_ERROR;
+	agent_status = iot_agent_keystore_free(&keystore);
+	if (agent_status != IOT_AGENT_SUCCESS)
+		status = OEM_PROV_STATUS_EL2GO_AGENT_ERROR;
+
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 
 	return status;
 }

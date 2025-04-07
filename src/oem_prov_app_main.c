@@ -218,8 +218,8 @@ int main(int argc, char *argv[])
 
 	/* Input parameters check */
 	if (online && indirect) {
-		OEM_PROV_DBG_PRINTF(ERROR,
-				    "Select online or indirect, not both!\n");
+		OEM_PROV_PRINTF("Select online or indirect, not both!\n");
+		usage(argv[0]);
 		goto exit;
 	}
 
@@ -259,8 +259,8 @@ int main(int argc, char *argv[])
 		OEM_PROV_DBG_PRINTF(INFO, "Commit storage option\n");
 
 		if (cs == OEM_PROV_S_NONE) {
-			OEM_PROV_DBG_PRINTF(ERROR, "Invalid option %s\n",
-					    storage_option);
+			OEM_PROV_PRINTF("Invalid option %s\n", storage_option);
+			usage(argv[0]);
 			goto exit;
 		}
 		status = oem_prov_commit_key_storage();
@@ -273,8 +273,8 @@ int main(int argc, char *argv[])
 		OEM_PROV_DBG_PRINTF(INFO, "Close device option\n");
 
 		if (option == OEM_PROV_LC_NONE) {
-			OEM_PROV_DBG_PRINTF(ERROR, "Invalid option %s\n",
-					    close_option);
+			OEM_PROV_PRINTF("Invalid option %s\n", close_option);
+			usage(argv[0]);
 			goto exit;
 		}
 		status = oem_prov_set_lifecycle(option);
@@ -289,6 +289,7 @@ exit:
 		OEM_PROV_DBG_PRINTF(INFO, "Status(%s): SUCCESS\n", argv[0]);
 	else
 		OEM_PROV_DBG_PRINTF(INFO, "Status(%s): FAILURE\n", argv[0]);
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	if (close_option)
 		free(close_option);
 	if (storage_option)

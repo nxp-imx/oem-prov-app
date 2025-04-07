@@ -119,10 +119,11 @@ oem-prov-app -i /etc/opt/oem-prov-app/config.yaml
 4. __Provisioning status:__
 * The application will display a short report indicating the success or failure for each asset:
 ```
-Blob (id: 0x03002000) import: SUCCESS
-Blob (id: 0x30002001) import: SUCCESS
-Blob (id: 0x20002001) import: SUCCESS
-Blob (id: 0x20001000) import: SUCCESS
+Object (id: 0x03002000) import: SUCCESS
+Object (id: 0x30002001) import: SUCCESS
+Object (id: 0x20002001) import: SUCCESS
+Object (id: 0x20001000) import: SUCCESS
+
 ```
 ### Run automatically at boot time
 You can configure the OEM Provisioning Application to run at boot time by applying a __Yocto layer__. This allows the application to automatically run when the device boots, provisioning it with the security assets.

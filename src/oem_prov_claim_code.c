@@ -73,11 +73,12 @@ int oem_prov_inject_claimcode(const char *filename)
 	}
 
 exit:
-	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	if (cc != NULL)
 		free(cc);
 	/* remove the file from the disk */
 	if (remove(filename) < 0)
 		status = OEM_PROV_STATUS_INVALID_FILE;
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
+
 	return status;
 }

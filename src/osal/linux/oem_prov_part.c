@@ -231,7 +231,7 @@ int oem_prov_load_assets(void **stream)
 		goto exit;
 	}
 
-	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n",
+	OEM_PROV_DBG_PRINTF(INFO, "Assets file: %s\n",
 			    os_ctx->assets_file_path);
 	fp = fopen(os_ctx->assets_file_path, "rb");
 	if (!fp) {

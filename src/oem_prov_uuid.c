@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  */
 
 #include <smw_device.h>
@@ -37,5 +37,6 @@ int oem_prov_get_uuid(void)
 	OEM_PROV_PRINTF("\n");
 
 exit:
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	return status;
 }

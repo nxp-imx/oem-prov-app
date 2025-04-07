@@ -27,17 +27,18 @@ static int parse_objects(void)
 	void *stream = NULL;
 
 	status = oem_prov_load_assets(&stream);
-	if (status != OEM_PROV_STATUS_OK)
+	if (status != OEM_PROV_STATUS_OK) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Error loading assets file\n");
 		return status;
-
+	}
 	status = oem_prov_extract_blobs_metadata(stream, &metadata_list);
-	if (status != OEM_PROV_STATUS_OK)
+	if (status != OEM_PROV_STATUS_OK) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Error parsing assets file\n");
 		goto exit;
-
+	}
 	status = oem_prov_import_blob_by_id(stream, metadata_list, SRKH_KEY_ID);
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
-
 	status = oem_prov_import_all_blobs(stream, metadata_list);
 	oem_prov_list_destroy(&metadata_list);
 
