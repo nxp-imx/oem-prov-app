@@ -27,6 +27,11 @@ static const cyaml_strval_t cs_strings[] = {
 	{ "commit", OEM_PROV_S_COMMIT },
 };
 
+static const cyaml_strval_t bool_strings[] = {
+	{ "yes", OEM_PROV_TRUE },
+	{ "no", OEM_PROV_FALSE }
+};
+
 static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_STRING_PTR("hostname", CYAML_FLAG_POINTER,
 			       struct oem_prov_online, hostname, 0,
@@ -58,6 +63,9 @@ static const cyaml_schema_field_t indirect_schema[] = {
 	CYAML_FIELD_STRING_PTR("file_name", CYAML_FLAG_POINTER,
 			       struct oem_prov_indirect, file_name, 0,
 			       CYAML_UNLIMITED),
+	CYAML_FIELD_ENUM("delete_assets_file", CYAML_FLAG_OPTIONAL,
+			 struct oem_prov_indirect, delete_assets, bool_strings,
+			 CYAML_ARRAY_LEN(bool_strings)),
 	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_indirect, close, lc_strings,
 			 CYAML_ARRAY_LEN(lc_strings)),

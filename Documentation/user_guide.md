@@ -63,7 +63,7 @@ In online mode, the application connects to EdgeLock 2GO Server via mutual TLS t
 ### Steps
 1. __Prepare the security assets:__
 * Configure the security assets on the EdgeLock 2GO Server. Refer to the EdgeLock 2GO Server documentation for guidance.
-2. __Updated the configuration file:__
+2. __Update the configuration file:__
 * Modify the configuration file ([config.yaml](../config/config.yaml)) to configure the provisioning process.
 3. __Run the application:__
 * Execute the following command to initiate provisioning:
@@ -109,12 +109,14 @@ In __indirect mode__, the application does not connect to the EdgeLock 2GO Serve
 ### Steps
 1. __Prepare Security Assets:__
 * Ensure that the security assets are stored on the partition (eMMC/SD card). For guidance on writing the assets refer to [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
-2. __Run the application:__
+2. __Update the configuration file:__
+* Modify the configuration file ([config.yaml](../config/config.yaml)) to configure the provisioning process.
+3. __Run the application:__
 * Execute the following command to provision the device in indirect mode:
 ```s
 oem-prov-app -i /etc/opt/oem-prov-app/config.yaml
 ```
-3. __Provisioning status:__
+4. __Provisioning status:__
 * The application will display a short report indicating the success or failure for each asset:
 ```
 Blob (id: 0x03002000) import: SUCCESS
@@ -139,6 +141,10 @@ You can configure the OEM Provisioning Application to run at boot time by applyi
 ```sh
 systemctl status oem-prov
 ```
+### Post provisioning cleanup
+After provisioning, the user may choose to __delete the assets file__ by configuring this behavior in the [config.yaml](../config/config.yaml) file.
+
+This option is particularly useful when boot-time provisioning is enabled, but the user does not want the provisioning process to repeat on every boot. By removing the assets file after the initial provisioning, the system ensures that provisioning only occurs once.
 
 ## Optional Post-Provisioning Actions
 The user can configure the application (through the configuration file) to perform the following actions at the end of provisioning. These actions have __irreversible__ effects.

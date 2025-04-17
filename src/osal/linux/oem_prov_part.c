@@ -187,7 +187,6 @@ int oem_prov_load_assets(void **stream)
 	char *mount_point_ptr = NULL;
 	struct oem_prov_os_ctx *os_ctx = NULL;
 	struct oem_prov_indirect *assets = NULL;
-	char *file_path = NULL;
 	FILE *fp = NULL;
 	int test_unmount = 1;
 
@@ -217,26 +216,29 @@ int oem_prov_load_assets(void **stream)
 
 	/* path + file name + '/' + '\0' */
 	total_len = strlen(assets->file_name) + strlen(mount_point_ptr) + 2;
-	file_path = malloc(total_len);
-	if (!file_path) {
+	os_ctx->assets_file_path = malloc(total_len);
+	if (!os_ctx->assets_file_path) {
 		status = OEM_PROV_STATUS_ALLOCATION_ERROR;
 		goto exit;
 	}
 
-	chars_written = snprintf(file_path, total_len, "%s/%s", mount_point_ptr,
-				 assets->file_name);
+	chars_written = snprintf(os_ctx->assets_file_path, total_len, "%s/%s",
+				 mount_point_ptr, assets->file_name);
 
 	if (chars_written < total_len - 1) {
+		free(os_ctx->assets_file_path);
 		status = OEM_PROV_STATUS_INCOMPLETE_DATA;
 		goto exit;
 	}
 
-	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n", file_path);
-	fp = fopen(file_path, "rb");
+	OEM_PROV_DBG_PRINTF(INFO, "Assets file is %s\n",
+			    os_ctx->assets_file_path);
+	fp = fopen(os_ctx->assets_file_path, "rb");
 	if (!fp) {
 		OEM_PROV_DBG_PRINTF(ERROR, "Error opening file %s\n",
-				    file_path);
+				    os_ctx->assets_file_path);
 		status = OEM_PROV_STATUS_INVALID_FILE;
+		free(os_ctx->assets_file_path);
 		goto exit;
 	}
 	*stream = fp;
@@ -249,7 +251,6 @@ exit:
 	if (test_unmount)
 		unmount_device(os_ctx, assets->mount_point);
 
-	free(file_path);
 	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	return status;
 }
@@ -268,6 +269,13 @@ int oem_prov_unload_assets(void *stream)
 
 	if (fclose(fp))
 		status = OEM_PROV_STATUS_INVALID_FILE;
+
+	/* delete the file if configured to be deleted */
+	if (os_ctx->oem_config->indirect->delete_assets) {
+		if (remove(os_ctx->assets_file_path) < 0)
+			status = OEM_PROV_STATUS_INVALID_FILE;
+	}
+	free(os_ctx->assets_file_path);
 
 	if (os_ctx->needs_unmount) {
 		status = unmount_device(os_ctx, assets->mount_point);

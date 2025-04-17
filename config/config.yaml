@@ -53,6 +53,12 @@ indirect:
   file_name: "assets.bin"
 
 # [optional]
+# If set to "yes" the assets file is deleted after provisioning. If set to "no"
+# or missing, the assets file is not deleted after provisioning.
+
+# delete_assets_file: "yes"/"no"
+
+# [optional]
 # If set to "commit" the non-volatile key storage is committed in the physical
 # memory and the hardware anti-rollback counter is incremented after the
 # provisioning is done. If the option is not present in the configuration

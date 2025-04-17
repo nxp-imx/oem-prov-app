@@ -25,6 +25,11 @@ enum oem_prov_storage_options {
 	OEM_PROV_S_COMMIT
 };
 
+enum oem_prov_bool_options {
+	OEM_PROV_FALSE = 0,
+	OEM_PROV_TRUE
+};
+
 /**
  * oem_prov_get_uint_be() - Extracts a big-endian unsigned integer
  *
