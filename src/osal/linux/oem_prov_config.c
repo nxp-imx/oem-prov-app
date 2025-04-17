@@ -8,6 +8,7 @@
 #include <cyaml/cyaml.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <string.h>
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
@@ -84,10 +85,42 @@ static const cyaml_schema_value_t oem_prov_config_schema = {
 			    oem_prov_config_fields_schema)
 };
 
+/**
+ * oem_prov_cyaml_mem() - Custom allocation function
+ *
+ * The cymal library has a default allocation function. Add a custom allocation
+ * function which is initializing the allocated structure. Although cyaml does
+ * set default values for optional fields, it is safer to initialize the memory.
+ * @ctx: Context passed by the user
+ * @ptr: Pointer to realloc, NULL for allocation
+ * @size: Allocation size, 0 for free
+ * Return:
+ * pointer to te allocate memory
+ */
+void *oem_prov_cyaml_mem(void *ctx, void *ptr, size_t size)
+{
+	void *ret_ptr = NULL;
+
+	if (size == 0) {
+		free(ptr);
+		return NULL;
+	}
+
+	ret_ptr = realloc(ptr, size);
+
+	if (!ret_ptr)
+		return NULL;
+
+	if (!ptr)
+		memset(ret_ptr, 0, size);
+
+	return ret_ptr;
+}
+
 static const cyaml_config_t config = {
-	.log_fn = cyaml_log,            /* Use the default logging function. */
-	.mem_fn = cyaml_mem,            /* Use the default memory allocator. */
-	.log_level = CYAML_LOG_WARNING, /* Logging errors and warnings only. */
+	.log_fn = cyaml_log,              /* Use the default logging function. */
+	.mem_fn = oem_prov_cyaml_mem,     /* Use a custom memory allocation */
+	.log_level = CYAML_LOG_WARNING,   /* Logging errors and warnings only. */
 };
 
 /**
