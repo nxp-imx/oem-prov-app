@@ -24,7 +24,7 @@ LD[unexport] = "1"
 
 EXTRA_OECMAKE = " \
     -DNXP_SMW_DIR=${STAGING_DIR_HOST}${libdir}/cmake \
-    -DEL2GOAGENT_ROOT=${STAGING_DIR_HOST} \
+    -Del2go_agent_DIR=${STAGING_DIR_HOST}${libdir}/cmake/el2go-agent \
     -DCYAML_ROOT=${STAGING_DIR_HOST} \
     -DVERBOSE=2"
 

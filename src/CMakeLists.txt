@@ -1,5 +1,5 @@
 find_package(NXP_SMW CONFIG REQUIRED)
-find_package(EL2GOAgent REQUIRED)
+find_package(el2go_agent CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME} "")
 
@@ -21,13 +21,13 @@ target_sources(${PROJECT_NAME} PRIVATE
                oem_prov_storage.c)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-                           ${INCLUDE_DIR}
-                           ${EL2GOAgent_INCLUDE_DIRS})
+                           ${INCLUDE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
                       NXP_SMW::smw
                       ${EXT_LIBS}
-                      ${EL2GOAgent_LIBRARIES}
+                      el2go_agent::nxp_iot_agent_common
+                      el2go_agent::nxp_iot_agent
                       utils
                       osal)
 

@@ -69,9 +69,9 @@ Several CMake options are available to customize the build process.
 	<td>Path to the folder where configuration packages for the SMW library are located.</td>
 </tr>
 <tr>
-	<td>EL2GOAGENT_ROOT</td>
-	<td>-DDEL2GOAGENT_ROOT=[/path/to/export]</td>
-	<td>Path to the folder where EdgeLock 2GO Agent headers and libraries are located.
+	<td>el2go_agent_DIR</td>
+	<td>-Del2go_agent_DIR=[/path/to/config]</td>
+	<td>Path to the folder where configuration packages for the EdgeLock 2GO Agent library are located.
 	</td>
 </tr>
 <tr>
