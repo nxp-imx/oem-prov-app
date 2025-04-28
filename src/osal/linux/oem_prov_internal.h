@@ -9,6 +9,7 @@
 struct oem_prov_online {
 	char *hostname;
 	char *port;
+	char *server_cert;
 	int close;
 	int commit_storage;
 };

@@ -104,6 +104,8 @@ oem-prov-app -o /etc/opt/oem-prov-app/config.yaml
 * A provisioning report will be displayed as shown above
 * EdgeLock 2GO Web Server interface shows that the device UUID has been successfully added to the device group
 
+### Server certificate
+By default, the EdgeLock 2GO Agent uses a built-in server certificate for TLS connection establishment. If the application targets a non-default server instance (e.g. in test or staging environments), a custom server certificate can be specified. This is configured by setting the ```server_cert``` field in the application's configuration file to the path of the desired DER-encoded certificate.
 ## Indirect mode
 In __indirect mode__, the application does not connect to the EdgeLock 2GO Server. Instead, the security assets are provided from a local partition (eMMC/SD card), and the application provisions the device using these assets.
 ### Steps

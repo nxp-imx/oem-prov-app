@@ -8,19 +8,25 @@
 /**
  * oem_prov_get_buffer_from_file() - Reads the data from a file
  *
- * This function reads the content of a text file in a buffer. The function trims any
- * trailing spaces and line separators.
+ * This function reads the content of a file in a buffer starting from
+ * a specified offset. It also allocates memory for the buffer, potentially
+ * allocating more than necessary to allow for additional data if needed
+ * by the caller.
+ * It is the caller responsability to free the memory.
  *
  * @file_name: The file name
  * @buffer: The buffer where the data is stored. The buffer is allocated
  *          by this function and it should be freed by the caller.
- * @length: The size of the buffer. This is an output parameter, this function sets it.
+ * @length: The size of the buffer. This is an in/out parameter.
+ *          If length > 0, the function will allocate additional length bytes.
+ *          Returns the size of the actual data written.
+ * @offset: The data is written in the buffer starting this offset.
  *
  * Return:
  * none
  */
 int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
-				  unsigned int *length);
+				  unsigned int *length, int offset);
 
 /**
  * oem_prov_load_config_file() - Loads the configuration file by the Cyaml library
@@ -144,5 +150,16 @@ int oem_prov_get_lc_option(unsigned int mode);
  * the option from the configuration file
  */
 int oem_prov_get_storage(unsigned int mode);
+
+/**
+ * oem_prov_get_server_cert() - Returns the user option for server_cert
+ *
+ * The user has the posibility to specify a server certificate. This function
+ * returns the option from the configuration file.
+ *
+ * Return:
+ * the option from the configuration file
+ */
+char *oem_prov_get_server_cert(void);
 
 #endif /* __OEM_PROV_OS_H__ */

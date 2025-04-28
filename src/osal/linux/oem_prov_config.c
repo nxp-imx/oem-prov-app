@@ -39,11 +39,14 @@ static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_STRING_PTR("port", CYAML_FLAG_POINTER,
 			       struct oem_prov_online, port, 0,
 			       CYAML_UNLIMITED),
+	CYAML_FIELD_STRING_PTR("server_cert", CYMAL_FLAG_OPTIONAL_POINTER,
+			       struct oem_prov_online, server_cert, 0,
+			       CYAML_UNLIMITED),
 	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_online, close, lc_strings,
 			 CYAML_ARRAY_LEN(lc_strings)),
-	CYAML_FIELD_ENUM("storage", CYAML_FLAG_OPTIONAL,
-			 struct oem_prov_online, commit_storage, cs_strings,
+	CYAML_FIELD_ENUM("storage", CYAML_FLAG_OPTIONAL, struct oem_prov_online,
+			 commit_storage, cs_strings,
 			 CYAML_ARRAY_LEN(cs_strings)),
 
 	CYAML_FIELD_END
@@ -252,4 +255,13 @@ int oem_prov_get_storage(unsigned int mode)
 	}
 
 	return 0;
+}
+
+char *oem_prov_get_server_cert(void)
+{
+	struct oem_prov_os_ctx *os_ctx = NULL;
+
+	os_ctx = oem_prov_get_os_ctx();
+
+	return os_ctx->oem_config->online->server_cert;
 }

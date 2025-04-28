@@ -20,8 +20,9 @@ int oem_prov_inject_claimcode(const char *filename)
 {
 	int status = OEM_PROV_STATUS_OK;
 	unsigned char *cc = NULL;
-	unsigned int buffer_length = 0;
+	unsigned int buffer_length = 1;
 	enum smw_status_code smw_status = SMW_STATUS_OK;
+	unsigned int i = 0;
 
 	struct smw_store_data_args args = { 0 };
 	struct smw_data_descriptor data_descriptor = { 0 };
@@ -33,11 +34,25 @@ int oem_prov_inject_claimcode(const char *filename)
 	struct smw_key_descriptor *encr_key_ptr = &encr_key;
 	struct smw_key_descriptor sign_key = { 0 };
 
-	status = oem_prov_get_buffer_from_file(filename, &cc, &buffer_length);
+	/* allocate one more byte for \0 */
+	status =
+		oem_prov_get_buffer_from_file(filename, &cc, &buffer_length, 0);
 	if (status != OEM_PROV_STATUS_OK) {
 		OEM_PROV_DBG_PRINTF(ERROR, "Invalid configuration file!\n");
 		goto exit;
 	}
+
+	/* trim any trailing spaces and line separators */
+	for (i = buffer_length; i > 0; i--) {
+		if (cc[i - 1] == ' ' || cc[i - 1] == '\r' ||
+		    cc[i - 1] == '\n') {
+			continue;
+		} else {
+			break;
+		}
+	}
+	buffer_length = i;
+	cc[buffer_length] = '\0';
 
 	data_descriptor.identifier = OEM_PROV_CLAIM_CODE_ID;
 	data_descriptor.data = cc;

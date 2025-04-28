@@ -30,6 +30,9 @@ int oem_prov_online(const char *config_filename)
 	nxp_iot_UpdateStatusReport status_report =
 		nxp_iot_UpdateStatusReport_init_default;
 	int close_option = 0;
+	iot_agent_array_t *server_cert = NULL;
+	char *server_cert_file = NULL;
+	unsigned int server_cert_length = sizeof(server_cert->size);
 
 	status = oem_prov_load_config(config_filename, OEM_PROV_ONLINE);
 	if (status != OEM_PROV_STATUS_OK) {
@@ -85,14 +88,32 @@ int oem_prov_online(const char *config_filename)
 		goto exit;
 	}
 
+	/* Check if a server certificate was provided. If no certificat was provided
+	 * a default one will be used. The default certificate allows connection to the
+	 * EdgeLock2GO production server.
+	 */
+	server_cert_file = oem_prov_get_server_cert();
+	if (server_cert_file) {
+		/* allocate bytes to accommodate length and skip the size field */
+		status = oem_prov_get_buffer_from_file(server_cert_file,
+						       (unsigned char **)&server_cert,
+						       &server_cert_length,
+						       server_cert_length);
+		if (status != OEM_PROV_STATUS_OK) {
+			OEM_PROV_DBG_PRINTF(ERROR, "Invalid certificate file\n");
+			goto exit;
+		}
+		server_cert->size = server_cert_length;
+	}
+
 	/* Configure the connection information. The server URL and port are taken
 	 * from the configuration file. Currently the server certificate is hardcoded.
 	 */
 	oem_prov_set_host_and_port();
-	agent_status =
-		iot_agent_utils_configure_edgelock2go_datastore(&keystore,
-								&el2go_data,
-								NULL, 0, NULL);
+	agent_status = iot_agent_utils_configure_edgelock2go_datastore(&keystore,
+								       &el2go_data,
+								       server_cert,
+								       0, NULL);
 	if (agent_status != IOT_AGENT_SUCCESS) {
 		status = OEM_PROV_STATUS_EL2GO_AGENT_ERROR;
 		goto exit;
@@ -142,7 +163,8 @@ exit:
 	agent_status = iot_agent_keystore_free(&keystore);
 	if (agent_status != IOT_AGENT_SUCCESS)
 		status = OEM_PROV_STATUS_EL2GO_AGENT_ERROR;
-
+	if (server_cert)
+		free(server_cert);
 	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 
 	return status;

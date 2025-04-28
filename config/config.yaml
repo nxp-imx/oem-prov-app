@@ -32,6 +32,16 @@ online:
 
 #  lifecycle: "closed"/"closed-locked"
 
+# [optional]
+# The user can optionally provide a custom server certificate used for establishing the TLS
+# connection. By default, the EdgeLock 2GO Agent uses its built-in server certificate.
+# However, if a different server instance is used (e.g. for testing),
+# the user can supply a custom certificate to the OEM Provisioning Application.
+# The certificate should be in DER format.
+
+#server_cert: "server_certificate.der"
+
+
 # ==========================================================================
 #                              Indirect flow
 # ==========================================================================
