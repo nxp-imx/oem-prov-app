@@ -89,9 +89,10 @@ int oem_prov_online(const char *config_filename)
 	 * from the configuration file. Currently the server certificate is hardcoded.
 	 */
 	oem_prov_set_host_and_port();
-	agent_status = iot_agent_utils_configure_edgelock2go_datastore(&keystore,
-								       &el2go_data,
-								       0, NULL);
+	agent_status =
+		iot_agent_utils_configure_edgelock2go_datastore(&keystore,
+								&el2go_data,
+								NULL, 0, NULL);
 	if (agent_status != IOT_AGENT_SUCCESS) {
 		status = OEM_PROV_STATUS_EL2GO_AGENT_ERROR;
 		goto exit;
