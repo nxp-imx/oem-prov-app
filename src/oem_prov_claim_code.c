@@ -28,7 +28,6 @@ int oem_prov_inject_claimcode(const char *filename)
 	struct smw_data_descriptor data_descriptor = { 0 };
 	struct smw_encryption_args encr_args = { 0 };
 	struct smw_sign_args sign_args = { 0 };
-	struct smw_data_attributes data_attrs = { 0 };
 
 	struct smw_key_descriptor encr_key = { 0 };
 	struct smw_key_descriptor *encr_key_ptr = &encr_key;
@@ -57,9 +56,8 @@ int oem_prov_inject_claimcode(const char *filename)
 	data_descriptor.identifier = OEM_PROV_CLAIM_CODE_ID;
 	data_descriptor.data = cc;
 	data_descriptor.length = buffer_length;
-	data_descriptor.data_attributes = &data_attrs;
-	SMW_ATTR_SET_PERSISTENT(data_attrs.attributes);
-	SMW_ATTR_SET_LC_CURRENT(data_attrs.attributes);
+	SMW_ATTR_SET_PERSISTENT(data_descriptor.attributes.attributes);
+	SMW_ATTR_SET_LC_CURRENT(data_descriptor.attributes.attributes);
 
 	encr_key.type_name = SMW_KEY_TYPE_NAME_AES;
 	encr_key.id = OEM_PROV_CLAIM_ENC_KEY_ID;
