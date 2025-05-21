@@ -7,6 +7,7 @@
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
 #include "psa/crypto.h"
+#include "psa/internal_trusted_storage.h"
 
 int oem_prov_import_blob(unsigned char *data, psa_key_attributes_t *attributes,
 			 size_t length)
@@ -35,6 +36,22 @@ int oem_prov_import_blob(unsigned char *data, psa_key_attributes_t *attributes,
 			OEM_PROV_PRINTF("Object (id: 0x%08x) import: FAILED\n",
 					blob_id);
 			return OEM_PROV_STATUS_PSA_ERROR;
+		}
+		/* In case the ID was not found in the key storage, it is still
+		 * possible that ID to be present in the data storage. Try to
+		 * delete the ID from the data storage
+		 */
+		if (status == PSA_ERROR_INVALID_HANDLE) {
+			status = psa_its_remove(blob_id);
+			OEM_PROV_DBG_PRINTF(DEBUG,
+					    "psa_its_remove (id: 0x%08x) returned %d\n",
+					     blob_id, status);
+			if ((status != PSA_SUCCESS) &&
+			    (status != PSA_ERROR_DOES_NOT_EXIST)) {
+				OEM_PROV_PRINTF("Object (id: 0x%08x) import: FAILED\n",
+						blob_id);
+				return OEM_PROV_STATUS_PSA_ERROR;
+			}
 		}
 	}
 
