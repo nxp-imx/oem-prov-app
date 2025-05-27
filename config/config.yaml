@@ -1,5 +1,5 @@
 # ==========================================================================
-#                              Online flow
+#                       Provisioning via cloud
 # ==========================================================================
 online:
 # The hostname used for the connection with EdgeLock 2GO server.
@@ -43,7 +43,7 @@ online:
 
 
 # ==========================================================================
-#                              Indirect flow
+#                       Provisioning via proxy
 # ==========================================================================
 indirect:
 # partition where the security assets file is located. If the partition is already

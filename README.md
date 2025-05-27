@@ -6,11 +6,11 @@ This git repository contains the sources (C standard) for the OEM Provisioning A
 The OEM Provisioning Application is a tool designed to facilitate the OEM provisioning process. It supports the import of security assets into the EdgeLock Enclave. The application can operate in two main modes.
 ## Modes of operation
 The OEM Provisioning Application supports two modes of operation:
-### __Direct on-line mode__
+### __Device provisioning via cloud mode__
 * In this mode, the application connects directly to EdgeLock 2GO Server using the EdgeLock 2GO Agent libraries and retrieves the necessary security assets over a mutual TLS connection.
 * After receiving each asset, the application provisions them into the EdgeLock Enclave.
 * Optionally, the non-volatile key storage can be committed to the physical memory and device lifecycle moved to closed/closed-locked state.
-### __Indirect mode__
+### __Device Provisioning via proxy mode__
 * In this mode, the security assets are already available in an external memory location, such as an eMMC/SD card on a FAT32 partition.
 * The OEM Provisioning Application reads the assets from the partition and imports them into the EdgeLock Enclave.
 * Optionally, the non-volatile key storage can be committed to the physical memory and device lifecycle moved to closed/closed-locked state.

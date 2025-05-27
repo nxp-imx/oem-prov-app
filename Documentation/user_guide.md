@@ -1,5 +1,5 @@
 # Introduction
-This guide provides instructions on how to run the __OEM Provisioning Application__ in various modes of configuration. It covers both the __online__ and __indirect__ provisioning flows, including additional features and configuration options.
+This guide provides instructions on how to run the __OEM Provisioning Application__ in various modes of configuration. It covers both __device provisioning via cloud__ and __device provisioning via proxy__ flows, including additional features and configuration options.
 
 # Running the OEM Provisioning Application
 
@@ -22,12 +22,12 @@ For detailed description of the available options, refer to the
 <tbody>
 <tr>
 	<td>--online, -o config_file</td>
-	<td> Runs the application in <b>online mode</b>, connecting to EdgeLock 2GO Server to download security assets and provision the device.
+	<td> Runs the application in <b>the device provisioning via cloud mode</b>, connecting to EdgeLock 2GO Server to download security assets and provision the device.
 	</td>
 </tr>
 <tr>
 	<td>--indirect, -i config_file</td>
-	<td> Runs the application in <b>indirect mode</b>, provisioning the device using assets stored in a file on FAT32 partition.
+	<td> Runs the application in <b>the device provisioning via proxy mode</b>, provisioning the device using assets stored in a file on FAT32 partition.
 	</td>
 </tr>
 <tr>
@@ -55,10 +55,10 @@ For detailed description of the available options, refer to the
 The configuration file of the OEM Provisioning Application is managed through a customizable yaml file. The user can modify the template provided ([config.yaml](../config/config.yaml)).
 
 # Modes of operation
-The OEM Provisioning Application supports two primary modes of operation: __direct online mode__ and __indirect mode__. Bellow, we describe each mode and provide example of usage.
+The OEM Provisioning Application supports two primary modes of operation: __device provisioning via cloud__ and __device provisioning via proxy__. Bellow, we describe each mode and provide example of usage.
 
-## 1. Direct online mode
-In online mode, the application connects to EdgeLock 2GO Server via mutual TLS to download the necessary security assets and provisions them into the device.
+## 1. Device provisioning via cloud
+In this mode, the application connects to EdgeLock 2GO Server via mutual TLS to download the necessary security assets and provisions them into the device.
 
 ### Steps
 1. __Prepare the security assets:__
@@ -95,7 +95,7 @@ oem-prov-app -c claim_code.txt
 ```
 The local file, e.g `claim_code.txt` is deleted after the injection.
 
-3. __Run the application in online mode:__
+3. __Run the application in device provisioning via cloud mode:__
 * Run the following command to perform the provisioning:
 ```sh
 oem-prov-app -o /etc/opt/oem-prov-app/config.yaml
@@ -106,15 +106,15 @@ oem-prov-app -o /etc/opt/oem-prov-app/config.yaml
 
 ### Server certificate
 By default, the EdgeLock 2GO Agent uses a built-in server certificate for TLS connection establishment. If the application targets a non-default server instance (e.g. in test or staging environments), a custom server certificate can be specified. This is configured by setting the ```server_cert``` field in the application's configuration file to the path of the desired DER-encoded certificate.
-## Indirect mode
-In __indirect mode__, the application does not connect to the EdgeLock 2GO Server. Instead, the security assets are provided from a local partition (eMMC/SD card), and the application provisions the device using these assets.
+## Device provisioning via proxy
+In this mode, the application does not connect to the EdgeLock 2GO Server. Instead, the security assets are provided from a local partition (eMMC/SD card), and the application provisions the device using these assets.
 ### Steps
 1. __Prepare Security Assets:__
 * Ensure that the security assets are stored on the partition (eMMC/SD card). For guidance on writing the assets refer to [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
 2. __Update the configuration file:__
 * Modify the configuration file ([config.yaml](../config/config.yaml)) to configure the provisioning process.
 3. __Run the application:__
-* Execute the following command to provision the device in indirect mode:
+* Execute the following command to provision the device in the provisioning via proxy mode:
 ```s
 oem-prov-app -i /etc/opt/oem-prov-app/config.yaml
 ```
@@ -138,7 +138,7 @@ You can configure the OEM Provisioning Application to run at boot time by applyi
    * Use SPSDK to download the security assets from the EdgeLock 2GO Server
    * Use SPSDK to write the security assets on the local partition
 3. __Boot the system:__
-* The system is automatically booted by SPSDK, the application will start automatically after boot, running in indirect mode.
+* The system is automatically booted by SPSDK, the application will start automatically after boot, running in provisioning via proxy mode.
 4. __Check status:__
 * You can check the status of operation with:
 ```sh
@@ -189,4 +189,4 @@ oem-prov-app -u
 ```
 
 ### Claim code injection
-Claim code injection is described in detail in [Direct online mode](#1-direct-online-mode)
+Claim code injection is described in detail in [Device provisioning via cloud](#1-device-provisioning-via-cloud).

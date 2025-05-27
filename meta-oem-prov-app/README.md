@@ -8,7 +8,7 @@ This layer contains the OEM Provisioning Application related Yocto recipes.
 1. Recipes
 
 * `oem-prov-app_git.bb`: This recipe is responsible for adding support to compile and deploy the OEM Provisioning Application to the Yocto BSP.
-* `oem-prov-config.bb`: This recipe deploys the configuration file for the OEM Provisioning Application into the root filesystem under `/etc/opt/oem-prov-app`. It also configures the application to start automatically at boot time, running in indirect flow mode. \
+* `oem-prov-config.bb`: This recipe deploys the configuration file for the OEM Provisioning Application into the root filesystem under `/etc/opt/oem-prov-app`. It also configures the application to start automatically at boot time, running in provisioning via proxy mode. \
 It is possible that the application runs early at boot time before the storage (such as an eMMC device) is mounted by the system. To avoid race conditions it is advisable to use a mount point different than the folder the system is using for mounting the volume.
 * `u-boot bbappend`: A bbappend file is added to modify the U-Boot configuration (set `CONFIG_CONSOLE_MUX`) which is needed by the SPSDK tool, which handles loading the security assets on the storage before the system boots. The SPSDK is accessing the device via fastboot.
 2. Configuration file

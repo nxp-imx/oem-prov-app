@@ -20,10 +20,10 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("Usage: %s [OPTION]...\n", prg);
 	OEM_PROV_PRINTF("OEM provisioning application\n");
 	OEM_PROV_PRINTF("%-40s", "--online,-o file_name");
-	OEM_PROV_PRINTF("%s", "Runs the application in the online mode\n");
+	OEM_PROV_PRINTF("%s", "Device provisioning via cloud mode\n");
 
 	OEM_PROV_PRINTF("%-40s", "--indirect,-i file_name");
-	OEM_PROV_PRINTF("%s", "Runs the application in the indirect mode\n");
+	OEM_PROV_PRINTF("%s", "Device Provisioning via proxy mode\n");
 
 	OEM_PROV_PRINTF("%-40s", "--claim-code,-c file_name");
 	OEM_PROV_PRINTF("%s", "Injects the claim code from the <file_name>\n");

@@ -1,5 +1,5 @@
 # ==========================================================================
-#                              Online flow
+#                       Provisioning via cloud
 # ==========================================================================
 online:
 # The hostname used for the connection with EdgeLock 2GO server.
@@ -12,7 +12,7 @@ online:
   port: "EdgeLock 2GO port"
 
 # [optional]
-# If set to "yes" the non-volatile key storage is committed in the physical
+# If set to "commit" the non-volatile key storage is committed in the physical
 # memory and the hardware anti-rollback counter is incremented after the
 # provisioning is done. If the option is not present in the configuration
 # file, the key storage is not committed.
@@ -20,7 +20,7 @@ online:
 # hardware counter was incremented must be present in the file system
 # Uncomment the option if you want to commit the key storage
 
-#  commit-storage: "yes"/"Yes"
+# storage: "commit"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.
@@ -32,8 +32,18 @@ online:
 
 #  lifecycle: "closed"/"closed-locked"
 
+# [optional]
+# The user can optionally provide a custom server certificate used for establishing the TLS
+# connection. By default, the EdgeLock 2GO Agent uses its built-in server certificate.
+# However, if a different server instance is used (e.g. for testing),
+# the user can supply a custom certificate to the OEM Provisioning Application.
+# The certificate should be in DER format.
+
+#server_cert: "server_certificate.der"
+
+
 # ==========================================================================
-#                              Indirect flow
+#                       Provisioning via proxy
 # ==========================================================================
 indirect:
 # partition where the security assets file is located. If the partition is already
@@ -59,7 +69,7 @@ indirect:
 # delete_assets_file: "yes"/"no"
 
 # [optional]
-# If set to "yes" the non-volatile key storage is committed in the physical
+# If set to "commit" the non-volatile key storage is committed in the physical
 # memory and the hardware anti-rollback counter is incremented after the
 # provisioning is done. If the option is not present in the configuration
 # file, the key storage is not committed.
@@ -67,7 +77,7 @@ indirect:
 # hardware counter was incremented must be present in the file system
 # Uncomment the option if you want to commit the key storage
 
-#  commit-storage: "yes"/"Yes"
+#  storage: "commit"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.
