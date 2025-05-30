@@ -65,6 +65,8 @@ void oem_prov_set_host_and_port(void);
 
 /**
  * oem_prov_load_assets() - Returns a stream associated with the security assets
+ * @index: The index of the assets file in the assets list
+ * @path: The mount point of the partition where the file is
  * @stream: Pointer to the stream (file or memory buffer) associated with the
  * security assets. This is used to read the content of security assets. This is
  * an output parameter, this function sets it.
@@ -72,7 +74,7 @@ void oem_prov_set_host_and_port(void);
  * Return:
  * error code
  */
-int oem_prov_load_assets(void **stream);
+int oem_prov_load_assets(unsigned int index, char *path, void **stream);
 
 /**
  * oem_prov_unload_assets() - Cleanup any allocated resources
@@ -85,6 +87,26 @@ int oem_prov_load_assets(void **stream);
  * error code
  */
 int oem_prov_unload_assets(void *stream);
+
+/**
+ * oem_prov_load_env() - Gets the mount point of the partition where
+ * the asset files are located.
+ * @path: The folder name where the security assets file is located.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_load_env(char **path);
+
+/**
+ * oem_prov_unload_env() - Umounts the partition where the assets file
+ * is located. It also frees the allocated path.
+ * @path: The folder name where the security assets file is located.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_unload_env(char **path);
 
 /**
  * oem_prov_read_data() - Reads data from a stream

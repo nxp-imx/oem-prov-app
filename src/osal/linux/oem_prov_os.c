@@ -8,7 +8,7 @@
 #include "oem_prov_internal.h"
 #include "oem_prov_debug_info.h"
 
-static struct oem_prov_os_ctx os_ctx = { 0, NULL, NULL };
+static struct oem_prov_os_ctx os_ctx = { 0 };
 
 inline struct oem_prov_os_ctx *oem_prov_get_os_ctx(void)
 {

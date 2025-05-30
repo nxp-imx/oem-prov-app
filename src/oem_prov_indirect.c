@@ -20,13 +20,13 @@
  * Return:
  * error code
  */
-static int parse_objects(void)
+static int parse_objects(char *path)
 {
 	int status = OEM_PROV_STATUS_OK;
 	struct oem_prov_list metadata_list = { 0 };
 	void *stream = NULL;
 
-	status = oem_prov_load_assets(&stream);
+	status = oem_prov_load_assets(0, path, &stream);
 	if (status != OEM_PROV_STATUS_OK) {
 		OEM_PROV_DBG_PRINTF(ERROR, "Error loading assets file\n");
 		return status;
@@ -53,6 +53,7 @@ int oem_prov_indirect(const char *config_filename)
 	int status = OEM_PROV_STATUS_OK;
 	int close_option = 0;
 	psa_status_t psa_status = PSA_SUCCESS;
+	char *path = NULL;
 
 	status = oem_prov_load_config(config_filename, OEM_PROV_INDIRECT);
 	if (status != OEM_PROV_STATUS_OK) {
@@ -66,8 +67,17 @@ int oem_prov_indirect(const char *config_filename)
 		status = OEM_PROV_STATUS_PSA_ERROR;
 		goto exit;
 	}
+	status = oem_prov_load_env(&path);
+	if (status != OEM_PROV_STATUS_OK)
+		goto exit;
 
-	status = parse_objects();
+	status = parse_objects(path);
+	if (status != OEM_PROV_STATUS_OK) {
+		oem_prov_unload_env(&path);
+		goto exit;
+	}
+
+	status = oem_prov_unload_env(&path);
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
 

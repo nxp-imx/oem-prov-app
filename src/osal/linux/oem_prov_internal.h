@@ -18,10 +18,13 @@ struct oem_prov_indirect {
 	char *partition;
 	char *type;
 	char *mount_point;
-	char *file_name;
+	char **file_name;
+	unsigned int file_name_count;
 	int delete_assets;
 	int close;
 	int commit_storage;
+	int needs_unmount;
+	char *assets_file_path;
 };
 
 struct oem_prov_config {
@@ -30,9 +33,7 @@ struct oem_prov_config {
 };
 
 struct oem_prov_os_ctx {
-	int needs_unmount;
 	struct oem_prov_config *oem_config;
-	char *assets_file_path;
 };
 
 /**

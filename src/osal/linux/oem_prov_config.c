@@ -32,6 +32,10 @@ static const cyaml_strval_t bool_strings[] = {
 	{ "no", OEM_PROV_FALSE }
 };
 
+static const cyaml_schema_value_t string_ptr_schema = {
+	CYAML_VALUE_STRING(CYAML_FLAG_POINTER, char, 0, CYAML_UNLIMITED),
+};
+
 static const cyaml_schema_field_t online_schema[] = {
 	CYAML_FIELD_STRING_PTR("hostname", CYAML_FLAG_POINTER,
 			       struct oem_prov_online, hostname, 0,
@@ -63,9 +67,9 @@ static const cyaml_schema_field_t indirect_schema[] = {
 	CYAML_FIELD_STRING_PTR("mount_point", CYAML_FLAG_POINTER,
 			       struct oem_prov_indirect, mount_point, 0,
 			       CYAML_UNLIMITED),
-	CYAML_FIELD_STRING_PTR("file_name", CYAML_FLAG_POINTER,
-			       struct oem_prov_indirect, file_name, 0,
-			       CYAML_UNLIMITED),
+	CYAML_FIELD_SEQUENCE("file_name", CYAML_FLAG_POINTER,
+			     struct oem_prov_indirect, file_name,
+			     &string_ptr_schema, 0, 1),
 	CYAML_FIELD_ENUM("delete_assets_file", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_indirect, delete_assets, bool_strings,
 			 CYAML_ARRAY_LEN(bool_strings)),
@@ -148,6 +152,7 @@ static int oem_prov_validate_option(int option,
 {
 	int close = 0;
 	int commit_storage = 0;
+	int file_count = 0;
 
 	if (!oem_config)
 		return OEM_PROV_STATUS_EMPTY_FILE;
@@ -175,8 +180,12 @@ static int oem_prov_validate_option(int option,
 				    oem_config->indirect->type);
 		OEM_PROV_DBG_PRINTF(INFO, "\tMount_point: %s\n",
 				    oem_config->indirect->mount_point);
-		OEM_PROV_DBG_PRINTF(INFO, "\tFile_name: %s\n",
-				    oem_config->indirect->file_name);
+
+		file_count = oem_config->indirect->file_name_count;
+		for (int i = 0; i < file_count; i++) {
+			OEM_PROV_DBG_PRINTF(INFO, "\tFile_name: %s\n",
+					    oem_config->indirect->file_name[i]);
+		}
 		break;
 	}
 
@@ -221,8 +230,9 @@ void oem_prov_unload_config(void)
 
 	os_ctx = oem_prov_get_os_ctx();
 
-	OEM_PROV_DBG_ASSERT(os_ctx);
-	cyaml_free(&config, &oem_prov_config_schema, os_ctx->oem_config, 0);
+	if (os_ctx)
+		cyaml_free(&config, &oem_prov_config_schema, os_ctx->oem_config,
+			   0);
 }
 
 int oem_prov_get_lc_option(unsigned int mode)

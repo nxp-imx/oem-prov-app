@@ -59,8 +59,9 @@ indirect:
 # in case that the partition is not mounted, it will be mounted in this location
   mount_point: "/run/oem-prov-app"
 
-# the file name containing the security assets in binary format
-  file_name: "assets.bin"
+# the file name containing the security assets in binary format. The field is a list,
+# but currently only one assets file is supported.
+  file_name: ["assets.bin"]
 
 # [optional]
 # If set to "yes" the assets file is deleted after provisioning. If set to "no"
