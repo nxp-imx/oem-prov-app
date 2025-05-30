@@ -20,7 +20,7 @@ online:
 # hardware counter was incremented must be present in the file system
 # Uncomment the option if you want to commit the key storage
 
-# storage: "commit"
+#  storage: "commit"
 
 # [optional]
 # Indicates if the device will be closed after provisioning.
@@ -39,7 +39,7 @@ online:
 # the user can supply a custom certificate to the OEM Provisioning Application.
 # The certificate should be in DER format.
 
-#server_cert: "server_certificate.der"
+#  server_cert: "server_certificate.der"
 
 
 # ==========================================================================
@@ -66,7 +66,7 @@ indirect:
 # If set to "yes" the assets file is deleted after provisioning. If set to "no"
 # or missing, the assets file is not deleted after provisioning.
 
-# delete_assets_file: "yes"/"no"
+#  delete_assets_file: "yes"/"no"
 
 # [optional]
 # If set to "commit" the non-volatile key storage is committed in the physical
