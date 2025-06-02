@@ -11,6 +11,7 @@
 #include "psa/crypto.h"
 
 #define SRKH_KEY_ID 0x7FFF817AU
+#define EL2GO_PROV_OEM_KEY_ID 0x7FFF8181U
 
 /**
  * oem_prov_import_all_blobs() - Imports all blobs not already imported into ELE

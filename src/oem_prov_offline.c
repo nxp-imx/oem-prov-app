@@ -36,6 +36,10 @@ static int parse_objects(char *path)
 		OEM_PROV_DBG_PRINTF(ERROR, "Error parsing assets file\n");
 		goto exit;
 	}
+	status = oem_prov_import_blob_by_id(stream, metadata_list,
+					    EL2GO_PROV_OEM_KEY_ID);
+	if (status != OEM_PROV_STATUS_OK)
+		goto exit;
 	status = oem_prov_import_blob_by_id(stream, metadata_list, SRKH_KEY_ID);
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
