@@ -12,7 +12,7 @@ SRC_URI = "${PROVAPP_SRC};branch=${PROVAPP_SRCBRANCH};name=oem-prov-app"
 PROVAPP_SRC ?= "git://github.com/nxp-imx/oem-prov-app.git;protocol=https"
 PROVAPP_SRCBRANCH = "release/version_1.x"
 
-SRCREV = "release_1.0"
+SRCREV = "release_1.1"
 S = "${WORKDIR}/git"
 
 inherit cmake
