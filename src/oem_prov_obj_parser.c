@@ -27,6 +27,7 @@
 
 #define MAX_LLENGTH 0x03U
 #define LLENGTH_MAGIC 0x01
+#define SIZE_MAGIC_TLV (LENGTH_TAG + LLENGTH_MAGIC + LENGTH_MAGIC)
 
 #define LSB_MASK(N) ((1UL << (N)) - 1)
 #define LSB_BITS(X, N) ((X) & LSB_MASK(N))
@@ -279,7 +280,7 @@ int oem_prov_extract_blobs_metadata(void *stream,
 				blob->attributes = attributes;
 				blob->length = blob_length;
 				blob->offset = oem_prov_get_offset(stream) -
-					       blob_length - (ret == 1);
+					       blob_length - (ret == 1) * SIZE_MAGIC_TLV;
 				blob->imported = 0;
 
 				oem_prov_list_insert_last(metadata_list, blob);
@@ -290,7 +291,7 @@ int oem_prov_extract_blobs_metadata(void *stream,
 				break;
 
 			count++;
-			blob_length = LENGTH_TAG + LLENGTH_MAGIC + LENGTH_MAGIC;
+			blob_length = SIZE_MAGIC_TLV;
 			continue;
 		} else {
 			status = safe_add(&blob_length, 1);

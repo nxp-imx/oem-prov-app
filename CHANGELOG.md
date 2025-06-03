@@ -13,6 +13,7 @@ This release is compatible with i.MX Linux BSP 6.12.20_2.0.0.
 * Fix reprovisioning data objects
 * Remove manual search for EdgeLock 2GO agent libraries
 * Changed the provisioning terminology
+* Correct the offset calculation formula
 
 ### **Release 1.0**
 This is the first release version of the project. The release is compatible with i.MX Linux BSP 6.12.3_1.0.0.
