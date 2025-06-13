@@ -16,7 +16,7 @@ target_sources(${PROJECT_NAME} PRIVATE
                oem_prov_online.c
                oem_prov_obj_parser.c
                oem_prov_obj_import.c
-               oem_prov_indirect.c
+               oem_prov_offline.c
                oem_prov_dev_mgr.c
                oem_prov_storage.c)
 

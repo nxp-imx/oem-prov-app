@@ -14,7 +14,7 @@ struct oem_prov_online {
 	int commit_storage;
 };
 
-struct oem_prov_indirect {
+struct oem_prov_offline {
 	char *partition;
 	char *type;
 	char *mount_point;
@@ -29,7 +29,7 @@ struct oem_prov_indirect {
 
 struct oem_prov_config {
 	struct oem_prov_online *online;
-	struct oem_prov_indirect *indirect;
+	struct oem_prov_offline *offline;
 };
 
 struct oem_prov_os_ctx {

@@ -57,27 +57,27 @@ static const cyaml_schema_field_t online_schema[] = {
 
 };
 
-static const cyaml_schema_field_t indirect_schema[] = {
+static const cyaml_schema_field_t offline_schema[] = {
 	CYAML_FIELD_STRING_PTR("partition", CYAML_FLAG_POINTER,
-			       struct oem_prov_indirect, partition, 0,
+			       struct oem_prov_offline, partition, 0,
 			       CYAML_UNLIMITED),
 	CYAML_FIELD_STRING_PTR("type", CYAML_FLAG_POINTER,
-			       struct oem_prov_indirect, type, 0,
+			       struct oem_prov_offline, type, 0,
 			       CYAML_UNLIMITED),
 	CYAML_FIELD_STRING_PTR("mount_point", CYAML_FLAG_POINTER,
-			       struct oem_prov_indirect, mount_point, 0,
+			       struct oem_prov_offline, mount_point, 0,
 			       CYAML_UNLIMITED),
 	CYAML_FIELD_SEQUENCE("file_name", CYAML_FLAG_POINTER,
-			     struct oem_prov_indirect, file_name,
+			     struct oem_prov_offline, file_name,
 			     &string_ptr_schema, 0, 1),
 	CYAML_FIELD_ENUM("delete_assets_file", CYAML_FLAG_OPTIONAL,
-			 struct oem_prov_indirect, delete_assets, bool_strings,
+			 struct oem_prov_offline, delete_assets, bool_strings,
 			 CYAML_ARRAY_LEN(bool_strings)),
 	CYAML_FIELD_ENUM("lifecycle", CYAML_FLAG_OPTIONAL,
-			 struct oem_prov_indirect, close, lc_strings,
+			 struct oem_prov_offline, close, lc_strings,
 			 CYAML_ARRAY_LEN(lc_strings)),
 	CYAML_FIELD_ENUM("storage", CYAML_FLAG_OPTIONAL,
-			 struct oem_prov_indirect, commit_storage, cs_strings,
+			 struct oem_prov_offline, commit_storage, cs_strings,
 			 CYAML_ARRAY_LEN(cs_strings)),
 
 	CYAML_FIELD_END
@@ -89,9 +89,9 @@ static const cyaml_schema_field_t oem_prov_config_fields_schema[] = {
 	CYAML_FIELD_MAPPING_PTR("online", CYMAL_FLAG_OPTIONAL_POINTER,
 				struct oem_prov_config, online, online_schema),
 
-	CYAML_FIELD_MAPPING_PTR("indirect", CYMAL_FLAG_OPTIONAL_POINTER,
-				struct oem_prov_config, indirect,
-				indirect_schema),
+	CYAML_FIELD_MAPPING_PTR("offline", CYMAL_FLAG_OPTIONAL_POINTER,
+				struct oem_prov_config, offline,
+				offline_schema),
 	CYAML_FIELD_END
 };
 
@@ -168,23 +168,23 @@ static int oem_prov_validate_option(int option,
 				    oem_config->online->hostname,
 				    oem_config->online->port);
 		break;
-	case OEM_PROV_INDIRECT:
-		if (!oem_config->indirect)
-			return OEM_PROV_STATUS_INDIRECT_OPT_MISSING;
-		close = oem_config->indirect->close;
-		commit_storage = oem_config->indirect->commit_storage;
+	case OEM_PROV_OFFLINE:
+		if (!oem_config->offline)
+			return OEM_PROV_STATUS_OFFLINE_OPT_MISSING;
+		close = oem_config->offline->close;
+		commit_storage = oem_config->offline->commit_storage;
 
 		OEM_PROV_DBG_PRINTF(INFO, "\tPartition: %s\n",
-				    oem_config->indirect->partition);
+				    oem_config->offline->partition);
 		OEM_PROV_DBG_PRINTF(INFO, "\tType: %s\n",
-				    oem_config->indirect->type);
+				    oem_config->offline->type);
 		OEM_PROV_DBG_PRINTF(INFO, "\tMount_point: %s\n",
-				    oem_config->indirect->mount_point);
+				    oem_config->offline->mount_point);
 
-		file_count = oem_config->indirect->file_name_count;
+		file_count = oem_config->offline->file_name_count;
 		for (int i = 0; i < file_count; i++) {
 			OEM_PROV_DBG_PRINTF(INFO, "\tFile_name: %s\n",
-					    oem_config->indirect->file_name[i]);
+					    oem_config->offline->file_name[i]);
 		}
 		break;
 	}
@@ -244,8 +244,8 @@ int oem_prov_get_lc_option(unsigned int mode)
 	switch (mode) {
 	case OEM_PROV_ONLINE:
 		return os_ctx->oem_config->online->close;
-	case OEM_PROV_INDIRECT:
-		return os_ctx->oem_config->indirect->close;
+	case OEM_PROV_OFFLINE:
+		return os_ctx->oem_config->offline->close;
 	}
 
 	return 0;
@@ -260,8 +260,8 @@ int oem_prov_get_storage(unsigned int mode)
 	switch (mode) {
 	case OEM_PROV_ONLINE:
 		return os_ctx->oem_config->online->commit_storage;
-	case OEM_PROV_INDIRECT:
-		return os_ctx->oem_config->indirect->commit_storage;
+	case OEM_PROV_OFFLINE:
+		return os_ctx->oem_config->offline->commit_storage;
 	}
 
 	return 0;

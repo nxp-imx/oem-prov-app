@@ -177,7 +177,7 @@ exit:
 static inline int unmount_device(struct oem_prov_os_ctx *os_ctx,
 				 char *mount_point)
 {
-	if (os_ctx->oem_config->indirect->needs_unmount) {
+	if (os_ctx->oem_config->offline->needs_unmount) {
 		if (umount(mount_point)) {
 			OEM_PROV_DBG_PRINTF(ERROR,
 					    "Umount returned %s for %s\n",
@@ -193,12 +193,12 @@ int oem_prov_load_env(char **path)
 	int status = OEM_PROV_STATUS_OK;
 	size_t len = 0;
 	struct oem_prov_os_ctx *os_ctx = NULL;
-	struct oem_prov_indirect *assets = NULL;
+	struct oem_prov_offline *assets = NULL;
 
 	os_ctx = oem_prov_get_os_ctx();
 	OEM_PROV_DBG_ASSERT(os_ctx && os_ctx->oem_config &&
-			    os_ctx->oem_config->indirect);
-	assets = os_ctx->oem_config->indirect;
+			    os_ctx->oem_config->offline);
+	assets = os_ctx->oem_config->offline;
 
 	/* partition cannot be empty string */
 	if (!assets->partition || !strlen(assets->partition)) {
@@ -252,7 +252,7 @@ int oem_prov_load_assets(unsigned int index, char *path, void **stream)
 	size_t total_len = 0;
 	int chars_written = 0;
 	struct oem_prov_os_ctx *os_ctx = NULL;
-	struct oem_prov_indirect *assets = NULL;
+	struct oem_prov_offline *assets = NULL;
 	FILE *fp = NULL;
 	size_t file_length = 0;
 
@@ -267,8 +267,8 @@ int oem_prov_load_assets(unsigned int index, char *path, void **stream)
 
 	os_ctx = oem_prov_get_os_ctx();
 	OEM_PROV_DBG_ASSERT(os_ctx && os_ctx->oem_config &&
-			    os_ctx->oem_config->indirect);
-	assets = os_ctx->oem_config->indirect;
+			    os_ctx->oem_config->offline);
+	assets = os_ctx->oem_config->offline;
 
 	if (index >= assets->file_name_count) {
 		status = OEM_PROV_STATUS_OUT_OF_BOUNDS;
@@ -335,7 +335,7 @@ exit:
 int oem_prov_unload_assets(void *stream)
 {
 	int status = OEM_PROV_STATUS_OK;
-	struct oem_prov_indirect *assets = NULL;
+	struct oem_prov_offline *assets = NULL;
 	struct oem_prov_os_ctx *os_ctx = NULL;
 	FILE *fp = (FILE *)stream;
 
@@ -343,13 +343,13 @@ int oem_prov_unload_assets(void *stream)
 		status = OEM_PROV_STATUS_INVALID_FILE;
 
 	os_ctx = oem_prov_get_os_ctx();
-	if (!os_ctx || !os_ctx->oem_config || !os_ctx->oem_config->indirect)
+	if (!os_ctx || !os_ctx->oem_config || !os_ctx->oem_config->offline)
 		return OEM_PROV_STATUS_INVALID_POINTER;
 
-	assets = os_ctx->oem_config->indirect;
+	assets = os_ctx->oem_config->offline;
 
 	/* delete the file if configured to be deleted */
-	if (os_ctx->oem_config->indirect->delete_assets) {
+	if (os_ctx->oem_config->offline->delete_assets) {
 		if (remove(assets->assets_file_path) < 0)
 			status = OEM_PROV_STATUS_INVALID_FILE;
 	}
@@ -361,7 +361,7 @@ int oem_prov_unload_assets(void *stream)
 int oem_prov_unload_env(char **path)
 {
 	int status = OEM_PROV_STATUS_OK;
-	struct oem_prov_indirect *assets = NULL;
+	struct oem_prov_offline *assets = NULL;
 	struct oem_prov_os_ctx *os_ctx = NULL;
 
 	free(*path);
@@ -369,9 +369,9 @@ int oem_prov_unload_env(char **path)
 
 	os_ctx = oem_prov_get_os_ctx();
 
-	if (!os_ctx || !os_ctx->oem_config || !os_ctx->oem_config->indirect)
+	if (!os_ctx || !os_ctx->oem_config || !os_ctx->oem_config->offline)
 		return OEM_PROV_STATUS_INVALID_POINTER;
-	assets = os_ctx->oem_config->indirect;
+	assets = os_ctx->oem_config->offline;
 
 	if (assets->needs_unmount)
 		status = unmount_device(os_ctx, assets->mount_point);

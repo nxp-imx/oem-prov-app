@@ -12,7 +12,7 @@
  * @OEM_PROV_STATUS_INVALID_FILE: The configuration file/claim code file cannot be opened
  * @OEM_PROV_STATUS_EMPTY_FILE: The configuration file is empty
  * @OEM_PROV_STATUS_ONLINE_OPT_MISSING: The online option from thr config file is missing
- * @OEM_PROV_STATUS_INDIRECT_OPT_MISSING: The indirect option from the config file is missing
+ * @OEM_PROV_STATUS_OFFLINE_OPT_MISSING: The offline option from the config file is missing
  * @OEM_PROV_STATUS_FILENAME_TOO_LONG: The file name is too long
  * @OEM_PROV_STATUS_INVALID_OPTION: Invalid option in the configuration file
  *
@@ -35,7 +35,7 @@ enum oem_prov_status_code {
 	OEM_PROV_STATUS_INVALID_FILE,
 	OEM_PROV_STATUS_EMPTY_FILE,
 	OEM_PROV_STATUS_ONLINE_OPT_MISSING,
-	OEM_PROV_STATUS_INDIRECT_OPT_MISSING,
+	OEM_PROV_STATUS_OFFLINE_OPT_MISSING,
 	OEM_PROV_STATUS_FILENAME_TOO_LONG,
 	OEM_PROV_STATUS_INVALID_OPTION,
 	OEM_PROV_STATUS_ALLOCATION_ERROR,

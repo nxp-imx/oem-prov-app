@@ -45,7 +45,7 @@ online:
 # ==========================================================================
 #                       Provisioning via proxy
 # ==========================================================================
-indirect:
+offline:
 # partition where the security assets file is located. If the partition is already
 # mounted the file is searched within the mount point. If the partition is not
 # mounted, the application will mount it.

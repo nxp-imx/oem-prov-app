@@ -10,9 +10,9 @@
  * enum oem_prov_config_options - OEM Provisioning Application modes
  *
  * @OEM_PROV_ONLINE: Online mode, the provisioning is done through EdgeLock 2GO server
- * @OEM_PROV_INDIRECT: Indirect mode, the provisioning is done without EdgeLock 2Go server
+ * @OEM_PROV_OFFLINE: Offline modes, the provisioning is done without EdgeLock 2GO server
  */
-enum oem_prov_config_options { OEM_PROV_ONLINE, OEM_PROV_INDIRECT };
+enum oem_prov_config_options { OEM_PROV_ONLINE, OEM_PROV_OFFLINE };
 
 enum oem_prov_lc_options {
 	OEM_PROV_LC_NONE = 0,

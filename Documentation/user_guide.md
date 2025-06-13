@@ -26,7 +26,7 @@ For detailed description of the available options, refer to the
 	</td>
 </tr>
 <tr>
-	<td>--indirect, -i config_file</td>
+	<td>--offline, -f config_file</td>
 	<td> Runs the application in <b>the device provisioning via proxy mode</b>, provisioning the device using assets stored in a file on FAT32 partition.
 	</td>
 </tr>

@@ -22,7 +22,7 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("%-40s", "--online,-o file_name");
 	OEM_PROV_PRINTF("%s", "Device provisioning via cloud mode\n");
 
-	OEM_PROV_PRINTF("%-40s", "--indirect,-i file_name");
+	OEM_PROV_PRINTF("%-40s", "--offline,-f file_name");
 	OEM_PROV_PRINTF("%s", "Device Provisioning via proxy mode\n");
 
 	OEM_PROV_PRINTF("%-40s", "--claim-code,-c file_name");
@@ -74,7 +74,7 @@ static int validate_and_convert_storage(const char *storage)
 int main(int argc, char *argv[])
 {
 	unsigned int online = 0;
-	unsigned int indirect = 0;
+	unsigned int offline = 0;
 	unsigned int close = 0;
 	unsigned int claim_code = 0;
 	unsigned int uuid = 0;
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 	while (1) {
 		static struct option long_options[] = {
 			{ "online", required_argument, 0, 'o' },
-			{ "indirect", required_argument, 0, 'i' },
+			{ "offline", required_argument, 0, 'f' },
 			{ "life-cycle", required_argument, 0, 'l' },
 			{ "storage", required_argument, 0, 's' },
 			{ "claim-code", required_argument, 0, 'c' },
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 		if (argc <= 1)
 			usage(argv[0]);
 
-		c = getopt_long(argc, argv, "i:o:c:huvs:l:", long_options,
+		c = getopt_long(argc, argv, "f:o:c:huvs:l:", long_options,
 				&option_index);
 
 		if (c == -1) {
@@ -129,12 +129,12 @@ int main(int argc, char *argv[])
 			}
 			strcpy(config_file_name, optarg);
 			break;
-		case 'i':
-			if (indirect) {
+		case 'f':
+			if (offline) {
 				usage(argv[0]);
 				goto exit;
 			}
-			indirect = 1;
+			offline = 1;
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {
 				usage(argv[0]);
@@ -217,8 +217,8 @@ int main(int argc, char *argv[])
 	}
 
 	/* Input parameters check */
-	if (online && indirect) {
-		OEM_PROV_PRINTF("Select online or indirect, not both!\n");
+	if (online && offline) {
+		OEM_PROV_PRINTF("Select online or offline, not both!\n");
 		usage(argv[0]);
 		goto exit;
 	}
@@ -248,9 +248,9 @@ int main(int argc, char *argv[])
 			goto exit;
 	}
 
-	if (indirect) {
-		OEM_PROV_DBG_PRINTF(INFO, "Indirect provisioning\n");
-		status = oem_prov_indirect(config_file_name);
+	if (offline) {
+		OEM_PROV_DBG_PRINTF(INFO, "Offline provisioning\n");
+		status = oem_prov_offline(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}

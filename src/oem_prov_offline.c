@@ -48,14 +48,14 @@ exit:
 	return status;
 }
 
-int oem_prov_indirect(const char *config_filename)
+int oem_prov_offline(const char *config_filename)
 {
 	int status = OEM_PROV_STATUS_OK;
 	int close_option = 0;
 	psa_status_t psa_status = PSA_SUCCESS;
 	char *path = NULL;
 
-	status = oem_prov_load_config(config_filename, OEM_PROV_INDIRECT);
+	status = oem_prov_load_config(config_filename, OEM_PROV_OFFLINE);
 	if (status != OEM_PROV_STATUS_OK) {
 		OEM_PROV_DBG_PRINTF(ERROR, "Invalid configuration file!\n");
 		return status;
@@ -82,14 +82,14 @@ int oem_prov_indirect(const char *config_filename)
 		goto exit;
 
 	/* check if the key storage should be committed */
-	if (oem_prov_get_storage(OEM_PROV_INDIRECT)) {
+	if (oem_prov_get_storage(OEM_PROV_OFFLINE)) {
 		status = oem_prov_commit_key_storage();
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
 	/* check if the device needs to be closed */
-	close_option = oem_prov_get_lc_option(OEM_PROV_INDIRECT);
+	close_option = oem_prov_get_lc_option(OEM_PROV_OFFLINE);
 	if (close_option)
 		status = oem_prov_set_lifecycle(close_option);
 

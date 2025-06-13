@@ -53,7 +53,7 @@ int oem_prov_inject_claimcode(const char *config_filename);
 int oem_prov_online(const char *config_filename);
 
 /**
- * oem_prov_indirect() -  Runs the OEM Provisioning Application in indirect mode.
+ * oem_prov_offline() -  Runs the OEM Provisioning Application in offline mode.
  *
  * @filename: Config file name
  *
@@ -64,7 +64,7 @@ int oem_prov_online(const char *config_filename);
  * Return:
  * error code
  */
-int oem_prov_indirect(const char *config_filename);
+int oem_prov_offline(const char *config_filename);
 
 /**
  * oem_prov_set_lifecycle() -  Sets the lifecycle of a device.
