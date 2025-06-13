@@ -29,7 +29,7 @@ else
 	echo "" >> $BBLAYERS_CONF
 	echo "# OEM Provisioning Application" >> $BBLAYERS_CONF
 	echo "BBLAYERS += \"\${BSPDIR}$LAYER_PATH\"" >> $BBLAYERS_CONF
-	echo "Adding $LAYERNAME to $BBLAYERS_CONF"
+	echo "Adding $LAYER_NAME to $BBLAYERS_CONF"
 fi
 
 LOCAL_CONF=$BUILD_DIR/conf/local.conf
