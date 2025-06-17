@@ -15,12 +15,18 @@
 #include "oem_prov_os.h"
 #include "oem_prov_internal.h"
 #include "oem_prov_common.h"
+#include "oem_prov_arithmetic_ops.h"
 
 #define CYMAL_FLAG_OPTIONAL_POINTER (CYAML_FLAG_POINTER | CYAML_FLAG_OPTIONAL)
 
 static const cyaml_strval_t lc_strings[] = {
 	{ "closed", OEM_PROV_LC_CLOSED },
 	{ "closed-locked", OEM_PROV_LC_CLOSED_LOCKED },
+};
+
+static const cyaml_strval_t provisioning_str[] = {
+	{ "individual", OEM_PROV_FLOW_IND },
+	{ "product", OEM_PROV_FLOW_PROD },
 };
 
 static const cyaml_strval_t cs_strings[] = {
@@ -79,6 +85,9 @@ static const cyaml_schema_field_t offline_schema[] = {
 	CYAML_FIELD_ENUM("storage", CYAML_FLAG_OPTIONAL,
 			 struct oem_prov_offline, commit_storage, cs_strings,
 			 CYAML_ARRAY_LEN(cs_strings)),
+	CYAML_FIELD_ENUM("provisioning", CYAML_FLAG_OPTIONAL,
+			 struct oem_prov_offline, flow, provisioning_str,
+			 CYAML_ARRAY_LEN(provisioning_str)),
 
 	CYAML_FIELD_END
 
@@ -138,6 +147,63 @@ static const cyaml_config_t config = {
 	.log_level = CYAML_LOG_WARNING,   /* Logging errors and warnings only. */
 };
 
+const char *get_str_for_int(int option, const cyaml_strval_t *array, int len)
+{
+	for (int i = 0; i < len; i++)
+		if (array[i].val == option)
+			return array[i].str;
+	return NULL;
+}
+
+static void print_online_info(struct oem_prov_online *config)
+{
+	OEM_PROV_DBG_PRINTF(INFO, "\thost: %s[%s]\n", config->hostname,
+			    config->port);
+	if (config->commit_storage)
+		OEM_PROV_DBG_PRINTF(INFO, "\tstorage: %s\n",
+				    get_str_for_int(config->commit_storage,
+						    cs_strings,
+						    ARRAY_SIZE(cs_strings)));
+	if (config->close)
+		OEM_PROV_DBG_PRINTF(INFO, "\tlifecycle: %s\n",
+				    get_str_for_int(config->close, lc_strings,
+						    ARRAY_SIZE(lc_strings)));
+	if (config->server_cert)
+		OEM_PROV_DBG_PRINTF(INFO, "\tserver_cert: %s\n",
+				    config->server_cert);
+}
+
+static void print_offline_info(struct oem_prov_offline *config)
+{
+	OEM_PROV_DBG_PRINTF(INFO, "\tpartition: %s\n", config->partition);
+	OEM_PROV_DBG_PRINTF(INFO, "\ttype: %s\n", config->type);
+	OEM_PROV_DBG_PRINTF(INFO, "\tmount_point: %s\n", config->mount_point);
+
+	OEM_PROV_DBG_PRINTF(INFO, "\tfile_name: ");
+	for (int i = 0; i < config->file_name_count; i++)
+		OEM_PROV_DBG_PRINTF(INFO, "%s ", config->file_name[i]);
+	OEM_PROV_DBG_PRINTF(INFO, "\n");
+
+	if (config->delete_assets)
+		OEM_PROV_DBG_PRINTF(INFO, "\tdelete_assets_file: %s\n",
+				    get_str_for_int(config->delete_assets,
+						    bool_strings,
+						    ARRAY_SIZE(bool_strings)));
+	if (config->commit_storage)
+		OEM_PROV_DBG_PRINTF(INFO, "\tstorage: %s\n",
+				    get_str_for_int(config->commit_storage,
+						    cs_strings,
+						    ARRAY_SIZE(cs_strings)));
+	if (config->close)
+		OEM_PROV_DBG_PRINTF(INFO, "\tlifecycle: %s\n",
+				    get_str_for_int(config->close, lc_strings,
+						    ARRAY_SIZE(lc_strings)));
+	if (config->flow)
+		OEM_PROV_DBG_PRINTF(INFO, "\tprovisioning: %s\n",
+				    get_str_for_int(config->flow, provisioning_str,
+						    ARRAY_SIZE(provisioning_str)));
+}
+
 /**
  * oem_prov_validate_option() - Validates the configuration file
  *
@@ -150,10 +216,6 @@ static const cyaml_config_t config = {
 static int oem_prov_validate_option(int option,
 				    struct oem_prov_config *oem_config)
 {
-	int close = 0;
-	int commit_storage = 0;
-	int file_count = 0;
-
 	if (!oem_config)
 		return OEM_PROV_STATUS_EMPTY_FILE;
 
@@ -161,41 +223,14 @@ static int oem_prov_validate_option(int option,
 	case OEM_PROV_ONLINE:
 		if (!oem_config->online)
 			return OEM_PROV_STATUS_ONLINE_OPT_MISSING;
-		close = oem_config->online->close;
-		commit_storage = oem_config->online->commit_storage;
-
-		OEM_PROV_DBG_PRINTF(INFO, "\tHost: %s[%s]\n",
-				    oem_config->online->hostname,
-				    oem_config->online->port);
+		print_online_info(oem_config->online);
 		break;
 	case OEM_PROV_OFFLINE:
 		if (!oem_config->offline)
 			return OEM_PROV_STATUS_OFFLINE_OPT_MISSING;
-		close = oem_config->offline->close;
-		commit_storage = oem_config->offline->commit_storage;
-
-		OEM_PROV_DBG_PRINTF(INFO, "\tPartition: %s\n",
-				    oem_config->offline->partition);
-		OEM_PROV_DBG_PRINTF(INFO, "\tType: %s\n",
-				    oem_config->offline->type);
-		OEM_PROV_DBG_PRINTF(INFO, "\tMount_point: %s\n",
-				    oem_config->offline->mount_point);
-
-		file_count = oem_config->offline->file_name_count;
-		for (int i = 0; i < file_count; i++) {
-			OEM_PROV_DBG_PRINTF(INFO, "\tFile_name: %s\n",
-					    oem_config->offline->file_name[i]);
-		}
+		print_offline_info(oem_config->offline);
 		break;
 	}
-
-	if (commit_storage) {
-		OEM_PROV_DBG_PRINTF(INFO, "\tCommit storage: %d\n",
-				    commit_storage);
-	}
-
-	if (close)
-		OEM_PROV_DBG_PRINTF(INFO, "\tClose: %d\n", close);
 
 	return OEM_PROV_STATUS_OK;
 }
@@ -249,6 +284,14 @@ int oem_prov_get_lc_option(unsigned int mode)
 	}
 
 	return 0;
+}
+
+int oem_prov_get_prov_type(void)
+{
+	struct oem_prov_os_ctx *os_ctx = NULL;
+
+	os_ctx = oem_prov_get_os_ctx();
+	return os_ctx->oem_config->offline->flow;
 }
 
 int oem_prov_get_storage(unsigned int mode)

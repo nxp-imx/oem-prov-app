@@ -90,3 +90,10 @@ offline:
 
 #  lifecycle: "closed"/"closed-locked"
 
+# [optional]
+# Indicates the provisioning type. If the option is missing the application
+# detects the provisioning type from the blob content. If the option is present
+# extra validations can be made (e.g. if the OEM key blob is present for product
+# flow provisioning)
+
+#  provisioning: "individual"/"product"

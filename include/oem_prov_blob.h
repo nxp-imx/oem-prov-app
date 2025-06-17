@@ -40,12 +40,13 @@ int oem_prov_import_all_blobs(void *stream, struct oem_prov_list metadata_list);
  * @metadata_list: The head of the linked list where the metadata of the security
  * assets are stored.
  * @id: The id of the security asset to be imported.
+ * @found: Indicates if the specified blob ID was found
  *
  * Return:
  * error code
  */
 int oem_prov_import_blob_by_id(void *stream, struct oem_prov_list metadata_list,
-			       psa_key_id_t id);
+			       psa_key_id_t id, unsigned int *found);
 
 /**
  * oem_prov_extract_blobs_metadata() - Extracts security assets metadata

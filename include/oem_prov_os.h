@@ -31,7 +31,7 @@ int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
 /**
  * oem_prov_load_config_file() - Loads the configuration file by the Cyaml library
  * @file_name: The configuration file name
- * @option: Indicates if the user has selected online or offline flow
+ * @option: Indicates if the user has selected online or offline flows
  *
  * This function opens the configuration file and loads it into the Cyaml internal
  * structures.
@@ -147,7 +147,7 @@ long oem_prov_get_offset(void *stream);
 /**
  * oem_prov_get_lc_option() - Get the configuration options for the device lifecycle
  *
- * @mode: The current flow: online, indirect, etc.
+ * @mode: The current flow: online, offline, etc.
  *
  * Return:
  * Returns the setting from the configuration file. After the provisioning is done,
@@ -160,13 +160,13 @@ int oem_prov_get_lc_option(unsigned int mode);
 /**
  * oem_prov_get_storage() - Returns the user option for commit_storage
  *
- * After the provisioning is done (either online, indirect or batch mode),
- * the non-volatile key storage can be committed into the physical memory.
+ * After the provisioning is done, the non-volatile key storage can be
+ * committed into the physical memory.
  * The configuration file has an option to indicate if the storage is to be
  * committed immediately after provisioning. This can be also done at a later stage
  * using a command line argument.
  *
- * @mode: the provisioning flow type: online, indirect or batch flow
+ * @mode: the provisioning flow type: online, offline flows
  *
  * Return:
  * the option from the configuration file
@@ -183,5 +183,16 @@ int oem_prov_get_storage(unsigned int mode);
  * the option from the configuration file
  */
 char *oem_prov_get_server_cert(void);
+
+/**
+ * oem_prov_get_prov_type() - Returns the user option for provisioning
+ *
+ * The user has the posibility to specify an offline provisioning type.
+ * It is optional and it can be either individual or product.
+ *
+ * Return:
+ * the option from the configuration file
+ */
+int oem_prov_get_prov_type(void);
 
 #endif /* __OEM_PROV_OS_H__ */

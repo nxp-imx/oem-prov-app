@@ -25,6 +25,8 @@ static int parse_objects(char *path)
 	int status = OEM_PROV_STATUS_OK;
 	struct oem_prov_list metadata_list = { 0 };
 	void *stream = NULL;
+	int found = 0;
+	int prov_type;
 
 	status = oem_prov_load_assets(0, path, &stream);
 	if (status != OEM_PROV_STATUS_OK) {
@@ -36,11 +38,30 @@ static int parse_objects(char *path)
 		OEM_PROV_DBG_PRINTF(ERROR, "Error parsing assets file\n");
 		goto exit;
 	}
-	status = oem_prov_import_blob_by_id(stream, metadata_list,
-					    EL2GO_PROV_OEM_KEY_ID);
-	if (status != OEM_PROV_STATUS_OK)
-		goto exit;
-	status = oem_prov_import_blob_by_id(stream, metadata_list, SRKH_KEY_ID);
+
+	prov_type = oem_prov_get_prov_type();
+
+	/* If the user did not specify the flow type in the configuration file
+	 * the application searches for the OEM key.
+	 * If the user specified the flow type in the configuration file
+	 * skip the search for the OEM key if product based provisioning is
+	 * not selected
+	 */
+	if (!prov_type || prov_type == OEM_PROV_FLOW_PROD) {
+		status = oem_prov_import_blob_by_id(stream, metadata_list,
+						    EL2GO_PROV_OEM_KEY_ID, &found);
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
+
+		if (!found && prov_type == OEM_PROV_FLOW_PROD) {
+			status = OEM_PROV_STATUS_INVALID_BLOB;
+			OEM_PROV_DBG_PRINTF(ERROR, "The OEM key is missing\n");
+			goto exit;
+		}
+	}
+
+	status = oem_prov_import_blob_by_id(stream, metadata_list, SRKH_KEY_ID,
+					    &found);
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
 	status = oem_prov_import_all_blobs(stream, metadata_list);

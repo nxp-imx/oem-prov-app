@@ -23,6 +23,7 @@ struct oem_prov_offline {
 	int delete_assets;
 	int close;
 	int commit_storage;
+	int flow;
 	int needs_unmount;
 	char *assets_file_path;
 };

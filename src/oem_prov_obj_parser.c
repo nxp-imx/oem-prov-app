@@ -323,13 +323,14 @@ exit:
 }
 
 int oem_prov_import_blob_by_id(void *stream, struct oem_prov_list metadata_list,
-			       unsigned int id)
+			       unsigned int id, unsigned int *found)
 {
 	int status = OEM_PROV_STATUS_OK;
 	struct node *next = NULL;
 	struct oem_prov_blob_metadata *blob = NULL;
 	size_t ret = 0;
 
+	*found = 0;
 	next = metadata_list.first;
 	while (next) {
 		blob = (struct oem_prov_blob_metadata *)(next->data);
@@ -357,6 +358,8 @@ int oem_prov_import_blob_by_id(void *stream, struct oem_prov_list metadata_list,
 			if (status == OEM_PROV_STATUS_OK)
 				blob->imported = 1;
 			free(data);
+
+			*found = 1;
 			return status;
 		}
 		next = next->next;
