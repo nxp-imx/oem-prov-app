@@ -12,6 +12,7 @@
 #include "oem_prov_common.h"
 #include "oem_prov_list.h"
 #include "psa/crypto.h"
+#include "oem_prov_arithmetic_ops.h"
 
 #define TAG_MAGIC 0x40U
 #define TAG_KEY_ID 0x41U
@@ -217,27 +218,6 @@ static int is_field_magic(void *stream)
 	return status;
 }
 
-/**
- * safe_add() - Safely adds a value to an unsigned integer
- *
- * The function adds a value to an unsigned integer, but first checks if the result
- * would exceed the maximum limit of an unsigned integer.
- *
- * @out: Pointer to the variable where the addition is performed.
- * @add_value: The value to be added.
- *
- * Return:
- * error code
- */
-static inline int safe_add(unsigned int *out, unsigned int add_value)
-{
-	if (*out > UINT_MAX - add_value)
-		return OEM_PROV_STATUS_INCOMPLETE_DATA;
-	*out += add_value;
-
-	return OEM_PROV_STATUS_OK;
-}
-
 int oem_prov_extract_blobs_metadata(void *stream,
 				    struct oem_prov_list *metadata_list)
 {
@@ -294,9 +274,10 @@ int oem_prov_extract_blobs_metadata(void *stream,
 			blob_length = SIZE_MAGIC_TLV;
 			continue;
 		} else {
-			status = safe_add(&blob_length, 1);
-			if (status != OEM_PROV_STATUS_OK)
+			if (INC_OVERFLOW(blob_length, 1)) {
+				status = OEM_PROV_STATUS_INCOMPLETE_DATA;
 				goto exit;
+			}
 		}
 
 		field_length = 0;
@@ -307,9 +288,10 @@ int oem_prov_extract_blobs_metadata(void *stream,
 			goto exit;
 		}
 
-		status = safe_add(&blob_length, llength);
-		if (status != OEM_PROV_STATUS_OK)
+		if (INC_OVERFLOW(blob_length, llength)) {
+			status = OEM_PROV_STATUS_INCOMPLETE_DATA;
 			goto exit;
+		}
 
 		status = read_data(stream, &value, field_length);
 		if (status != OEM_PROV_STATUS_OK) {
@@ -329,9 +311,10 @@ int oem_prov_extract_blobs_metadata(void *stream,
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 
-		status = safe_add(&blob_length, field_length);
-		if (status != OEM_PROV_STATUS_OK)
+		if (INC_OVERFLOW(blob_length, field_length)) {
+			status = OEM_PROV_STATUS_INCOMPLETE_DATA;
 			goto exit;
+		}
 	}
 
 exit:
