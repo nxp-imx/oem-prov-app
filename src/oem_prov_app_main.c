@@ -11,9 +11,19 @@
 #include "oem_prov.h"
 #include "oem_prov_version.h"
 #include "oem_prov_common.h"
+#include "oem_prov_arithmetic_ops.h"
 
 #define MAX_FILE_SIZE_NAME 256
 #define MAX_PARAM_OPTION 48
+
+enum command_line_options {
+	CL_ONLINE = 0,
+	CL_OFFLINE,
+	CL_CLAIM_CODE,
+	CL_UUID,
+	CL_STORAGE,
+	CL_LCYCLE
+};
 
 static void usage(const char *prg)
 {
@@ -72,14 +82,47 @@ static int validate_and_convert_storage(const char *storage)
 
 	return OEM_PROV_S_NONE;
 }
+
+static inline int is_option_exclusive(uint32_t params, uint32_t offset)
+{
+	if (IS_BIT_SET(params, offset) && params != BIT(offset))
+		return 0;
+	return 1;
+}
+
+static int check_input_params(uint32_t params)
+{
+	/* online and offline cannot be selected in the same command line */
+	if (IS_BIT_SET(params, CL_ONLINE) && IS_BIT_SET(params, CL_OFFLINE)) {
+		OEM_PROV_PRINTF("Select online or offline, not both!\n");
+		return OEM_PROV_STATUS_INVALID_PARAM;
+	}
+
+	/* storage option should not be mixed with other options*/
+	if (!is_option_exclusive(params, CL_STORAGE)) {
+		OEM_PROV_PRINTF("Storage should not be mixed with other options\n");
+		return OEM_PROV_STATUS_INVALID_PARAM;
+	}
+
+	/* Lifecycle should not be mixed with other options */
+	if (!is_option_exclusive(params, CL_LCYCLE)) {
+		OEM_PROV_PRINTF("Lifcycle should not be mixed with other options\n");
+		return OEM_PROV_STATUS_INVALID_PARAM;
+	}
+
+	/* Claim code should not be mixed with offline */
+	if (IS_BIT_SET(params, CL_CLAIM_CODE) &&
+	    IS_BIT_SET(params, CL_OFFLINE)) {
+		OEM_PROV_PRINTF("Claim code and offline should not be mixed\n");
+		return OEM_PROV_STATUS_INVALID_PARAM;
+	}
+
+	return OEM_PROV_STATUS_OK;
+}
+
 int main(int argc, char *argv[])
 {
-	unsigned int online = 0;
-	unsigned int offline = 0;
-	unsigned int close = 0;
-	unsigned int claim_code = 0;
-	unsigned int uuid = 0;
-	unsigned int commit_storage = 0;
+	unsigned int options_bitmap = 0;
 	int c = 0;
 	char config_file_name[MAX_FILE_SIZE_NAME] = { 0 };
 	char cc_file_name[MAX_FILE_SIZE_NAME] = { 0 };
@@ -118,11 +161,12 @@ int main(int argc, char *argv[])
 
 		switch (c) {
 		case 'o':
-			if (online) {
+			if (IS_BIT_SET(options_bitmap, CL_ONLINE)) {
 				usage(argv[0]);
 				goto exit;
 			}
-			online = 1;
+
+			SET_BIT(options_bitmap, CL_ONLINE);
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {
 				usage(argv[0]);
@@ -131,11 +175,11 @@ int main(int argc, char *argv[])
 			strcpy(config_file_name, optarg);
 			break;
 		case 'f':
-			if (offline) {
+			if (IS_BIT_SET(options_bitmap, CL_OFFLINE)) {
 				usage(argv[0]);
 				goto exit;
 			}
-			offline = 1;
+			SET_BIT(options_bitmap, CL_OFFLINE);
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {
 				usage(argv[0]);
@@ -144,11 +188,11 @@ int main(int argc, char *argv[])
 			strcpy(config_file_name, optarg);
 			break;
 		case 'l':
-			if (close) {
+			if (IS_BIT_SET(options_bitmap, CL_LCYCLE)) {
 				usage(argv[0]);
 				goto exit;
 			}
-			close = 1;
+			SET_BIT(options_bitmap, CL_LCYCLE);
 			if (validate_string(optarg, MAX_PARAM_OPTION)) {
 				usage(argv[0]);
 				goto exit;
@@ -162,11 +206,11 @@ int main(int argc, char *argv[])
 			strcpy(close_option, optarg);
 			break;
 		case 'c':
-			if (claim_code) {
+			if (IS_BIT_SET(options_bitmap, CL_CLAIM_CODE)) {
 				usage(argv[0]);
 				goto exit;
 			}
-			claim_code = 1;
+			SET_BIT(options_bitmap, CL_CLAIM_CODE);
 			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
 			if (status != OEM_PROV_STATUS_OK) {
 				usage(argv[0]);
@@ -175,18 +219,18 @@ int main(int argc, char *argv[])
 			strcpy(cc_file_name, optarg);
 			break;
 		case 'u':
-			if (uuid) {
+			if (IS_BIT_SET(options_bitmap, CL_UUID)) {
 				usage(argv[0]);
 				goto exit;
 			}
-			uuid = 1;
+			SET_BIT(options_bitmap, CL_UUID);
 			break;
 		case 's':
-			if (commit_storage) {
+			if (IS_BIT_SET(options_bitmap, CL_STORAGE)) {
 				usage(argv[0]);
 				goto exit;
 			}
-			commit_storage = 1;
+			SET_BIT(options_bitmap, CL_STORAGE);
 			if (validate_string(optarg, MAX_PARAM_OPTION)) {
 				usage(argv[0]);
 				goto exit;
@@ -217,46 +261,44 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* Input parameters check */
-	if (online && offline) {
-		OEM_PROV_PRINTF("Select online or offline, not both!\n");
-		usage(argv[0]);
+	status = check_input_params(options_bitmap);
+	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
-	}
 
 	status = oem_prov_init_smw();
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;
 
-	if (uuid) {
+	if (IS_BIT_SET(options_bitmap, CL_UUID)) {
 		OEM_PROV_DBG_PRINTF(INFO, "UUID read option\n");
 		status = oem_prov_get_uuid();
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
-	if (claim_code) {
+	if (IS_BIT_SET(options_bitmap, CL_CLAIM_CODE)) {
 		OEM_PROV_DBG_PRINTF(INFO, "Claim code inject option\n");
 		status = oem_prov_inject_claimcode(cc_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
-	if (online) {
+	if (IS_BIT_SET(options_bitmap, CL_ONLINE)) {
 		OEM_PROV_DBG_PRINTF(INFO, "Online provisioning\n");
 		status = oem_prov_online(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
-	if (offline) {
+	if (IS_BIT_SET(options_bitmap, CL_OFFLINE)) {
 		OEM_PROV_DBG_PRINTF(INFO, "Offline provisioning\n");
 		status = oem_prov_offline(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
-	if (commit_storage) {
+	if (IS_BIT_SET(options_bitmap, CL_STORAGE)) {
 		int cs = validate_and_convert_storage(storage_option);
+
 		OEM_PROV_DBG_PRINTF(INFO, "Commit storage option\n");
 
 		if (cs == OEM_PROV_S_NONE) {
@@ -268,7 +310,7 @@ int main(int argc, char *argv[])
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
-	if (close) {
+	if (IS_BIT_SET(options_bitmap, CL_LCYCLE)) {
 		int option = validate_and_convert_life_cycle(close_option);
 
 		OEM_PROV_DBG_PRINTF(INFO, "Close device option\n");

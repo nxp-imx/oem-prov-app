@@ -161,17 +161,18 @@ The user can configure the application (through the configuration file) to perfo
 ## Additional features
 
 ### Commit the secure storage
-The application can commit the non-volatile key storage into physical memory and increment the anti-rollback counter. This can be performed:
-* Automatically after provisioning (if configured in the configuration file)
-* By executing:
+The application supports committing the non-volatile key storage to physical memory and incrementing the anti-rollback counter. This can be done in one of the following ways:
+* __Automatically__ after the provisioning process (if configured in the configuration file)
+* __Manually__, using the command:
 ```sh
 oem-prov-app -s commit
 ```
+> **Note:** This command must be used exclusively. Combining it with other options is not permitted to prevent conflicts between command-line arguments and configuration file settings.
 
 ### Close the device
 The application allows transitioning the device lifecycle to __closed__ or __closed-locked__, which ensures that the device will only boot signed images. This can be performed:
-* Automatically after provisioning (if configured in the configuration file)
-* By executing:
+* __Automatically__ after the provisioning process (if configured in the configuration file)
+* __Manually__, using this command:
 ```sh
 oem-prov-app -l closed
 ```
@@ -179,8 +180,7 @@ or
 ```sh
 oem-prov-app -l closed-locked
 ```
-
-###
+> **Note:** This command must be used exclusively. Combining it with other options is not permitted to prevent conflicts between command-line arguments and configuration file settings.
 
 ### Retrieve the device UUID
 To retrieve the device UUID, which can be useful during development, run the following command:
@@ -189,4 +189,4 @@ oem-prov-app -u
 ```
 
 ### Claim code injection
-Claim code injection is described in detail in [Device provisioning via cloud](#1-device-provisioning-via-cloud).
+Claim code injection is described in detail in [Device provisioning via cloud](#1-device-provisioning-via-cloud). The claim code option can only be used with offline modes.
