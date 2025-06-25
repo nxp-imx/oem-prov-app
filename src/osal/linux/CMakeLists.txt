@@ -6,7 +6,8 @@ target_sources(osal PRIVATE
                oem_prov_os_utils.c
                oem_prov_os.c
                oem_prov_part.c
-               oem_prov_file.c)
+               oem_prov_file.c
+               oem_prov_debug.c)
 
 target_include_directories(osal
                            PRIVATE ${CMAKE_SOURCE_DIR}/include

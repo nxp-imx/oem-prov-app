@@ -16,6 +16,59 @@
  #define INC_OVERFLOW(a, b)	__builtin_add_overflow(a, b, &(a))
  #define DEC_OVERFLOW(a, b)	__builtin_sub_overflow(a, b, &(a))
 
+ #define SET_OVERFLOW_UNSIGNED(ua, res)                                         \
+	({                                                                     \
+		__typeof__(res) _max = 0;                                      \
+		__typeof__(ua) _ua = (ua);                                     \
+		int _overflow = 1;                                             \
+		if (sizeof(ua) > sizeof(res))                                  \
+			_ua = _ua & ~_max;                                     \
+		if (_ua == _ua) {                                              \
+			res = _ua;                                             \
+			_overflow = 0;                                         \
+		}                                                              \
+		_overflow;                                                     \
+	})
+
+#define TO_UNSIGNED(v, res)                                                    \
+	({                                                                     \
+		__typeof__(v) _max_v = 0;                                      \
+		__typeof__(v) _v = (v);                                        \
+		__typeof__(res) _res = 0;                                      \
+		int _overflow = 1;                                             \
+		_max_v = ~_max_v;                                              \
+		if ((_v & _max_v) == _v) {                                     \
+			_res = _v;                                             \
+			_overflow = 0;                                         \
+		} else if (!ADD_OVERFLOW(~_v, 1, &_res)) {                     \
+			_overflow = 0;                                         \
+		}                                                              \
+		res = _res;                                                    \
+		_overflow;                                                     \
+	})
+
+#define SET_OVERFLOW(a, res)                                                   \
+	({                                                                     \
+		__typeof__(a) _a = (a);                                        \
+		__typeof__(res) _res = 0;                                      \
+		int _overflow = 1;                                             \
+		if (sizeof(_a) == sizeof(uint64_t)) {                          \
+			uint64_t __ua = 0;                                     \
+			if (!TO_UNSIGNED(_a, __ua))                            \
+				_overflow = SET_OVERFLOW_UNSIGNED(__ua, _res); \
+		} else if (sizeof(_a) == sizeof(uint32_t)) {                   \
+			uint32_t __ua = 0;                                     \
+			if (!TO_UNSIGNED(_a, __ua))                            \
+				_overflow = SET_OVERFLOW_UNSIGNED(__ua, _res); \
+		} else if (sizeof(_a) == sizeof(uint8_t)) {                    \
+			uint8_t __ua = 0;                                      \
+			if (!TO_UNSIGNED(_a, __ua))                            \
+				_overflow = SET_OVERFLOW_UNSIGNED(__ua, _res); \
+		}                                                              \
+		res = _res;                                                    \
+		_overflow;                                                     \
+	})
+
  #ifndef BIT
  #define BIT(n) (1UL << (n))
  #endif
@@ -24,5 +77,7 @@
  #define CLEAR_BITS(val, mask)   ((val) &= ~(mask))
  #define IS_BIT_SET(value, n)    (((value) & BIT(n)) != 0)
  #define SET_BIT(value, n)       ((value) |= BIT(n))
+ #define CLEAR_BIT(value, n)     ((value) &= ~BIT(n))
+
 
  #endif /* __OEM_PROV_ARITHMETIC_OPS_H__ */

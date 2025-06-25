@@ -157,6 +157,7 @@ const char *get_str_for_int(int option, const cyaml_strval_t *array, int len)
 
 static void print_online_info(struct oem_prov_online *config)
 {
+	OEM_PROV_DBG_PRINTF(INFO, "Online provisioning\n");
 	OEM_PROV_DBG_PRINTF(INFO, "\thost: %s[%s]\n", config->hostname,
 			    config->port);
 	if (config->commit_storage)
@@ -175,6 +176,7 @@ static void print_online_info(struct oem_prov_online *config)
 
 static void print_offline_info(struct oem_prov_offline *config)
 {
+	OEM_PROV_DBG_PRINTF(INFO, "Offline provisioning\n");
 	OEM_PROV_DBG_PRINTF(INFO, "\tpartition: %s\n", config->partition);
 	OEM_PROV_DBG_PRINTF(INFO, "\ttype: %s\n", config->type);
 	OEM_PROV_DBG_PRINTF(INFO, "\tmount_point: %s\n", config->mount_point);

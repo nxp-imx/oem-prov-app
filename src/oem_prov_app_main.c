@@ -22,7 +22,8 @@ enum command_line_options {
 	CL_CLAIM_CODE,
 	CL_UUID,
 	CL_STORAGE,
-	CL_LCYCLE
+	CL_LCYCLE,
+	CL_VERBOSE,
 };
 
 static void usage(const char *prg)
@@ -47,6 +48,8 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("%-40s", "--life-cycle,-l closed/closed-locked");
 	OEM_PROV_PRINTF("%s",
 		        "Forwards the device lifecycle to closed/closed-locked.\n");
+	OEM_PROV_PRINTF("%-40s", "--verbose,-V level[0-4]");
+	OEM_PROV_PRINTF("%s", "Sets the verbosity level\n");
 
 	OEM_PROV_PRINTF("%-40s", "--version,-v");
 	OEM_PROV_PRINTF("%s", "Version information\n");
@@ -85,12 +88,14 @@ static int validate_and_convert_storage(const char *storage)
 
 static inline int is_option_exclusive(uint32_t params, uint32_t offset)
 {
+	/* verbosity level is allowed to be combined with any other parameter */
+	CLEAR_BIT(params, CL_VERBOSE);
 	if (IS_BIT_SET(params, offset) && params != BIT(offset))
 		return 0;
 	return 1;
 }
 
-static int check_input_params(uint32_t params)
+static int check_input_params(unsigned long params)
 {
 	/* online and offline cannot be selected in the same command line */
 	if (IS_BIT_SET(params, CL_ONLINE) && IS_BIT_SET(params, CL_OFFLINE)) {
@@ -122,7 +127,7 @@ static int check_input_params(uint32_t params)
 
 int main(int argc, char *argv[])
 {
-	unsigned int options_bitmap = 0;
+	unsigned long options_bitmap = 0;
 	int c = 0;
 	char config_file_name[MAX_FILE_SIZE_NAME] = { 0 };
 	char cc_file_name[MAX_FILE_SIZE_NAME] = { 0 };
@@ -140,6 +145,7 @@ int main(int argc, char *argv[])
 			{ "claim-code", required_argument, 0, 'c' },
 			{ "uuid", no_argument, 0, 'u' },
 			{ "version", no_argument, 0, 'v' },
+			{ "verbose", required_argument, 0, 'V' },
 			{ "help", no_argument, 0, 'h' },
 			{ 0, 0, 0, 0 }
 		};
@@ -148,7 +154,7 @@ int main(int argc, char *argv[])
 		if (argc <= 1)
 			usage(argv[0]);
 
-		c = getopt_long(argc, argv, "f:o:c:huvs:l:", long_options,
+		c = getopt_long(argc, argv, "f:o:c:huvs:l:V:", long_options,
 				&option_index);
 
 		if (c == -1) {
@@ -248,6 +254,14 @@ int main(int argc, char *argv[])
 					OEM_PROV_VERSION_MAJOR,
 					OEM_PROV_VERSION_MINOR);
 			break;
+		case 'V':
+			if (IS_BIT_SET(options_bitmap, CL_VERBOSE)) {
+				usage(argv[0]);
+				goto exit;
+			}
+			oem_prov_dbg_set_level(optarg);
+			SET_BIT(options_bitmap, CL_VERBOSE);
+			break;
 		case '?':
 			usage(argv[0]);
 			goto exit;
@@ -284,14 +298,12 @@ int main(int argc, char *argv[])
 	}
 
 	if (IS_BIT_SET(options_bitmap, CL_ONLINE)) {
-		OEM_PROV_DBG_PRINTF(INFO, "Online provisioning\n");
 		status = oem_prov_online(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}
 
 	if (IS_BIT_SET(options_bitmap, CL_OFFLINE)) {
-		OEM_PROV_DBG_PRINTF(INFO, "Offline provisioning\n");
 		status = oem_prov_offline(config_file_name);
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;

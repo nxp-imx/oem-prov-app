@@ -48,6 +48,16 @@ For detailed description of the available options, refer to the
 	<td> Commits the <b>non-volatile key storage</b> to physical memory and increments the <b>hardware anti-rollback counter</b>.
 	</td>
 </tr>
+<tr>
+	<td>--verbose, -V level[0-4]</td>
+	<td>Sets the verbosity level:
+		<ul>0 &rarr; No debug </ul>
+		<ul>1 &rarr; ERROR - messages only </ul>
+		<ul>2 &rarr; INFO - errors + information messages </ul>
+		<ul>3 &rarr; DEBUG - all of the above + debug messages </ul>
+		<ul>4 &rarr; VERBOSE - all of the above + verbose messages </ul>
+	</td>
+</tr>
 </tbody>
 </table>
 

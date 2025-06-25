@@ -8,21 +8,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "oem_prov_common.h"
+
 /* Debug levels*/
 #define OEM_PROV_DBG_LEVEL_NONE    0 /* No debug information */
 #define OEM_PROV_DBG_LEVEL_ERROR   1 /* Important error for the user*/
 #define OEM_PROV_DBG_LEVEL_INFO    2 /* First level of debugging information */
 #define OEM_PROV_DBG_LEVEL_DEBUG   3 /* Second level of debugging information */
 #define OEM_PROV_DBG_LEVEL_VERBOSE 4 /* Maximum level of debugging information */
+#define OEM_PROV_DBG_LEVEL_MAX     OEM_PROV_DBG_LEVEL_VERBOSE
 
 #define OEM_PROV_FLUSH fflush
 
 #if defined(ENABLE_VERBOSE)
-#define OEM_PROV_DBG_PRINTF(level, ...)                                        \
-	do {                                                                   \
-		if (OEM_PROV_DBG_LEVEL_##level <= VERBOSE_LEVEL)               \
-			printf(__VA_ARGS__);                                   \
-	} while (0)
+#define OEM_PROV_DBG_PRINTF(level, ...) \
+	oem_prov_dbg_printf(OEM_PROV_DBG_LEVEL_##level, __VA_ARGS__)
 
 #define OEM_PROV_DBG_ASSERT(exp)                                       \
 	do {                                                           \

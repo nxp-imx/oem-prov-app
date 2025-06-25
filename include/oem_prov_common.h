@@ -52,4 +52,24 @@ enum oem_prov_bool_options {
 unsigned int oem_prov_get_uint_be(const unsigned char *buffer,
 				  unsigned int bytes);
 
+/**
+ * oem_prov_dbg_set_level() - Sets the debug level
+ *
+ * The user can set the verbosity level from command line.
+ *
+ * Return: none
+ */
+void oem_prov_dbg_set_level(char *level_ptr);
+
+/**
+ * oem_prov_dbg_printf() - Prints a debug level
+ *
+ * Prints the debug level depending on the selected
+ * verbosity
+ * @level: The verbosity level. Function checks if the default verbosity
+ * allows printing the message.
+ * Return: none
+ */
+void oem_prov_dbg_printf(unsigned int level, const char *fmt, ...);
+
 #endif /* __OEM_PROV_COMMON_H__ */
