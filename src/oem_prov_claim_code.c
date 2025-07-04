@@ -37,7 +37,7 @@ int oem_prov_inject_claimcode(const char *filename)
 	status =
 		oem_prov_get_buffer_from_file(filename, &cc, &buffer_length, 0);
 	if (status != OEM_PROV_STATUS_OK) {
-		OEM_PROV_DBG_PRINTF(ERROR, "Invalid configuration file!\n");
+		OEM_PROV_DBG_PRINTF(ERROR, "Invalid claim code file!\n");
 		goto exit;
 	}
 
