@@ -35,7 +35,8 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("%s", "Commits the secure storage\n");
 
 	OEM_PROV_PRINTF("%-40s", "--life-cycle,-l closed/closed-locked");
-	OEM_PROV_PRINTF("%s", "Closes the device\n");
+	OEM_PROV_PRINTF("%s",
+		        "Forwards the device lifecycle to closed/closed-locked.\n");
 
 	OEM_PROV_PRINTF("%-40s", "--version,-v");
 	OEM_PROV_PRINTF("%s", "Version information\n");
