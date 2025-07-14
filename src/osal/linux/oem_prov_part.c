@@ -207,6 +207,36 @@ int oem_prov_load_env(char **path)
 		goto exit;
 	}
 
+	/* if the partition is "none", then the assets file will be read from
+	 * the directory indicated by the mountpoint in the local filesystem
+	 */
+	if (!strcmp(assets->partition, "none")) {
+		if (!assets->mount_point) {
+			status = OEM_PROV_STATUS_INVALID_POINTER;
+			goto exit;
+		}
+
+		/* mount point cannot be empty string */
+		len = strlen(assets->mount_point);
+		if (!len) {
+			OEM_PROV_DBG_PRINTF(ERROR, "Empty mount point\n");
+			status = OEM_PROV_STATUS_INVALID_STRING;
+			goto exit;
+		}
+
+		if (INC_OVERFLOW(len, 1)) {
+			status = OEM_PROV_STATUS_NUMBER_TOO_LARGE;
+			goto exit;
+		}
+		*path = malloc(len);
+		if (!(*path)) {
+			status = OEM_PROV_STATUS_ALLOCATION_ERROR;
+			goto exit;
+		}
+		memcpy(*path, assets->mount_point, len);
+		goto exit;
+	}
+
 	status = is_device_mounted(assets->partition, path);
 	if (status != OEM_PROV_STATUS_OK)
 		goto exit;

@@ -27,7 +27,7 @@ For detailed description of the available options, refer to the
 </tr>
 <tr>
 	<td>--offline, -f config_file</td>
-	<td> Runs the application in <b>the device provisioning via proxy mode</b>, provisioning the device using assets stored in a file on FAT32 partition.
+	<td> Runs the application in <b>the device provisioning via proxy mode</b>, provisioning the device using assets stored in a file on FAT32 partition or local filesystem.
 	</td>
 </tr>
 <tr>
@@ -117,10 +117,10 @@ oem-prov-app -o /etc/opt/oem-prov-app/config.yaml
 ### Server certificate
 By default, the EdgeLock 2GO Agent uses a built-in server certificate for TLS connection establishment. If the application targets a non-default server instance (e.g. in test or staging environments), a custom server certificate can be specified. This is configured by setting the ```server_cert``` field in the application's configuration file to the path of the desired DER-encoded certificate.
 ## Device provisioning via proxy
-In this mode, the application does not connect to the EdgeLock 2GO Server. Instead, the security assets are provided from a local partition (eMMC/SD card), and the application provisions the device using these assets.
+In this mode, the application does not connect to the EdgeLock 2GO Server. Instead, it uses security assets stored locally, either on a partition (eMMC/SD card) or within the local filesystem, to provision the device. These assets can be written to a FAT32 partition using the [SPSDK tool](https://spsdk.readthedocs.io/en/latest/), which operates through U-Boot and therefore has access only to FAT32 partitions. However, the application also supports loading assets directly from the local filesystem, offering flexibility for testing and rapid experimentation.
 ### Steps
 1. __Prepare Security Assets:__
-* Ensure that the security assets are stored on the partition (eMMC/SD card). For guidance on writing the assets refer to [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
+* Ensure that the security assets are stored on the partition (eMMC/SD card) or local filesystem. For guidance on writing the assets refer to [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
 2. __Update the configuration file:__
 * Modify the configuration file ([config.yaml](../config/config.yaml)) to configure the provisioning process.
 3. __Run the application:__

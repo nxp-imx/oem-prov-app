@@ -11,8 +11,8 @@ The OEM Provisioning Application supports two modes of operation:
 * After receiving each asset, the application provisions them into the EdgeLock Enclave.
 * Optionally, the non-volatile key storage can be committed to the physical memory and device lifecycle moved to closed/closed-locked state.
 ### __Device Provisioning via proxy mode__
-* In this mode, the security assets are already available in an external memory location, such as an eMMC/SD card on a FAT32 partition.
-* The OEM Provisioning Application reads the assets from the partition and imports them into the EdgeLock Enclave.
+* In this mode, the security assets are already available in an external memory location, such as an eMMC/SD card on a FAT32 partition, or in local filesystem.
+* The OEM Provisioning Application reads the assets from the partition or local filesystem and imports them into the EdgeLock Enclave.
 * Optionally, the non-volatile key storage can be committed to the physical memory and device lifecycle moved to closed/closed-locked state.
 
 ## Additional features

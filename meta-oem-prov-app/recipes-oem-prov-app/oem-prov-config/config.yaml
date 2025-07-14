@@ -48,7 +48,9 @@ online:
 offline:
 # partition where the security assets file is located. If the partition is already
 # mounted the file is searched within the mount point. If the partition is not
-# mounted, the application will mount it.
+# mounted, the application will mount it. If the partition is "none", then the
+# assets file will be read from the directory indicated by the mount_point in
+# the local filesystem.
   partition: "/dev/mmcblk0p1"
 
 # type of partition. Although the partition filesystem type is transparent for
@@ -56,7 +58,9 @@ offline:
 # in the partition is supporting only FAT32 partitions.
   type: "vfat"
 
-# in case that the partition is not mounted, it will be mounted in this location
+# in case that the partition is not mounted, it will be mounted in this location.
+# in case that the partition is "none", the assets file will be read from this
+# directory.
   mount_point: "/tmp/oem-prov-app"
 
 # the file name containing the security assets in binary format. The field is a list,
