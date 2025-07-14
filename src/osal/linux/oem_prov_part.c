@@ -84,7 +84,7 @@ static int mkdir_p(const char *path, unsigned int mode)
 	char *copy_path = NULL, *ptr = NULL;
 
 	if (path_len == 0 || path_len >= PATH_MAX) {
-		OEM_PROV_DBG_PRINTF(ERROR, "Incorrect path size: %d\n",
+		OEM_PROV_DBG_PRINTF(ERROR, "Incorrect path size: %ld\n",
 				    path_len);
 		status = OEM_PROV_STATUS_INVALID_FILE;
 		goto exit;
@@ -283,7 +283,7 @@ int oem_prov_load_assets(unsigned int index, char *path, void **stream)
 	/* the filename cannot be empty string or too long */
 	file_length = strlen(assets->file_name[index]);
 	if (!file_length || file_length >= NAME_MAX) {
-		OEM_PROV_DBG_PRINTF(ERROR, "Incorrect file name size: %d\n",
+		OEM_PROV_DBG_PRINTF(ERROR, "Incorrect file name size: %ld\n",
 				    file_length);
 		status = OEM_PROV_STATUS_INVALID_FILE;
 		goto exit;
