@@ -8,5 +8,5 @@ Description and comments: OEM Provisioning Application
                           This SW is a reference code for OEM
                           provisioning.
 Release Location:         https://github.com/nxp-imx/oem-prov-app
-Version:                  1.1
+Version:                  2.0
 Origin:                   NXP (BSD-3-clause)

@@ -4,7 +4,13 @@ This file briefly describes the list of changes and bug fixes for each OEM Provi
 # List of releases
 1. [Release 1.1](#release-11)
 2. [Release 1.0](#release-10)
+2. [Release 2.0](#release-20)
 
+### **Release 2.0**
+* Changed command line arguments for Provisioning by Proxy
+* Added a list of assets files in the configuration file
+* Added support for product based provisioning
+* Removed the Yocto recipe as the application is included into the i.MX LinuxOS BSP
 
 ### **Release 1.1**
 This release is compatible with i.MX Linux BSP 6.12.20_2.0.0.
