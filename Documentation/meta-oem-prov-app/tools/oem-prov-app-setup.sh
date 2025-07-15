@@ -2,9 +2,7 @@
 # Copyright 2025 NXP
 
 show_help() {
-	echo "Usage: $0 [--no-config]"
-	echo "Arguments:"
-	echo "    --no-config        Skip running the OEM Provisioning Application at boot time"
+	echo "Usage: $0"
 }
 
 if [ "$1" == "--help" ]; then
@@ -45,11 +43,5 @@ add_recipe_to_local_conf() {
 		echo "Adding $RECIPE_NAME to $LOCAL_CONF"
 	fi
 }
+add_recipe_to_local_conf "oem-prov-config"
 
-add_recipe_to_local_conf "oem-prov-app"
-#if --no_config is passed, skip adding the second recipe
-if [ "$NO_CONFIG" == "--no-config" ]; then
-	echo "Skipping adding oem-prov-config recipe"
-else
-	add_recipe_to_local_conf "oem-prov-config"
-fi

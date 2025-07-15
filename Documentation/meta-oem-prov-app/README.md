@@ -3,13 +3,12 @@ meta-oem-prov-app Yocto layer
 
 Overview of the Layer
 ---------------------
-This layer contains the OEM Provisioning Application related Yocto recipes.
+This layer contains an example of running the OEM Provisioning Application at boot time.
 
 1. Recipes
 
-* `oem-prov-app_git.bb`: This recipe is responsible for adding support to compile and deploy the OEM Provisioning Application to the Yocto BSP.
-* `oem-prov-config.bb`: This recipe deploys the configuration file for the OEM Provisioning Application into the root filesystem under `/etc/opt/oem-prov-app`. It also configures the application to start automatically at boot time, running in provisioning via proxy mode. \
-It is possible that the application runs early at boot time before the storage (such as an eMMC device) is mounted by the system. To avoid race conditions it is advisable to use a mount point different than the folder the system is using for mounting the volume.
+* `oem-prov-config.bb`: This recipe installs the configuration file for the OEM Provisioning Application into the root filesystem at `/etc/opt/oem-prov-app`. It also configures the application to automatically start at boot, running in provisioning via proxy mode.
+> **Note:** The application may start early in the boot sequence, pottentially before the system mounts the storage device (e.g. eMMC). To avoid race conditions it is recommended to use a mount point that is not used by the system to mount the volume.
 * `u-boot bbappend`: A bbappend file is added to modify the U-Boot configuration (set `CONFIG_CONSOLE_MUX`) which is needed by the SPSDK tool, which handles loading the security assets on the storage before the system boots. The SPSDK is accessing the device via fastboot.
 2. Configuration file
 * The configuration file `config.yaml` found in `meta-oem-prov-app/recipes-oem-prov-app/oem-prov-config/config.yaml` can be modified to adjust settings specific to the user scenario. If the user already has a configuration file, it should be placed in the above mentioned location.
@@ -44,10 +43,3 @@ bitbake-layers add-layer ../sources/meta-oem-prov-app
 ../sources/meta-oem-prov-app/tools/oem-prov-app-setup.sh
 ```
 
-Customization
--------------
-If you do not need all the recipes, you can customize your layer by removing any recipes you don't need. For example if you do not need the `oem-prov-config.bb` recipe, you can remove it, but you still need to keep the `oem-prov-app_git.bb` since it adds the OEM Provisioning Application to the BSP build.\
-The `oem-prov-app-setup.sh` script has a parameter that can skip the `oem-prov-config.bb` recipe:
-```sh
-../sources/meta-oem-prov-app/tools/oem-prov-app-setup.sh --no-config
-```

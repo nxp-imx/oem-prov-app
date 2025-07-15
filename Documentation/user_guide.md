@@ -138,9 +138,11 @@ Object (id: 0x20001000) import: SUCCESS
 
 ```
 ### Run automatically at boot time
-You can configure the OEM Provisioning Application to run at boot time by applying a __Yocto layer__. This allows the application to automatically run when the device boots, provisioning it with the security assets.
+A typical provisioning scenario may involve executing the __OEM Provisioning Application__ automatically during system boot. One recommended approach is to use systemd to manage this behavior by creating a dedicated service file. We provide an example Yocto layer that sets up the required systemd service, enabling the application to run at boot and provision the security assets. Additionally, this layer configures the ```CONFIG_CONSOLE_MUX``` U-boot configuration variable, which is used by the __SPSDK__ to write the security assets on the partition. For detailed guidance, refer to the [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/examples/el2go/imx93/imx93_el2go_provisioning.html).
+
+#### Steps
 1. __Setup the Yocto layer:__
-* Follow the [Yocto Layer Readme](../meta-oem-prov-app/README.md) to apply the Yocto Layer
+* Follow the [Yocto Layer Readme](./meta-oem-prov-app/README.md) to apply the Yocto Layer
 2. __Prepare Security Assets:__
 * Use SPDK to load the security assets on the partition. For detailed steps refer to [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
    * Build the i.MX Linux OS BSP after applying the Layer. For details refer to i.MX Linux OS BSP documentation.
@@ -148,12 +150,15 @@ You can configure the OEM Provisioning Application to run at boot time by applyi
    * Use SPSDK to download the security assets from the EdgeLock 2GO Server
    * Use SPSDK to write the security assets on the local partition
 3. __Boot the system:__
-* The system is automatically booted by SPSDK, the application will start automatically after boot, running in provisioning via proxy mode.
+* The system is automatically booted by SPSDK, the application will start automatically after boot, running in provisioning via proxy mode as configured by the systemd service.
 4. __Check status:__
 * You can check the status of operation with:
 ```sh
 systemctl status oem-prov
 ```
+> **Additiona Notes:**
+The OEM Provisioning Application itself only performs the provisioning task - it does not reboot the system afterward. If desired, users can modify the systemd service to reboot the device upon provisioning.
+
 ### Post provisioning cleanup
 After provisioning, the user may choose to __delete the assets file__ by configuring this behavior in the [config.yaml](../config/config.yaml) file.
 

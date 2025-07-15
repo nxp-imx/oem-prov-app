@@ -32,8 +32,7 @@ The __OEM Provisioning Application__ requires several external libraries and the
 </table>
 
 ## Project configuration and compilation
-The project can be build using the Yocto infrastructure, and a Yocto layer is provided for convenience which can be applied on __i.MX Linux OS BSP__. For detailed instructions on applying the Yocto layer, refer to [Yocto Layer Readme](../meta-oem-prov-app/README.md)
-
+The project can be build using the Yocto infrastructure, the application being integrated into the __i.MX Linux OS BSP__.
 
 Several CMake options are available to customize the build process.
 <table>
@@ -89,8 +88,6 @@ Several CMake options are available to customize the build process.
 </tbody>
 </table>
 
-These options are already set in the Yocto recipe of the Yocto layer, but they are provided here for reference in case further build customization is needed.
-
 ## Project installation
 
 After successfully building the OEM Provisioning Application, the following artifacts are required for the application to run correctly:
@@ -110,7 +107,7 @@ While the project can be installed using the `make install` command, which defau
 > If the project is compiled within the Yocto environment, the executable is automatically placed in the `/us/bin/` directory of the target filesystem.
 
 > **Note 2:**
-> The configuration file is not automatically installed during the build process, as it requires customization by the user. To install the configuration file into the root filesystem, you may utilize the [Yocto Layer](../meta-oem-prov-app/README.md), which facilitates the installation of the configuration file within the Yocto-generated filesystem.
+> The configuration file is not automatically installed during the build process, as it requires customization by the user. To install the configuration file into the root filesystem, you may utilize the [Yocto Layer](./meta-oem-prov-app/README.md), which facilitates the installation of the configuration file within the Yocto-generated filesystem.
 
 
 
