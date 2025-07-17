@@ -1,5 +1,5 @@
 # Introduction
-This guide provides instructions on how to run the __OEM Provisioning Application__ in various modes of configuration. It covers both __device provisioning via cloud__ and __device provisioning via proxy__ flows, including additional features and configuration options.
+This guide provides instructions on how to run the __OEM Provisioning Application__ in various modes of configuration. It covers both __device provisioning via cloud__ and __offline provisioning__ flows, including additional features and configuration options.
 
 # Running the OEM Provisioning Application
 
@@ -27,7 +27,7 @@ For detailed description of the available options, refer to the
 </tr>
 <tr>
 	<td>--offline, -f config_file</td>
-	<td> Runs the application in <b>the device provisioning via proxy mode</b>, provisioning the device using assets stored in a file on FAT32 partition or local filesystem.
+	<td>Runs the application in <b>offline mode</b>, provisioning the device via proxy or product-based methods using assets stored either on a FAT32 partition or in the local filesystem.
 	</td>
 </tr>
 <tr>
@@ -41,7 +41,7 @@ For detailed description of the available options, refer to the
 </tr>
 <tr>
 	<td>--lifecycle, -l option</td>
-	<td> Changes the device lifecycle to <b>closed</b> or <b>closed-locked</b> making the device boot signed images only. The operation is irreversible.
+	<td> Forwards the device lifecycle to <b>closed</b> or <b>closed-locked</b> making the device boot signed images only. The operation is irreversible.
 	</td>
 <tr>
 	<td>--storage, -s commit</td>
@@ -65,7 +65,7 @@ For detailed description of the available options, refer to the
 The configuration file of the OEM Provisioning Application is managed through a customizable yaml file. The user can modify the template provided ([config.yaml](../config/config.yaml)).
 
 # Modes of operation
-The OEM Provisioning Application supports two primary modes of operation: __device provisioning via cloud__ and __device provisioning via proxy__. Bellow, we describe each mode and provide example of usage.
+The OEM Provisioning Application supports two primary modes of operation: __device provisioning via cloud__ and __offline provisioning__ modes (including __device provisioning via proxy__ and __product based provisioning__). Bellow, we describe each mode and provide example of usage.
 
 ## 1. Device provisioning via cloud
 In this mode, the application connects to EdgeLock 2GO Server via mutual TLS to download the necessary security assets and provisions them into the device.
@@ -116,17 +116,29 @@ oem-prov-app -o /etc/opt/oem-prov-app/config.yaml
 
 ### Server certificate
 By default, the EdgeLock 2GO Agent uses a built-in server certificate for TLS connection establishment. If the application targets a non-default server instance (e.g. in test or staging environments), a custom server certificate can be specified. This is configured by setting the ```server_cert``` field in the application's configuration file to the path of the desired DER-encoded certificate.
-## Device provisioning via proxy
-In this mode, the application does not connect to the EdgeLock 2GO Server. Instead, it uses security assets stored locally, either on a partition (eMMC/SD card) or within the local filesystem, to provision the device. These assets can be written to a FAT32 partition using the [SPSDK tool](https://spsdk.readthedocs.io/en/latest/), which operates through U-Boot and therefore has access only to FAT32 partitions. However, the application also supports loading assets directly from the local filesystem, offering flexibility for testing and rapid experimentation.
+
+## Offline modes
+
+The __OEM Provisioning Application__ supports two offline provisioning modes:
+* Provisioning via Proxy
+* Product based Provisioning
+
+From the application's perspective, both modes operate similarly. The distinction lies in the nature of the security assets:
+* __Provisioning via Proxy__ uses assets that are device specific, tied to the device's UUID.
+* __Product based Provisioning__ uses assets that are not UUID tied, but tied to the device family and the EdgeLock 2GO provisioning group.
+
+The process of creating, downloading, and placing these assets on a FAT32 partition differs between the two modes. For detailed instructions, refer to EdgeLock 2GO Server documentation and  [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
+
+In offline provisioning, the application does not connect to the EdgeLock 2GO Server. Instead, it uses security assets stored locally, either on a partition (eMMC/SD card) or within the local filesystem, to provision the device. These assets can be written to a FAT32 partition using the [SPSDK tool](https://spsdk.readthedocs.io/en/latest/), which operates through U-Boot and therefore has access only to FAT32 partitions. However, the application also supports loading assets directly from the local filesystem, offering flexibility for testing and rapid experimentation.
 ### Steps
 1. __Prepare Security Assets:__
 * Ensure that the security assets are stored on the partition (eMMC/SD card) or local filesystem. For guidance on writing the assets refer to [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
 2. __Update the configuration file:__
 * Modify the configuration file ([config.yaml](../config/config.yaml)) to configure the provisioning process.
 3. __Run the application:__
-* Execute the following command to provision the device in the provisioning via proxy mode:
+* Execute the following command to provision the device in the offline mode:
 ```s
-oem-prov-app -i /etc/opt/oem-prov-app/config.yaml
+oem-prov-app -f /etc/opt/oem-prov-app/config.yaml
 ```
 4. __Provisioning status:__
 * The application will display a short report indicating the success or failure for each asset:
@@ -150,13 +162,13 @@ A typical provisioning scenario may involve executing the __OEM Provisioning App
    * Use SPSDK to download the security assets from the EdgeLock 2GO Server
    * Use SPSDK to write the security assets on the local partition
 3. __Boot the system:__
-* The system is automatically booted by SPSDK, the application will start automatically after boot, running in provisioning via proxy mode as configured by the systemd service.
+* The system is automatically booted by SPSDK, the application starts automatically after boot, running in offline mode (provisioning via proxy or product based provisioning dependending on the type of assets that were written into the FAT32 partition).
 4. __Check status:__
 * You can check the status of operation with:
 ```sh
 systemctl status oem-prov
 ```
-> **Additiona Notes:**
+> **Additional Notes:**
 The OEM Provisioning Application itself only performs the provisioning task - it does not reboot the system afterward. If desired, users can modify the systemd service to reboot the device upon provisioning.
 
 ### Post provisioning cleanup
@@ -164,13 +176,29 @@ After provisioning, the user may choose to __delete the assets file__ by configu
 
 This option is particularly useful when boot-time provisioning is enabled, but the user does not want the provisioning process to repeat on every boot. By removing the assets file after the initial provisioning, the system ensures that provisioning only occurs once.
 
+### Mode specific details
+#### Provisioning via proxy
+* Assets are tied to the device UUID
+* The application does not need to know the mode explicitly, but setting ```provisioning: individual``` in the config file enables stricter validation and early error detection.
+
+
+#### Product based provisioning
+* Assets are not device specific
+* Assets are tied to the device family
+* Assets are depending on the OEM Secret Shared Key (automatically added in the EdgeLock 2GO Provisioning group). For more details refer to EdgeLock 2GO Server documentation.
+* A special blob containing the OEM Secret Shared Key must be imported first.
+* The application automatically searches for this blob and imports it if found.
+* Setting ```provisioning: product``` in the configuration file enables early error reporting if the key blob is missing.
+* If the key is not present, provisioning will fail regardless of the configuration.
+
 ## Optional Post-Provisioning Actions
 The user can configure the application (through the configuration file) to perform the following actions at the end of provisioning. These actions have __irreversible__ effects.
 1. __Commit the secure storage:__
 * Commits the secure key-storage to physical memory and increment the hardware anti-rollback. This action can be also executed via command line (see [Additional features](#additional-features)).
 
-2. __Close the device:__
+2. __Forward the device lifecycle:__
 * Transitions the device to a __closed__ or __closed-locked__ state. This action can be also executed via command line (see [Additional features](#additional-features)).
+> **Note:** The device lifecycle cannot transition to the __closed__ state if the SRKH was provisioned during the same boot cycle. A reboot is required after the SRKH provisioning to enable lifecycle forwarding to __closed__. Additionally, no AHAB events should be reported during boot image authentication..
 
 
 ## Additional features
@@ -184,7 +212,7 @@ oem-prov-app -s commit
 ```
 > **Note:** This command must be used exclusively. Combining it with other options is not permitted to prevent conflicts between command-line arguments and configuration file settings.
 
-### Close the device
+### Forward the device lifecycle
 The application allows transitioning the device lifecycle to __closed__ or __closed-locked__, which ensures that the device will only boot signed images. This can be performed:
 * __Automatically__ after the provisioning process (if configured in the configuration file)
 * __Manually__, using this command:
@@ -197,6 +225,7 @@ oem-prov-app -l closed-locked
 ```
 > **Note:** This command must be used exclusively. Combining it with other options is not permitted to prevent conflicts between command-line arguments and configuration file settings.
 
+> **Note:** Forwarding the device lifecycle to __closed__ state can only be performed if the SRKH was provisioned during a previous boot cycle and no AHAB events were reported during boot image authentication.
 ### Retrieve the device UUID
 To retrieve the device UUID, which can be useful during development, run the following command:
 ```sh

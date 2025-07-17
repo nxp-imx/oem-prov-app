@@ -5,7 +5,7 @@ online:
 # The hostname used for the connection with EdgeLock 2GO server.
 # It can be obtained from the GUI interface of the EdgeLock 2GO server:
 # Admin Settings->Services
-  hostname: "https://your-instance.edgelock2go.com"
+  hostname: "your-instance.edgelock2go.com"
 
 # The port used for the communication with EdgeLock 2GO server. The
 # current value to be used is 443
