@@ -86,7 +86,7 @@ static int validate_and_convert_storage(const char *storage)
 	return OEM_PROV_S_NONE;
 }
 
-static inline int is_option_exclusive(uint32_t params, uint32_t offset)
+static inline int is_option_exclusive(unsigned long params, uint32_t offset)
 {
 	/* verbosity level is allowed to be combined with any other parameter */
 	CLEAR_BIT(params, CL_VERBOSE);
