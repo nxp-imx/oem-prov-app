@@ -233,4 +233,4 @@ oem-prov-app -u
 ```
 
 ### Claim code injection
-Claim code injection is described in detail in [Device provisioning via cloud](#1-device-provisioning-via-cloud). The claim code option can only be used with offline modes.
+Claim code injection is described in detail in [Device provisioning via cloud](#1-device-provisioning-via-cloud). The claim code option can only be used with online (Provisioning via Cloud) mode.

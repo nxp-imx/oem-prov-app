@@ -12,6 +12,7 @@ This file briefly describes the list of changes and bug fixes for each OEM Provi
 * Added support for product based provisioning
 * Removed the Yocto recipe as the application is included into the i.MX LinuxOS BSP
 * The assets file can be located in the local filesystem
+* Add the possibility to set the verbosity level from the command line
 
 ### **Release 1.1**
 This release is compatible with i.MX Linux BSP 6.12.20_2.0.0.
