@@ -43,7 +43,7 @@ online:
 
 
 # ==========================================================================
-#                       Provisioning via proxy
+# Offline provisioning (provisioning via proxy or product based provisioning)
 # ==========================================================================
 offline:
 # partition where the security assets file is located. If the partition is already
