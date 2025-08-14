@@ -1,6 +1,23 @@
 # Introduction
 This guide provides instructions on how to run the __OEM Provisioning Application__ in various modes of configuration. It covers both __device provisioning via cloud__ and __offline provisioning__ flows, including additional features and configuration options.
 
+# Prerequisites for running the OEM Provisioning Application
+Prior to executing the OEM Provisioning Application, the following prerequisites should be fulfilled:
+
+## 1. Configuration file
+The configuration file of the OEM Provisioning Application is managed through a customizable yaml file. A template ([config.yaml](../config/config.yaml)) is provided and may be adapted to meet specific deployment requirements. While not all commands require this file, operations such as provisioning do depend on its presence. Therefore, the configuration file should be available on the target system before initiating such procedures.
+
+## 2. NVM daemon
+The EdgeLock Enclave stores keys and data in Non-Volatile Memory (NVM), which is managed by the ELE NVM daemon. It is essential to ensure that the daemon is active prior to running the OEM Provisioning Application.
+
+To verify the daemon's status, the following command may be used:
+```sh
+systemctl status nvm_daemon
+```
+If the daemon is found to be inactive, it should be started using:
+```sh
+systemctl start nvm_daemon
+```
 # Running the OEM Provisioning Application
 
 The OEM Provisioning Application can be executed with the following command:
@@ -60,9 +77,6 @@ For detailed description of the available options, refer to the
 </tr>
 </tbody>
 </table>
-
-# Configuration file
-The configuration file of the OEM Provisioning Application is managed through a customizable yaml file. The user can modify the template provided ([config.yaml](../config/config.yaml)).
 
 # Modes of operation
 The OEM Provisioning Application supports two primary modes of operation: __device provisioning via cloud__ and __offline provisioning__ modes (including __device provisioning via proxy__ and __product based provisioning__). Bellow, we describe each mode and provide example of usage.
