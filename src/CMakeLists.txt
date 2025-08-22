@@ -25,7 +25,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
                       NXP_SMW::smw
-                      ${EXT_LIBS}
                       el2go_agent::nxp_iot_agent_common
                       el2go_agent::nxp_iot_agent
                       utils

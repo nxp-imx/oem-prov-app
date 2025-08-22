@@ -1,4 +1,6 @@
-find_package(Cyaml REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CYAML REQUIRED IMPORTED_TARGET libcyaml)
+
 add_library(osal OBJECT "")
 
 target_sources(osal PRIVATE
@@ -13,4 +15,6 @@ target_include_directories(osal
                            PRIVATE ${CMAKE_SOURCE_DIR}/include
                            PRIVATE ${CYAML_INCLUDE_DIRS})
 
-set(EXT_LIBS ${EXT_LIBS} ${CYAML_LIBRARY} PARENT_SCOPE)
+target_link_libraries(osal
+                      PRIVATE PkgConfig::CYAML)
+
