@@ -9,6 +9,8 @@
 #include "oem_prov_debug_info.h"
 #include "psa/crypto.h"
 #include "psa/internal_trusted_storage.h"
+#include "oem_prov_common.h"
+#include "oem_prov_os.h"
 
 static int oem_prov_get_lifecycle(smw_lifecycle_t *lifecycle)
 {
@@ -76,11 +78,22 @@ int oem_prov_import_blob(unsigned char *data, psa_key_attributes_t *attributes,
 		}
 	}
 
-	/* The EL2GO_PROV_OEM_KEY can be imported only in OPEN lifecycle */
 	if (blob_id == EL2GO_PROV_OEM_KEY_ID) {
 		smw_lifecycle_t lifecycle = SMW_LIFECYCLE_NAME_NONE;
 		int app_status = OEM_PROV_STATUS_OK;
+		int prov_type = 0;
 
+		/* if the application was configured for individual flow, it
+		 * should not import the OEM key
+		 */
+		prov_type = oem_prov_get_prov_type();
+		if (prov_type == OEM_PROV_FLOW_IND) {
+			OEM_PROV_PRINTF("Object (id: 0x%08x) import: Unexpected OEM key\n",
+					blob_id);
+			return OEM_PROV_STATUS_INVALID_BLOB;
+		}
+
+		/* The EL2GO_PROV_OEM_KEY can be imported only in OPEN lifecycle */
 		app_status = oem_prov_get_lifecycle(&lifecycle);
 		if (app_status != OEM_PROV_STATUS_OK)
 			return OEM_PROV_STATUS_SMW_ERROR;

@@ -193,7 +193,7 @@ This option is particularly useful when boot-time provisioning is enabled, but t
 ### Mode specific details
 #### Provisioning via proxy
 * Assets are tied to the device UUID
-* The application does not need to know the mode explicitly, but setting ```provisioning: individual``` in the config file enables stricter validation and early error detection.
+* The application does not need to know the mode explicitly, but setting ```provisioning: individual``` in the config file enables stricter validation and early error detection. If ```individual``` provisioning is set in the configuration file, the application will give an error if it finds the OEM key.
 
 
 #### Product based provisioning
@@ -202,8 +202,8 @@ This option is particularly useful when boot-time provisioning is enabled, but t
 * Assets are depending on the OEM Secret Shared Key (automatically added in the EdgeLock 2GO Provisioning group). For more details refer to EdgeLock 2GO Server documentation.
 * A special blob containing the OEM Secret Shared Key must be imported first.
 * The application automatically searches for this blob and imports it if found.
-* Setting ```provisioning: product``` in the configuration file enables early error reporting if the key blob is missing.
-* If the key is not present, provisioning will fail regardless of the configuration.
+* Setting ```provisioning: product``` in the configuration file enables early error reporting if the key blob is missing. The application will report an error if the OEM key is not found.
+* If the key is not present, provisioning will fail regardless of the configuration because the EdgeLock Enclave cannot unpack the security objects.
 
 ## Optional Post-Provisioning Actions
 The user can configure the application (through the configuration file) to perform the following actions at the end of provisioning. These actions have __irreversible__ effects.
