@@ -30,4 +30,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
                       utils
                       osal)
 
-install(TARGETS ${PROJECT_NAME} RUNTIME)
+install(TARGETS ${PROJECT_NAME}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
