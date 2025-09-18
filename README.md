@@ -35,7 +35,7 @@ There are two types of offline provisioning:
 * The application can retrieve the device UUID.
 
 ## Installation guide
-Project installation guide can be found in the [Installation Guide](./Documentation/build_instructions.md)
+Project build and installation guide can be found in the [Build and installation Guide](./Documentation/build_instructions.md)
 ## User guide
 Project user guide can be found in the [User Guide](./Documentation/user_guide.md)
 
