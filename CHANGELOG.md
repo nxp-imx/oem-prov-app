@@ -2,9 +2,13 @@
 This file briefly describes the list of changes and bug fixes for each OEM Provisioning Application release.
 
 # List of releases
+1. [Release 2.1](#release-21)
 1. [Release 2.0](#release-20)
 2. [Release 1.1](#release-11)
 3. [Release 1.0](#release-10)
+
+### **Release 2.1**
+* Added scripts to build oem-prov-app and dependencies
 
 ### **Release 2.0**
 * Changed command line arguments for Provisioning by Proxy
