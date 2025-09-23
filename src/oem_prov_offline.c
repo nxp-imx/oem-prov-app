@@ -25,7 +25,7 @@ static int parse_objects(char *path)
 	int status = OEM_PROV_STATUS_OK;
 	struct oem_prov_list metadata_list = { 0 };
 	void *stream = NULL;
-	int found = 0;
+	unsigned int found = 0;
 	int prov_type = 0;
 
 	status = oem_prov_load_assets(0, path, &stream);

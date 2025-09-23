@@ -13,6 +13,7 @@
 int oem_prov_get_uuid(void)
 {
 	int status = OEM_PROV_STATUS_OK;
+	unsigned int i = 0;
 	enum smw_status_code smw_status = SMW_STATUS_OK;
 	unsigned char buffer[OEM_PROV_MAX_UUID_LEN];
 
@@ -31,7 +32,7 @@ int oem_prov_get_uuid(void)
 	}
 
 	OEM_PROV_PRINTF("UUID is 0x");
-	for (int i = 0; i < smw_args.uuid_length; i++)
+	for (i = 0; i < smw_args.uuid_length; i++)
 		OEM_PROV_PRINTF("%02X", buffer[i]);
 
 	OEM_PROV_PRINTF("\n");

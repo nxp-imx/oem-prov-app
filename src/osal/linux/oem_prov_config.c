@@ -124,6 +124,7 @@ static const cyaml_schema_value_t oem_prov_config_schema = {
 void *oem_prov_cyaml_mem(void *ctx, void *ptr, size_t size)
 {
 	void *ret_ptr = NULL;
+	(void)ctx;
 
 	if (size == 0) {
 		free(ptr);
@@ -176,13 +177,15 @@ static void print_online_info(struct oem_prov_online *config)
 
 static void print_offline_info(struct oem_prov_offline *config)
 {
+	unsigned int i = 0;
+
 	OEM_PROV_DBG_PRINTF(INFO, "Offline provisioning\n");
 	OEM_PROV_DBG_PRINTF(INFO, "\tpartition: %s\n", config->partition);
 	OEM_PROV_DBG_PRINTF(INFO, "\ttype: %s\n", config->type);
 	OEM_PROV_DBG_PRINTF(INFO, "\tmount_point: %s\n", config->mount_point);
 
 	OEM_PROV_DBG_PRINTF(INFO, "\tfile_name: ");
-	for (int i = 0; i < config->file_name_count; i++)
+	for (i = 0; i < config->file_name_count; i++)
 		OEM_PROV_DBG_PRINTF(INFO, "%s ", config->file_name[i]);
 	OEM_PROV_DBG_PRINTF(INFO, "\n");
 

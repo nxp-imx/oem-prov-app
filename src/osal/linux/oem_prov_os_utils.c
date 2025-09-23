@@ -54,7 +54,7 @@ int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
 		goto exit;
 	}
 
-	*buffer = (char *)malloc(buff_length);
+	*buffer = (unsigned char *)malloc(buff_length);
 	if (!(*buffer)) {
 		res = OEM_PROV_STATUS_ALLOCATION_ERROR;
 		goto exit;

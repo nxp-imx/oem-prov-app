@@ -46,6 +46,11 @@ if (CLOSE_COMMIT_DRY_RUN)
 	add_definitions(-DOEM_PROV_DRY_RUN)
 endif()
 
+# define compiler options
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wall -Wextra -Werror)
+endif()
+
 # Create the version file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/oem_prov_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/oem_prov_version.h)
 

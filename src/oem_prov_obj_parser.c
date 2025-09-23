@@ -76,7 +76,7 @@ struct oem_prov_blob_metadata {
  */
 static int read_length(void *stream, unsigned int *length)
 {
-	int llength = 1;
+	size_t llength = 1;
 	size_t ret = 0;
 	unsigned char buffer[MAX_LLENGTH] = { 0 };
 
@@ -90,7 +90,7 @@ static int read_length(void *stream, unsigned int *length)
 	}
 
 	llength = LSB_BITS(buffer[0], 7);
-	if (!llength || (llength > MAX_LLENGTH))
+	if (!llength || llength > (int)MAX_LLENGTH)
 		return -OEM_PROV_STATUS_INCOMPLETE_DATA;
 
 	ret = oem_prov_read_data(buffer, sizeof(unsigned char), llength,
@@ -211,7 +211,7 @@ static int is_field_magic(void *stream)
 
 	status = read_data(stream, &value, field_length);
 	if (status != OEM_PROV_STATUS_OK ||
-	    strncmp(value, VALUE_MAGIC, LENGTH_MAGIC))
+	    strncmp((const char *)value, VALUE_MAGIC, LENGTH_MAGIC))
 		status = OEM_PROV_STATUS_INCOMPLETE_DATA;
 
 	free(value);
@@ -229,6 +229,7 @@ int oem_prov_extract_blobs_metadata(void *stream,
 	unsigned int blob_length = 0;
 	size_t ret = 0;
 	int llength = 0;
+	unsigned int i = 0;
 	psa_key_attributes_t attributes = psa_key_attributes_init();
 	struct oem_prov_blob_metadata *blob = NULL;
 
@@ -302,7 +303,7 @@ int oem_prov_extract_blobs_metadata(void *stream,
 		OEM_PROV_DBG_PRINTF(DEBUG,
 				    "[tag: %x, length: %x]\nvalue: ", tag,
 				    field_length);
-		for (int i = 0; i < field_length; i++)
+		for (i = 0; i < field_length; i++)
 			OEM_PROV_DBG_PRINTF(DEBUG, "%02x", value[i]);
 		OEM_PROV_DBG_PRINTF(DEBUG, "\n\n");
 

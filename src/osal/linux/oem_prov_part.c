@@ -108,7 +108,7 @@ static int mkdir_p(const char *path, unsigned int mode)
 	for (ptr = copy_path + 1; *ptr; ptr++) {
 		if (*ptr == '/') {
 			*ptr = '\0';
-			ret = mkdir(copy_path, 0755);
+			ret = mkdir(copy_path, mode);
 			/* Check if the error is due to folder already existing */
 			if (ret && (errno != EEXIST)) {
 				OEM_PROV_DBG_PRINTF(ERROR,
@@ -280,7 +280,7 @@ int oem_prov_load_assets(unsigned int index, char *path, void **stream)
 {
 	int status = OEM_PROV_STATUS_OK;
 	size_t total_len = 0;
-	int chars_written = 0;
+	size_t chars_written = 0;
 	struct oem_prov_os_ctx *os_ctx = NULL;
 	struct oem_prov_offline *assets = NULL;
 	FILE *fp = NULL;
