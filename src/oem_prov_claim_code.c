@@ -56,9 +56,8 @@ int oem_prov_inject_claimcode(const char *filename)
 	data_descriptor.identifier = OEM_PROV_CLAIM_CODE_ID;
 	data_descriptor.data = cc;
 	data_descriptor.length = buffer_length;
-	SMW_ATTR_SET_PERSISTENT(data_descriptor.attributes.attributes);
-	SMW_ATTR_SET_LC_CURRENT(data_descriptor.attributes.attributes);
-
+	data_descriptor.attributes.attributes =
+		SMW_ATTR_SET_LC_CURRENT(data_descriptor.attributes.attributes);
 	encr_key.type_name = SMW_KEY_TYPE_NAME_AES;
 	encr_key.id = OEM_PROV_CLAIM_ENC_KEY_ID;
 	encr_key.security_size = 256;
