@@ -125,6 +125,16 @@ static int check_input_params(unsigned long params)
 	return OEM_PROV_STATUS_OK;
 }
 
+static void oem_prov_init(void)
+{
+#if defined(OEM_PROV_DRY_RUN)
+	OEM_PROV_PRINTF("=== OEM PROVISIONING APPLICATION - DRY RUN MODE ===\n");
+	OEM_PROV_PRINTF("Warning: Test mode active - device operations simulated only\n");
+#else
+	OEM_PROV_PRINTF("=== OEM PROVISIONING APPLICATION ===\n");
+#endif
+}
+
 int main(int argc, char *argv[])
 {
 	unsigned long options_bitmap = 0;
@@ -136,6 +146,7 @@ int main(int argc, char *argv[])
 	int status = OEM_PROV_STATUS_OK;
 	int status_main = 1;
 
+	oem_prov_init();
 	while (1) {
 		static struct option long_options[] = {
 			{ "online", required_argument, 0, 'o' },
