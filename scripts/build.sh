@@ -207,6 +207,16 @@ function usage_install()
     printf "\n"
 }
 
+function usage_package()
+{
+    printf "\n"
+    printf "To package the oem-prov-app objects\n"
+    printf "  %s package out=[dir] dest=[dir]\n" "${script_name}"
+    printf "    out      = Build directory\n"
+    printf "    dest     = [optional] Installation directory\n"
+    printf "\n"
+}
+
 function usage()
 {
     printf "\n"
@@ -222,6 +232,7 @@ function usage()
     usage_configure
     usage_build
     usage_install
+    usage_package
     exit 1
 }
 
@@ -340,7 +351,7 @@ function smw()
 
     printf "Execute %s\n" "${cmd_conf_script}"
     eval "${cmd_conf_script}"
- 
+
     printf "Execute %s\n" "${cmd_build_script}"
     eval "${cmd_build_script}"
 
@@ -428,6 +439,35 @@ function install()
     fi
     printf "Execute ${cmd_make} install ${cmd_script}\n"
     eval "${cmd_make} install ${cmd_script}"
+}
+function package()
+{
+    local package_name="oem_prov_app.tar.gz"
+    pr_operation_header "Package oem-prov-app in ${opt_out}/${package_name}"
+
+    if [[ -z ${opt_out} ]]; then
+        usage_package
+        exit 1
+    fi
+
+    local tmp_inst_dir=$(mktemp -d)
+
+    # First do the installation
+    if [[ -z ${opt_dest} ]]; then
+        opt_dest="${tmp_inst_dir}"
+    else
+        # Convert relative path to absolute path
+        if [[ ! "${opt_dest}" = /* ]]; then
+            opt_dest="$(pwd)/${opt_dest}"
+        fi
+    fi
+
+    install
+
+    # Create the archive from the installation directory
+    eval "cd ${opt_dest} && tar -czf ${opt_out}/${package_name} ."
+
+    rm -rf "${opt_dest}"
 }
 
 check_cmake_version
@@ -548,6 +588,9 @@ case ${opt_action} in
         ;;
     install)
         install
+        ;;
+    package)
+        package
         ;;
     *)
         usage
