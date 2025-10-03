@@ -37,8 +37,8 @@
 	} while (0)
 
 #else
-#define OEM_PROV_DBG_PRINTF(level, ...)
-#define OEM_PROV_DBG_ASSERT(exp)
+#define OEM_PROV_DBG_PRINTF(level, fmt, ...)                ((void)0)
+#define OEM_PROV_DBG_ASSERT(exp)                            ((void)0)
 #endif /* ENABLE_VERBOSE */
 
 #define OEM_PROV_PRINTF(...)                                                   \

@@ -340,10 +340,8 @@ int main(int argc, char *argv[])
 	status_main = 0;
 
 exit:
-	if (!status_main)
-		OEM_PROV_DBG_PRINTF(INFO, "Status(%s): SUCCESS\n", argv[0]);
-	else
-		OEM_PROV_DBG_PRINTF(INFO, "Status(%s): FAILURE\n", argv[0]);
+	OEM_PROV_DBG_PRINTF(INFO, "Status(%s): %s\n", argv[0],
+			    !status_main ? "SUCCESS" : "FAILURE");
 	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
 	if (close_option)
 		free(close_option);
