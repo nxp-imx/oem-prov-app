@@ -177,6 +177,9 @@ exit:
 static inline int unmount_device(struct oem_prov_os_ctx *os_ctx,
 				 char *mount_point)
 {
+	if (!os_ctx || !os_ctx->oem_config || !os_ctx->oem_config->offline)
+		return OEM_PROV_STATUS_INVALID_POINTER;
+
 	if (os_ctx->oem_config->offline->needs_unmount) {
 		if (umount(mount_point)) {
 			OEM_PROV_DBG_PRINTF(ERROR,
@@ -196,8 +199,9 @@ int oem_prov_load_env(char **path)
 	struct oem_prov_offline *assets = NULL;
 
 	os_ctx = oem_prov_get_os_ctx();
-	OEM_PROV_DBG_ASSERT(os_ctx && os_ctx->oem_config &&
-			    os_ctx->oem_config->offline);
+	if (!os_ctx || !os_ctx->oem_config || !os_ctx->oem_config->offline)
+		return OEM_PROV_STATUS_INVALID_POINTER;
+
 	assets = os_ctx->oem_config->offline;
 
 	/* partition cannot be empty string */
@@ -379,7 +383,8 @@ int oem_prov_unload_assets(void *stream)
 	assets = os_ctx->oem_config->offline;
 
 	/* delete the file if configured to be deleted */
-	if (os_ctx->oem_config->offline->delete_assets) {
+	if (os_ctx->oem_config->offline->delete_assets &&
+	    assets->assets_file_path) {
 		if (remove(assets->assets_file_path) < 0)
 			status = OEM_PROV_STATUS_INVALID_FILE;
 	}

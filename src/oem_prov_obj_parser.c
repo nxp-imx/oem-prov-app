@@ -335,6 +335,9 @@ int oem_prov_import_blob_by_id(void *stream, struct oem_prov_list metadata_list,
 	next = metadata_list.first;
 	while (next) {
 		blob = (struct oem_prov_blob_metadata *)(next->data);
+		if (!blob)
+			return OEM_PROV_STATUS_INVALID_POINTER;
+
 		if ((blob->attributes.id == id) && !(blob->imported)) {
 			unsigned char *data = NULL;
 
@@ -382,6 +385,9 @@ int oem_prov_import_all_blobs(void *stream, struct oem_prov_list metadata_list)
 		unsigned char *data = NULL;
 
 		blob = (struct oem_prov_blob_metadata *)(next->data);
+		if (!blob)
+			return OEM_PROV_STATUS_INVALID_POINTER;
+
 		data = (unsigned char *)malloc(blob->length);
 		if (!data)
 			return OEM_PROV_STATUS_ALLOCATION_ERROR;

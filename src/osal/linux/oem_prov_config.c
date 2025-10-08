@@ -185,8 +185,13 @@ static void print_offline_info(struct oem_prov_offline *config)
 	OEM_PROV_DBG_PRINTF(INFO, "\tmount_point: %s\n", config->mount_point);
 
 	OEM_PROV_DBG_PRINTF(INFO, "\tfile_name: ");
-	for (i = 0; i < config->file_name_count; i++)
-		OEM_PROV_DBG_PRINTF(INFO, "%s ", config->file_name[i]);
+	if (config->file_name) {
+		for (i = 0; i < config->file_name_count; i++) {
+			if (config->file_name[i])
+				OEM_PROV_DBG_PRINTF(INFO, "%s ",
+						    config->file_name[i]);
+		}
+	}
 	OEM_PROV_DBG_PRINTF(INFO, "\n");
 
 	if (config->delete_assets)
@@ -281,10 +286,17 @@ int oem_prov_get_lc_option(unsigned int mode)
 
 	os_ctx = oem_prov_get_os_ctx();
 
+	if (!os_ctx->oem_config)
+		return 0;
+
 	switch (mode) {
 	case OEM_PROV_ONLINE:
+		if (!os_ctx->oem_config->online)
+			return 0;
 		return os_ctx->oem_config->online->close;
 	case OEM_PROV_OFFLINE:
+		if (!os_ctx->oem_config->offline)
+			return 0;
 		return os_ctx->oem_config->offline->close;
 	}
 
@@ -296,6 +308,9 @@ int oem_prov_get_prov_type(void)
 	struct oem_prov_os_ctx *os_ctx = NULL;
 
 	os_ctx = oem_prov_get_os_ctx();
+
+	if (!os_ctx->oem_config || !os_ctx->oem_config->offline)
+		return OEM_PROV_FLOW_NONE;
 	return os_ctx->oem_config->offline->flow;
 }
 
@@ -305,10 +320,17 @@ int oem_prov_get_storage(unsigned int mode)
 
 	os_ctx = oem_prov_get_os_ctx();
 
+	if (!os_ctx->oem_config)
+		return 0;
+
 	switch (mode) {
 	case OEM_PROV_ONLINE:
+		if (!os_ctx->oem_config->online)
+			return 0;
 		return os_ctx->oem_config->online->commit_storage;
 	case OEM_PROV_OFFLINE:
+		if (!os_ctx->oem_config->offline)
+			return 0;
 		return os_ctx->oem_config->offline->commit_storage;
 	}
 
@@ -321,5 +343,7 @@ char *oem_prov_get_server_cert(void)
 
 	os_ctx = oem_prov_get_os_ctx();
 
+	if (!os_ctx->oem_config || !os_ctx->oem_config->online)
+		return NULL;
 	return os_ctx->oem_config->online->server_cert;
 }
