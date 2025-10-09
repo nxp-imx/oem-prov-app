@@ -9,6 +9,10 @@ This file briefly describes the list of changes and bug fixes for each OEM Provi
 
 ### **Release 2.1**
 * Added scripts to build oem-prov-app and dependencies
+* Added startup banner for oem-prov-app
+* Added -Wall compile flag
+* Fix attributes settings for claim code injection
+* Fix compilation issues when VERBOSE is not enabled
 
 ### **Release 2.0**
 * Changed command line arguments for Provisioning by Proxy
