@@ -39,7 +39,7 @@ add_recipe_to_local_conf() {
 		echo "Recipe $RECIPE_NAME is already in $LOCAL_CONF"
 	else
 		echo "" >> $LOCAL_CONF
-		echo "CORE_IMAGE_EXTRA_INSTALL:append=\" $RECIPE_NAME\"" >> $LOCAL_CONF
+		echo "CORE_IMAGE_EXTRA_INSTALL:append = \" $RECIPE_NAME\"" >> $LOCAL_CONF
 		echo "Adding $RECIPE_NAME to $LOCAL_CONF"
 	fi
 }
