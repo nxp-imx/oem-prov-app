@@ -10,8 +10,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://config.yaml"
 SRC_URI += "file://oem-prov.service"
 
-S = "${WORKDIR}/sources"
-UNPACKDIR = "${S}"
+# Set S to UNPACKDIR since we're only using local files
+S = "${UNPACKDIR}"
 
 inherit systemd
 
