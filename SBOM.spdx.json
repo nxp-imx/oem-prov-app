@@ -2,23 +2,23 @@
   "SPDXID": "SPDXRef-DOCUMENT",
   "spdxVersion": "SPDX-2.3",
   "creationInfo": {
-    "created": "2025-11-12T07:06:33Z",
+    "created": "2026-02-02T12:37:19Z",
     "creators": [
       "Organization: NXP"
     ],
-    "licenseListVersion": "3.20"
+    "licenseListVersion": "3.26"
   },
-  "name": "oem-prov-app-LF_6.12.49_2.2.0",
+  "name": "oem-prov-app-v2.2",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://nxp.com/spdx/145d69dd-2fa8-43ca-9da8-3a01c88d0987",
+  "documentNamespace": "https://nxp.com/spdx/1c22c39d-ce7f-4f69-b7b0-32ac654fc3fd",
   "packages": [
     {
-      "SPDXID": "SPDXRef-package-145d69dd-2fa8-43ca-9da8-3a01c88d0987",
+      "SPDXID": "SPDXRef-package-1c22c39d-ce7f-4f69-b7b0-32ac654fc3fd",
       "name": "oem-prov-app",
-      "versionInfo": "LF_6.12.49_2.2.0",
+      "versionInfo": "v2.2",
       "licenseConcluded": "(BSD-3-Clause)",
       "licenseDeclared": "(BSD-3-Clause)",
-      "downloadLocation": "https://github.com/nxp-imx/oem-prov-app.git -b lf-6.12.49-2.2.0",
+      "downloadLocation": "NOASSERTION",
       "originator": "Organization: NXP",
       "supplier": "NOASSERTION",
       "externalRefs": [],
@@ -29,7 +29,7 @@
     {
       "spdxElementId": "SPDXRef-DOCUMENT",
       "relationshipType": "DESCRIBES",
-      "relatedSpdxElement": "SPDXRef-package-145d69dd-2fa8-43ca-9da8-3a01c88d0987"
+      "relatedSpdxElement": "SPDXRef-package-1c22c39d-ce7f-4f69-b7b0-32ac654fc3fd"
     }
   ]
 }
