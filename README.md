@@ -33,6 +33,8 @@ There are two types of offline provisioning:
 * The claim code can be read from a file on the local file system.
 4. __Retrieve Device UUID__
 * The application can retrieve the device UUID.
+5. __Retrieve Device Lifecycle__
+* The application can retrieve the device lifecycle.
 
 ## Installation guide
 Project build and installation guide can be found in the [Build and installation Guide](./Documentation/build_instructions.md)

@@ -2,12 +2,16 @@
 This file briefly describes the list of changes and bug fixes for each OEM Provisioning Application release.
 
 # List of releases
-1. [Release 2.2](#release-22)
-2. [Release 2.1](#release-21)
-3. [Release 2.0](#release-20)
-4. [Release 1.1](#release-11)
-5. [Release 1.0](#release-10)
+1. [Release 2.3](#release-23)
+2. [Release 2.2](#release-22)
+3. [Release 2.1](#release-21)
+4. [Release 2.0](#release-20)
+5. [Release 1.1](#release-11)
+6. [Release 1.0](#release-10)
 
+
+### **Release 2.3**
+* Retrieve the device lifecycle
 
 ### **Release 2.2**
 * Updated the Yocto layer example to support whinlatter

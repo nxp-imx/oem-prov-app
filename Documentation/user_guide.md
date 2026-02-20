@@ -57,7 +57,11 @@ For detailed description of the available options, refer to the
 	<td>Retrieves and prints the <b>device UUID</b> in hexadecimal format.</td>
 </tr>
 <tr>
-	<td>--lifecycle, -l option</td>
+	<td>--get-life-cycle, -g</td>
+	<td>Retrieves and prints the <b>device lifecycle</b> state (open, closed, or closed-locked).</td>
+</tr>
+<tr>
+	<td>--life-cycle, -l option</td>
 	<td> Forwards the device lifecycle to <b>closed</b> or <b>closed-locked</b> making the device boot signed images only. The operation is irreversible.
 	</td>
 <tr>
@@ -244,6 +248,12 @@ oem-prov-app -l closed-locked
 To retrieve the device UUID, which can be useful during development, run the following command:
 ```sh
 oem-prov-app -u
+```
+
+### Retrieve the device lifecycle
+To retrieve the device lifecycle, which can be useful during development, run the following command:
+```sh
+oem-prov-app -g
 ```
 
 ### Claim code injection
