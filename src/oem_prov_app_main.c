@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 
 #include <string.h>
 #include <getopt.h>
+#include <limits.h>
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
@@ -13,7 +14,6 @@
 #include "oem_prov_common.h"
 #include "oem_prov_arithmetic_ops.h"
 
-#define MAX_FILE_SIZE_NAME 256
 #define MAX_PARAM_OPTION 48
 
 enum command_line_options {
@@ -139,8 +139,8 @@ int main(int argc, char *argv[])
 {
 	unsigned long options_bitmap = 0;
 	int c = 0;
-	char config_file_name[MAX_FILE_SIZE_NAME] = { 0 };
-	char cc_file_name[MAX_FILE_SIZE_NAME] = { 0 };
+	char config_file_name[PATH_MAX] = { 0 };
+	char cc_file_name[PATH_MAX] = { 0 };
 	char *close_option = NULL;
 	char *storage_option = NULL;
 	int status = OEM_PROV_STATUS_OK;
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 			}
 
 			SET_BIT(options_bitmap, CL_ONLINE);
-			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
+			status = validate_string(optarg, PATH_MAX);
 			if (status != OEM_PROV_STATUS_OK) {
 				usage(argv[0]);
 				goto exit;
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 				goto exit;
 			}
 			SET_BIT(options_bitmap, CL_OFFLINE);
-			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
+			status = validate_string(optarg, PATH_MAX);
 			if (status != OEM_PROV_STATUS_OK) {
 				usage(argv[0]);
 				goto exit;
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 				goto exit;
 			}
 			SET_BIT(options_bitmap, CL_CLAIM_CODE);
-			status = validate_string(optarg, MAX_FILE_SIZE_NAME);
+			status = validate_string(optarg, PATH_MAX);
 			if (status != OEM_PROV_STATUS_OK) {
 				usage(argv[0]);
 				goto exit;
