@@ -24,6 +24,7 @@ enum command_line_options {
 	CL_STORAGE,
 	CL_LCYCLE,
 	CL_VERBOSE,
+	CL_GET_LCYCLE,
 };
 
 static void usage(const char *prg)
@@ -41,6 +42,9 @@ static void usage(const char *prg)
 
 	OEM_PROV_PRINTF("%-40s", "--uuid,-u");
 	OEM_PROV_PRINTF("%s", "Prints the device UUID in hex format\n");
+
+	OEM_PROV_PRINTF("%-40s", "--get-life-cycle,-g");
+	OEM_PROV_PRINTF("%s", "Prints the device lifecycle\n");
 
 	OEM_PROV_PRINTF("%-40s", "--storage,-s commit");
 	OEM_PROV_PRINTF("%s", "Commits the secure storage\n");
@@ -155,6 +159,7 @@ int main(int argc, char *argv[])
 			{ "storage", required_argument, 0, 's' },
 			{ "claim-code", required_argument, 0, 'c' },
 			{ "uuid", no_argument, 0, 'u' },
+			{ "get-life-cycle", no_argument, 0, 'g' },
 			{ "version", no_argument, 0, 'v' },
 			{ "verbose", required_argument, 0, 'V' },
 			{ "help", no_argument, 0, 'h' },
@@ -165,7 +170,7 @@ int main(int argc, char *argv[])
 		if (argc <= 1)
 			usage(argv[0]);
 
-		c = getopt_long(argc, argv, "f:o:c:huvs:l:V:", long_options,
+		c = getopt_long(argc, argv, "f:o:c:huvgs:l:V:", long_options,
 				&option_index);
 
 		if (c == -1) {
@@ -242,6 +247,13 @@ int main(int argc, char *argv[])
 			}
 			SET_BIT(options_bitmap, CL_UUID);
 			break;
+		case 'g':
+			if (IS_BIT_SET(options_bitmap, CL_GET_LCYCLE)) {
+				usage(argv[0]);
+				goto exit;
+			}
+			SET_BIT(options_bitmap, CL_GET_LCYCLE);
+			break;
 		case 's':
 			if (IS_BIT_SET(options_bitmap, CL_STORAGE)) {
 				usage(argv[0]);
@@ -297,6 +309,13 @@ int main(int argc, char *argv[])
 	if (IS_BIT_SET(options_bitmap, CL_UUID)) {
 		OEM_PROV_DBG_PRINTF(INFO, "UUID read option\n");
 		status = oem_prov_get_uuid();
+		if (status != OEM_PROV_STATUS_OK)
+			goto exit;
+	}
+
+	if (IS_BIT_SET(options_bitmap, CL_GET_LCYCLE)) {
+		OEM_PROV_DBG_PRINTF(INFO, "Get lifecycle option\n");
+		status = oem_prov_get_lifecycle();
 		if (status != OEM_PROV_STATUS_OK)
 			goto exit;
 	}

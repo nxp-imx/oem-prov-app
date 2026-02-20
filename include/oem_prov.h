@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 
 #ifndef __OEM_PROV_H__
@@ -16,6 +16,17 @@
  * error code
  */
 int oem_prov_get_uuid(void);
+
+/**
+ * oem_prov_get_lifecycle() - Returns the device lifecycle
+ *
+ * This function reads the device lifecycle using the SMW library and
+ * prints it.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_get_lifecycle(void);
 
 /**
  * oem_prov_init_smw() - Initialize the SMW library

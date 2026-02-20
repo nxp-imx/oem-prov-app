@@ -1,14 +1,28 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2025 NXP
+ * Copyright 2025-2026 NXP
  */
 
 #include <string.h>
-#include <smw_device.h>
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
 #include "oem_prov_common.h"
+#include "oem_prov_lifecycle.h"
+
+static const char *lifecycle_to_string(smw_lifecycle_t lifecycle)
+{
+	switch (lifecycle) {
+	case SMW_LIFECYCLE_NAME_OPEN:
+		return "OPEN";
+	case SMW_LIFECYCLE_NAME_CLOSED:
+		return "CLOSED";
+	case SMW_LIFECYCLE_NAME_CLOSED_LOCKED:
+		return "CLOSED-LOCKED";
+	default:
+		return "UNKNOWN";
+	}
+}
 
 static int convert_option(enum oem_prov_lc_options option)
 {
@@ -18,6 +32,47 @@ static int convert_option(enum oem_prov_lc_options option)
 		return SMW_LIFECYCLE_NAME_CLOSED_LOCKED;
 
 	return SMW_LIFECYCLE_NAME_CURRENT;
+}
+
+int oem_prov_read_lifecycle(smw_lifecycle_t *lifecycle)
+{
+	int status = OEM_PROV_STATUS_OK;
+	struct smw_device_lifecycle_args smw_args = { 0 };
+	int res = SMW_STATUS_OK;
+
+	if (!lifecycle) {
+		status = OEM_PROV_STATUS_INVALID_POINTER;
+		goto exit;
+	}
+
+	smw_args.subsystem_name = SMW_SUBSYSTEM_NAME_ELE;
+
+	res = smw_device_get_lifecycle(&smw_args);
+	if (res != SMW_STATUS_OK) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Get device lifecycle failed: %d\n",
+				    res);
+		status = OEM_PROV_STATUS_SMW_ERROR;
+		goto exit;
+	}
+
+	*lifecycle = smw_args.lifecycle_name;
+exit:
+	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, status);
+	return status;
+}
+
+int oem_prov_get_lifecycle(void)
+{
+	int status = OEM_PROV_STATUS_OK;
+	smw_lifecycle_t lifecycle = SMW_LIFECYCLE_NAME_NONE;
+
+	status = oem_prov_read_lifecycle(&lifecycle);
+	if (status != OEM_PROV_STATUS_OK)
+		return status;
+
+	OEM_PROV_PRINTF("Device lifecycle: %s\n",
+			lifecycle_to_string(lifecycle));
+	return status;
 }
 
 int oem_prov_set_lifecycle(enum oem_prov_lc_options option)

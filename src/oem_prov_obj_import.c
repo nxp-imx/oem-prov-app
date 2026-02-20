@@ -1,34 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2025 NXP
+ * Copyright 2025-2026 NXP
  */
-#include <smw_device.h>
-
 #include "oem_prov_blob.h"
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
 #include "psa/crypto.h"
 #include "psa/internal_trusted_storage.h"
 #include "oem_prov_common.h"
+#include "oem_prov_lifecycle.h"
 #include "oem_prov_os.h"
-
-static int oem_prov_get_lifecycle(smw_lifecycle_t *lifecycle)
-{
-	int status = OEM_PROV_STATUS_OK;
-	struct smw_device_lifecycle_args smw_args = { 0 };
-	int res = SMW_STATUS_OK;
-
-	smw_args.subsystem_name = SMW_SUBSYSTEM_NAME_ELE;
-
-	res = smw_device_get_lifecycle(&smw_args);
-	if (res != SMW_STATUS_OK) {
-		OEM_PROV_DBG_PRINTF(ERROR, "Get device lifecycle failed: %d\n",
-				    res);
-		status = OEM_PROV_STATUS_SMW_ERROR;
-	}
-	*lifecycle = smw_args.lifecycle_name;
-	return status;
-}
 
 int oem_prov_import_blob(unsigned char *data, psa_key_attributes_t *attributes,
 			 size_t length)
@@ -94,7 +75,7 @@ int oem_prov_import_blob(unsigned char *data, psa_key_attributes_t *attributes,
 		}
 
 		/* The EL2GO_PROV_OEM_KEY can be imported only in OPEN lifecycle */
-		app_status = oem_prov_get_lifecycle(&lifecycle);
+		app_status = oem_prov_read_lifecycle(&lifecycle);
 		if (app_status != OEM_PROV_STATUS_OK)
 			return OEM_PROV_STATUS_SMW_ERROR;
 		if (lifecycle != SMW_LIFECYCLE_NAME_OPEN) {
