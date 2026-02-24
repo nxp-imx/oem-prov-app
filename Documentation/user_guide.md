@@ -1,32 +1,83 @@
+# OEM Provisioning Application - User Guide
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Prerequisites for Running the OEM Provisioning Application](#prerequisites-for-running-the-oem-provisioning-application)
+  - [1. Configuration File](#1-configuration-file)
+  - [2. NVM Daemon](#2-nvm-daemon)
+- [Running the OEM Provisioning Application](#running-the-oem-provisioning-application)
+  - [Command Syntax](#command-syntax)
+  - [Command-Line Options](#command-line-options)
+  - [Usage Examples](#usage-examples)
+  - [Option Restrictions](#option-restrictions)
+- [Modes of Operation](#modes-of-operation)
+  - [1. Online Provisioning (Provisioning via Cloud)](#1-online-provisioning-provisioning-via-cloud)
+    - [Steps](#steps)
+    - [Provisioning with Claim Code Injection](#provisioning-with-claim-code-injection)
+    - [Server Certificate](#server-certificate)
+  - [2. Offline Provisioning (Provisioning via Proxy)](#2-offline-provisioning-provisioning-via-proxy)
+    - [Steps](#steps-1)
+    - [Run Automatically at Boot Time](#run-automatically-at-boot-time)
+    - [Post Provisioning Cleanup](#post-provisioning-cleanup)
+    - [Mode Specific Details](#mode-specific-details)
+      - [Provisioning via Proxy with Device ID](#provisioning-via-proxy-with-device-id)
+      - [Provisioning via Proxy per Product Type](#provisioning-via-proxy-per-product-type)
+- [Optional Post-Provisioning Actions](#optional-post-provisioning-actions)
+- [Additional Features](#additional-features)
+  - [Commit the Secure Storage](#commit-the-secure-storage)
+  - [Forward the Device Lifecycle](#forward-the-device-lifecycle)
+  - [Retrieve the Device UUID](#retrieve-the-device-uuid)
+  - [Retrieve the Device Lifecycle](#retrieve-the-device-lifecycle)
+  - [Claim Code Injection](#claim-code-injection)
+
+---
+
 # Introduction
-This guide provides instructions on how to run the __OEM Provisioning Application__ in various modes of configuration. It covers both __device provisioning via cloud__ and __offline provisioning__ flows, including additional features and configuration options.
+This guide provides instructions on how to run the __OEM Provisioning Application__ in various modes of configuration. It covers __online provisioning__ and __offline provisioning__ flows, including additional features and configuration options.
 
-# Prerequisites for running the OEM Provisioning Application
-Prior to executing the OEM Provisioning Application, the following prerequisites should be fulfilled:
+# Prerequisites for Running the OEM Provisioning Application
 
-## 1. Configuration file
-The configuration file of the OEM Provisioning Application is managed through a customizable yaml file. A template ([config.yaml](../config/config.yaml)) is provided and may be adapted to meet specific deployment requirements. While not all commands require this file, operations such as provisioning do depend on its presence. Therefore, the configuration file should be available on the target system before initiating such procedures.
+Before executing the OEM Provisioning Application, ensure the following prerequisites are met:
 
-## 2. NVM daemon
-The EdgeLock Enclave stores keys and data in Non-Volatile Memory (NVM), which is managed by the ELE NVM daemon. It is essential to ensure that the daemon is active prior to running the OEM Provisioning Application.
+## 1. Configuration File
 
-To verify the daemon's status, the following command may be used:
-```sh
+The application uses a YAML-based configuration file to control its behavior. A template configuration file ([config.yaml](../config/config.yaml)) is provided and may be adapted to meet specific deployment requirements.
+
+**Important notes:**
+* Not all commands require a configuration file (e.g., `--uuid`, `--version`)
+* Provisioning operations (`--online`, `--offline`) **require** a valid configuration file
+* The configuration file must be accessible on the target system before running provisioning commands
+
+## 2. NVM Daemon
+
+The EdgeLock Enclave stores cryptographic keys and secure data in Non-Volatile Memory (NVM), which is managed by the ELE NVM daemon. The daemon **must be running** before executing the OEM Provisioning Application.
+
+**Verify daemon status:**
+
+```bash
 systemctl status nvm_daemon
 ```
-If the daemon is found to be inactive, it should be started using:
-```sh
+
+**Start the daemon if inactive:**
+
+```bash
 systemctl start nvm_daemon
 ```
+
 # Running the OEM Provisioning Application
 
-The OEM Provisioning Application can be executed with the following command:
-```sh
+## Command Syntax
+
+The OEM Provisioning Application is executed using the following syntax:
+
+```bash
 oem-prov-app [OPTIONS]
 ```
 
-For detailed description of the available options, refer to the
-<a href="#table-oem-prov-options"/>OEM Provisioning Application Options</a> table bellow.
+## Command-Line Options
+
+The following table describes all available command-line options:
 
 <table>
 <caption id="table-oem-prov-options">OEM Provisioning Application Options</caption>
@@ -34,6 +85,7 @@ For detailed description of the available options, refer to the
 <tr>
 	<th>Option</th>
 	<th>Description</th>
+	<th>Required Argument</th>
 </tr>
 </thead>
 <tbody>
@@ -44,7 +96,11 @@ For detailed description of the available options, refer to the
 </tr>
 <tr>
 	<td>--offline, -f config_file</td>
-	<td>Runs the application in <b>offline mode</b>, provisioning the device via proxy or product-based methods using assets stored either on a FAT32 partition or in the local filesystem.
+	<td>Runs the application in <b>offline mode</b>, provisioning the device using locally stored assets (FAT32 partition or filesystem). Supports:
+		<ul>
+			<li>Provisioning via proxy with device ID (device-specific)</li>
+			<li>Provisioning via proxy per product type (product-based)</li>
+		</ul>
 	</td>
 </tr>
 <tr>
@@ -78,19 +134,59 @@ For detailed description of the available options, refer to the
 		<ul>3 &rarr; DEBUG - all of the above + debug messages </ul>
 		<ul>4 &rarr; VERBOSE - all of the above + verbose messages </ul>
 	</td>
+	<td>Level: <code>0-4</code></td>
 </tr>
 </tbody>
 </table>
 
-# Modes of operation
-The OEM Provisioning Application supports two primary modes of operation: __device provisioning via cloud__ and __offline provisioning__ modes (including __device provisioning via proxy__ and __product based provisioning__). Bellow, we describe each mode and provide example of usage.
+## Usage Examples
 
-## 1. Device provisioning via cloud
+**Online provisioning:**
+```bash
+oem-prov-app --online /etc/opt/oem-prov-app/config.yaml
+```
+
+**Offline provisioning:**
+```bash
+oem-prov-app --offline /etc/opt/oem-prov-app/config.yaml
+```
+
+**Retrieve device UUID:**
+```bash
+oem-prov-app --uuid
+```
+
+**Commit secure storage:**
+```bash
+oem-prov-app --storage commit
+```
+
+**Forward device lifecycle:**
+```bash
+oem-prov-app --lifecycle closed
+```
+
+**Enable verbose logging:**
+```bash
+oem-prov-app --online /etc/opt/oem-prov-app/config.yaml --verbose 3
+```
+
+## Option Restrictions
+
+* `--online` and `--offline` are mutually exclusive
+* `--storage` and `--lifecycle` must be used independently (cannot be combined with other options except `--verbose`)
+* `--claim-code` can only be used with `--online` mode (not with `--offline`)
+* `--verbose` can be combined with any other option
+
+# Modes of operation
+The OEM Provisioning Application supports two primary modes of operation: __online provisioning__ (__provisioning via cloud__) and __offline provisioning__ (including __device provisioning via proxy with device ID__ and __provisioning via proxy per product type__). Below, we describe each mode and provide example of usage.
+
+## 1. Online provisioning (Provisioning via cloud)
 In this mode, the application connects to EdgeLock 2GO Server via mutual TLS to download the necessary security assets and provisions them into the device.
 
 ### Steps
 1. __Prepare the security assets:__
-* Configure the security assets on the EdgeLock 2GO Server. Refer to the EdgeLock 2GO Server documentation for guidance.
+* Set up the security assets on the EdgeLock 2GO Server by creating a device group and assigning the required objects to it. Refer to the EdgeLock 2GO Server documentation for detailed instructions.
 2. __Update the configuration file:__
 * Modify the configuration file ([config.yaml](../config/config.yaml)) to configure the provisioning process.
 3. __Run the application:__
@@ -111,10 +207,12 @@ Update status report:
     On endpoint 0x70000010, for object 0x20002001, status: 0x0001: SUCCESS.
     On endpoint 0x70000010, for object 0x30002001, status: 0x0001: SUCCESS.
 ```
+> **Note:** The SRKH import happens only once per device. Any other attempts to import the SRKH will fail.
+
 ### Provisioning with claim code injection
 It is assumed that the assets were already created and configured into the EdgeLock 2GO Server.
 1. __Create and configure the claim code:__
-* Generate the claim code in the EdgeLock 2GO Server. Consult EdgeLock 2GO Server documentation (AN12691) for detailed instructions.
+* Create and configure the claim code in the EdgeLock 2GO Server. Consult EdgeLock 2GO Server documentation (AN12691) for detailed instructions.
 * Download the claim code (even if it was provided by the user) from the EdgeLock 2GO Server and save it in a file, e.g. `claim_code.txt`.
 2. __Inject claim code:__
 * Use the following command to inject the claim code into the device.
@@ -135,19 +233,20 @@ oem-prov-app -o /etc/opt/oem-prov-app/config.yaml
 ### Server certificate
 By default, the EdgeLock 2GO Agent uses a built-in server certificate for TLS connection establishment. If the application targets a non-default server instance (e.g. in test or staging environments), a custom server certificate can be specified. This is configured by setting the ```server_cert``` field in the application's configuration file to the path of the desired DER-encoded certificate.
 
-## Offline modes
+## 2. Offline provisioning (Provisioning via Proxy)
 
 The __OEM Provisioning Application__ supports two offline provisioning modes:
-* Provisioning via Proxy
-* Product based Provisioning
+* Provisioning via Proxy with device ID
+* Provisioning via Proxy per product type
 
 From the application's perspective, both modes operate similarly. The distinction lies in the nature of the security assets:
-* __Provisioning via Proxy__ uses assets that are device specific, tied to the device's UUID.
-* __Product based Provisioning__ uses assets that are not UUID tied, but tied to the device family and the EdgeLock 2GO provisioning group.
+* __Provisioning via Proxy with device ID__ uses assets that are device specific, tied to the device's UUID.
+* __Provisioning via Proxy per product type__ uses assets that are not UUID tied, but tied to the device family and the EdgeLock 2GO provisioning group.
 
 The process of creating, downloading, and placing these assets on a FAT32 partition differs between the two modes. For detailed instructions, refer to EdgeLock 2GO Server documentation and  [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
 
 In offline provisioning, the application does not connect to the EdgeLock 2GO Server. Instead, it uses security assets stored locally, either on a partition (eMMC/SD card) or within the local filesystem, to provision the device. These assets can be written to a FAT32 partition using the [SPSDK tool](https://spsdk.readthedocs.io/en/latest/), which operates through U-Boot and therefore has access only to FAT32 partitions. However, the application also supports loading assets directly from the local filesystem, offering flexibility for testing and rapid experimentation.
+
 ### Steps
 1. __Prepare Security Assets:__
 * Ensure that the security assets are stored on the partition (eMMC/SD card) or local filesystem. For guidance on writing the assets refer to [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/).
@@ -167,6 +266,8 @@ Object (id: 0x20002001) import: SUCCESS
 Object (id: 0x20001000) import: SUCCESS
 
 ```
+> **Note:** The SRKH import happens only once per device. Any other attempts to import the SRKH will fail.
+
 ### Run automatically at boot time
 A typical provisioning scenario may involve executing the __OEM Provisioning Application__ automatically during system boot. One recommended approach is to use systemd to manage this behavior by creating a dedicated service file. We provide an example Yocto layer that sets up the required systemd service, enabling the application to run at boot and provision the security assets. Additionally, this layer configures the ```CONFIG_CONSOLE_MUX``` U-boot configuration variable, which is used by the __SPSDK__ to write the security assets on the partition. For detailed guidance, refer to the [SPSDK documentation](https://spsdk.readthedocs.io/en/latest/examples/el2go/imx93/imx93_el2go_provisioning.html).
 
@@ -195,19 +296,20 @@ After provisioning, the user may choose to __delete the assets file__ by configu
 This option is particularly useful when boot-time provisioning is enabled, but the user does not want the provisioning process to repeat on every boot. By removing the assets file after the initial provisioning, the system ensures that provisioning only occurs once.
 
 ### Mode specific details
-#### Provisioning via proxy
+#### Provisioning via proxy with device ID
 * Assets are tied to the device UUID
 * The application does not need to know the mode explicitly, but setting ```provisioning: individual``` in the config file enables stricter validation and early error detection. If ```individual``` provisioning is set in the configuration file, the application will give an error if it finds the OEM key.
 
 
-#### Product based provisioning
+#### Provisioning via Proxy per product type
 * Assets are not device specific
 * Assets are tied to the device family
-* Assets are depending on the OEM Secret Shared Key (automatically added in the EdgeLock 2GO Provisioning group). For more details refer to EdgeLock 2GO Server documentation.
+* Assets are depending on the OEM Secret Shared Key (automatically generated by the EdgeLock 2GO Server). For more details refer to EdgeLock 2GO Server documentation.
 * A special blob containing the OEM Secret Shared Key must be imported first.
 * The application automatically searches for this blob and imports it if found.
 * Setting ```provisioning: product``` in the configuration file enables early error reporting if the key blob is missing. The application will report an error if the OEM key is not found.
 * If the key is not present, provisioning will fail regardless of the configuration because the EdgeLock Enclave cannot unpack the security objects.
+* This mode may not be available for all device families and all device lifecycles. For more information refer to the EdgeLock 2GO Server documentation.
 
 ## Optional Post-Provisioning Actions
 The user can configure the application (through the configuration file) to perform the following actions at the end of provisioning. These actions have __irreversible__ effects.
@@ -244,6 +346,7 @@ oem-prov-app -l closed-locked
 > **Note:** This command must be used exclusively. Combining it with other options is not permitted to prevent conflicts between command-line arguments and configuration file settings.
 
 > **Note:** Forwarding the device lifecycle to __closed__ state can only be performed if the SRKH was provisioned during a previous boot cycle and no AHAB events were reported during boot image authentication.
+
 ### Retrieve the device UUID
 To retrieve the device UUID, which can be useful during development, run the following command:
 ```sh

@@ -1,6 +1,9 @@
 # Table of Contents
 
 1. [Introduction](#1-introduction)
+   - 1.1. [Build Methods](#11-build-methods)
+     - 1.1.1. [Yocto Build System (Recommended for Production)](#111-yocto-build-system-recommended-for-production)
+     - 1.1.2. [Standalone Build (Manual Configuration)](#112-standalone-build-manual-configuration)
 2. [Toolchain](#2-toolchain)
    - 2.1. [Install in a default path](#21-install-in-a-default-path)
    - 2.2. [Install in a custom path](#22-install-in-a-custom-path)
@@ -19,10 +22,31 @@
    - 5.2. [Build script](#52-build-script)
    - 5.3. [Example of configuring and building the project](#53-example-of-configuring-and-building-the-project)
 ## 1. Introduction
-This guide outlines the steps to build the __OEM Provisioning Application__, including dependencies, configuration, compilation, and installation.
-The OEM Provisioning Application can be built as part of the __i.MX Linux OS BSP__ using the Yocto build system. In this setup, __Yocto__ handles the configuration, compilation, and installation processes automatically, placing the resulting binary under __/usr/bin__.
+This guide provides comprehensive instructions for building the **OEM Provisioning Application**, including toolchain setup, dependency management, configuration, compilation, and installation.
 
-Alternatively, the application can be built __outside of Yocto__. In this case, all required dependencies must be manually built and configured before building the application.
+### 1.1. Build Methods
+
+The OEM Provisioning Application can be built using two approaches:
+
+#### 1.1.1. Yocto Build System (Recommended for Production)
+When integrated into the **i.MX Linux OS BSP**, the Yocto build system automatically handles:
+* Dependency resolution and compilation
+* Cross-compilation toolchain configuration
+* Installation to the target filesystem (`/usr/bin`)
+
+This is the recommended approach for production deployments.
+
+#### 1.1.2. Standalone Build (Manual Configuration)
+For development, testing, or custom integration scenarios, the application can be built independently outside of Yocto. This approach requires:
+* Manual installation and configuration of the cross-compilation toolchain
+* Building all required dependencies from source
+* Explicit configuration of library paths and build options
+
+**Common use cases:**
+* Internal development and debugging
+* Continuous Integration (CI) pipeline integration
+
+The remainder of this guide focuses on the standalone build process.
 
 ## 2. Toolchain
 The OEM Provisioning Application is designed to run on ARM-based processors, specifically targeting the 64-bit ARM architecture. As such, a 64-bit GNU ARM toolchain is required for cross-compilation. Additionally, a toolchain configuration file must be provided for use by other scripts during the compilation of sub-components, ensuring the correct toolchain settings are applied.

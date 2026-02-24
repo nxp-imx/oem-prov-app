@@ -1,48 +1,67 @@
-# OEM Provisioning Application Project
-This git repository contains the sources (C standard) for the OEM Provisioning Application.
+# OEM Provisioning Application
+
+This repository contains the C implementation of the OEM Provisioning Application for NXP EdgeLock devices.
 
 ## Overview
 
-The OEM Provisioning Application is a tool designed to facilitate the OEM provisioning process. It supports the import of security assets into the EdgeLock Enclave. The application can operate in two main modes.
-## Modes of operation
-The OEM Provisioning Application operates in two primary modes:
-### __Device provisioning via cloud mode (online mode)__
-* The application connects to the EdgeLock 2GO Server using EdgeLock 2GO Agent libraries over a mutual TLS connection.
-* It retrieves and provisions security assets into the EdgeLock Enclave.
-* Optionally, it can:
-	* Commit non-volatile key storage to physical memory.
-	* Transition the device lifecycle to closed or closed-locked state.
-### __Offline modes__
-There are two types of offline provisioning:
+The OEM Provisioning Application facilitates secure provisioning of secure assets into the EdgeLock Enclave. It supports both cloud-based and offline provisioning workflows, along with device lifecycle management and secure storage operations.
 
-### a. Provisioning via Proxy
-* Security assets are device-specific (tied to the device UUID).
-* Assets are stored externally (e.g., on an eMMC/SD card on a FAT32 partition or on the local filesystem).
-* The application reads and imports these assets into the EdgeLock Enclave.
-### b. Product-Based Provisioning
-* Security assets are not tied to a specific device UUID, but they are tied to the device family and the EdgeLock 2GO provisioning group.
-* Like proxy mode, assets are read from external storage and provisioned into the enclave.
-## Additional features
-1. __Commit the secure storage__
-* The application can commit the non-volatile key storage into physical memory.
-* The hardware anti-rollback counter is also incremented during this process, ensuring that the device's state cannot be rolled back to a previous insecure state.
-2. __Forward the device lifecycle__
-* The device lifecycle can be moved to closed or closed-locked states. Once closed, the device can only boot signed images.
-3. __Claim Code Injection__
-* The application supports the injection of a claim code into the EdgeLock Enclave.
-* The claim code can be read from a file on the local file system.
-4. __Retrieve Device UUID__
-* The application can retrieve the device UUID.
-5. __Retrieve Device Lifecycle__
-* The application can retrieve the device lifecycle.
+## Modes of Operation
 
-## Installation guide
-Project build and installation guide can be found in the [Build and installation Guide](./Documentation/build_instructions.md)
-## User guide
-Project user guide can be found in the [User Guide](./Documentation/user_guide.md)
+### Device provisioning via cloud (online mode)
 
-## List of changes
-The list of changes can be found in the [Change Log](./CHANGELOG.md)
+In online mode, the application:
+* Establishes a secure mutual TLS connection to the EdgeLock 2GO Server
+* Retrieves device-specific security assets from the cloud
+* Provisions assets into the EdgeLock Enclave
+
+**Optional post-provisioning operations:**
+* Commit non-volatile key storage to physical memory
+* Transition device lifecycle to `closed` or `closed-locked` state
+
+### Device Provisioning via Proxy (offline modes)
+
+The application supports two offline provisioning methods:
+
+#### Provisioning via Proxy with device ID
+* Security assets are **device-specific** (bound to individual device UUID)
+* Assets are pre-generated and stored on external media (eMMC/SD card with FAT32 partition, or local filesystem)
+* Application reads and imports device-specific assets into the EdgeLock Enclave
+
+#### Provisioning via Proxy per product type
+* Security assets are **product-specific** (tied to device family and EdgeLock 2GO provisioning group)
+* Assets are pre-generated and stored on external media (eMMC/SD card with FAT32 partition, or local filesystem)
+
+## Additional Features
+
+### Secure Storage Commitment
+* Commits non-volatile key storage to physical memory
+* Increments hardware anti-rollback counter to prevent rollback attacks
+* Ensures device state cannot be reverted to a previous insecure configuration
+
+### Device Lifecycle Management
+* Transitions device lifecycle to `closed` or `closed-locked` states
+* Once closed, device can only boot cryptographically signed images
+
+### Claim Code Injection
+* Injects device claim codes into the EdgeLock Enclave
+* Reads claim code from a file on the local filesystem
+* Enables device registration into the EdgeLock 2GO Server
+
+### Retrieve Device UUID
+* Retrieves and displays the unique device UUID
+
+### Retrieve Device Lifecycle
+* Retrieves and displays the current device lifecycle state.
+
+## Documentation
+
+* **[Build and Installation Guide](./Documentation/build_instructions.md)** - Compilation and deployment instructions
+* **[User Guide](./Documentation/user_guide.md)** - Usage examples and command reference
+* **[Change Log](./CHANGELOG.md)** - Version history and release notes
 
 ## License
-All the sources are under <a href="https://opensource.org/license/BSD-3-clause/">BSD 3-Clause license</a>.
+
+This project is licensed under the [BSD 3-Clause License](https://opensource.org/license/BSD-3-clause/).
+
+---

@@ -9,8 +9,8 @@ This file briefly describes the list of changes and bug fixes for each OEM Provi
 5. [Release 1.1](#release-11)
 6. [Release 1.0](#release-10)
 
-
 ### **Release 2.3**
+* Enhanced documentation
 * Retrieve the device lifecycle
 
 ### **Release 2.2**
