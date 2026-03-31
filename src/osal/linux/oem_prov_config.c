@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 
 #include <stdlib.h>
@@ -346,4 +346,29 @@ char *oem_prov_get_server_cert(void)
 	if (!os_ctx->oem_config || !os_ctx->oem_config->online)
 		return NULL;
 	return os_ctx->oem_config->online->server_cert;
+}
+
+int oem_prov_set_no_confirm(bool value)
+{
+	struct oem_prov_os_ctx *ctx = oem_prov_get_os_ctx();
+
+	if (!ctx) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Failed to get OS context\n");
+		return OEM_PROV_STATUS_INVALID_POINTER;
+	}
+
+	ctx->no_confirm = value;
+	return OEM_PROV_STATUS_OK;
+}
+
+bool oem_prov_get_no_confirm(void)
+{
+	struct oem_prov_os_ctx *ctx = oem_prov_get_os_ctx();
+
+	if (!ctx) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Failed to get OS context\n");
+		return false; /* Default to requiring confirmation */
+	}
+
+	return ctx->no_confirm;
 }

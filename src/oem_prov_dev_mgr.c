@@ -9,6 +9,8 @@
 #include "oem_prov_debug_info.h"
 #include "oem_prov_common.h"
 #include "oem_prov_lifecycle.h"
+#include "oem_prov_os.h"
+#include "oem_prov_arithmetic_ops.h"
 
 static const char *lifecycle_to_string(smw_lifecycle_t lifecycle)
 {
@@ -98,10 +100,17 @@ int oem_prov_set_lifecycle(enum oem_prov_lc_options option)
 #else
 	struct smw_device_lifecycle_args smw_args = { 0 };
 	int res = SMW_STATUS_OK;
+	static const char *const warnings[] = {
+		"WARNING: You are about to forward the device lifecycle.",
+		"This operation is IRREVERSIBLE and cannot be undone."
+	};
+
+	status = oem_prov_confirm_operation(warnings, ARRAY_SIZE(warnings));
+	if (status != OEM_PROV_STATUS_OK)
+		return status;
 
 	smw_args.subsystem_name = SMW_SUBSYSTEM_NAME_ELE;
 	smw_args.lifecycle_name = close_option;
-
 	res = smw_device_set_lifecycle(&smw_args);
 	if (res != SMW_STATUS_OK) {
 		OEM_PROV_DBG_PRINTF(ERROR, "Set device lifecycle failed: %d\n",

@@ -13,6 +13,7 @@
 #include "oem_prov_version.h"
 #include "oem_prov_common.h"
 #include "oem_prov_arithmetic_ops.h"
+#include "oem_prov_os.h"
 
 #define MAX_PARAM_OPTION 48
 
@@ -25,6 +26,7 @@ enum command_line_options {
 	CL_LCYCLE,
 	CL_VERBOSE,
 	CL_GET_LCYCLE,
+	CL_NO_CONFIRM,
 };
 
 static void usage(const char *prg)
@@ -52,6 +54,10 @@ static void usage(const char *prg)
 	OEM_PROV_PRINTF("%-40s", "--life-cycle,-l closed/closed-locked");
 	OEM_PROV_PRINTF("%s",
 		        "Forwards the device lifecycle to closed/closed-locked.\n");
+
+	OEM_PROV_PRINTF("%-40s", "--no-confirm,-n");
+	OEM_PROV_PRINTF("%s", "Bypass confirmation prompts\n");
+
 	OEM_PROV_PRINTF("%-40s", "--verbose,-V level[0-4]");
 	OEM_PROV_PRINTF("%s", "Sets the verbosity level\n");
 
@@ -94,6 +100,8 @@ static inline int is_option_exclusive(unsigned long params, uint32_t offset)
 {
 	/* verbosity level is allowed to be combined with any other parameter */
 	CLEAR_BIT(params, CL_VERBOSE);
+	/* no-confirm is allowed to be combined with any other parameter */
+	CLEAR_BIT(params, CL_NO_CONFIRM);
 	if (IS_BIT_SET(params, offset) && params != BIT(offset))
 		return 0;
 	return 1;
@@ -109,13 +117,13 @@ static int check_input_params(unsigned long params)
 
 	/* storage option should not be mixed with other options*/
 	if (!is_option_exclusive(params, CL_STORAGE)) {
-		OEM_PROV_PRINTF("Storage should not be mixed with other options\n");
+		OEM_PROV_PRINTF("Storage option must be used alone\n\n");
 		return OEM_PROV_STATUS_INVALID_PARAM;
 	}
 
 	/* Lifecycle should not be mixed with other options */
 	if (!is_option_exclusive(params, CL_LCYCLE)) {
-		OEM_PROV_PRINTF("Lifcycle should not be mixed with other options\n");
+		OEM_PROV_PRINTF("Life-cycle option must be used alone\n");
 		return OEM_PROV_STATUS_INVALID_PARAM;
 	}
 
@@ -160,6 +168,7 @@ int main(int argc, char *argv[])
 			{ "claim-code", required_argument, 0, 'c' },
 			{ "uuid", no_argument, 0, 'u' },
 			{ "get-life-cycle", no_argument, 0, 'g' },
+			{ "no-confirm", no_argument, 0, 'n' },
 			{ "version", no_argument, 0, 'v' },
 			{ "verbose", required_argument, 0, 'V' },
 			{ "help", no_argument, 0, 'h' },
@@ -170,7 +179,7 @@ int main(int argc, char *argv[])
 		if (argc <= 1)
 			usage(argv[0]);
 
-		c = getopt_long(argc, argv, "f:o:c:huvgs:l:V:", long_options,
+		c = getopt_long(argc, argv, "f:o:c:huvgs:l:V:n", long_options,
 				&option_index);
 
 		if (c == -1) {
@@ -253,6 +262,16 @@ int main(int argc, char *argv[])
 				goto exit;
 			}
 			SET_BIT(options_bitmap, CL_GET_LCYCLE);
+			break;
+		case 'n':
+			if (IS_BIT_SET(options_bitmap, CL_NO_CONFIRM)) {
+				usage(argv[0]);
+				goto exit;
+			}
+			SET_BIT(options_bitmap, CL_NO_CONFIRM);
+			status = oem_prov_set_no_confirm(true);
+			if (status != OEM_PROV_STATUS_OK)
+				goto exit;
 			break;
 		case 's':
 			if (IS_BIT_SET(options_bitmap, CL_STORAGE)) {

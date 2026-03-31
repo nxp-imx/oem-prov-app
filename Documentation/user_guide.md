@@ -126,6 +126,10 @@ The following table describes all available command-line options:
 	</td>
 </tr>
 <tr>
+	<td>--no-confirm, -n</td>
+	<td>Bypasses user confirmation prompts for irreversible operations. <b>Use with caution</b> - intended for automation scenarios where operations are pre-validated.</td>
+</tr>
+<tr>
 	<td>--verbose, -V level[0-4]</td>
 	<td>Sets the verbosity level:
 		<ul>0 &rarr; No debug </ul>
@@ -166,6 +170,11 @@ oem-prov-app --storage commit
 oem-prov-app --lifecycle closed
 ```
 
+**Forward device lifecycle without confirmation (automation):**
+```bash
+oem-prov-app --lifecycle closed --no-confirm
+```
+
 **Enable verbose logging:**
 ```bash
 oem-prov-app --online /etc/opt/oem-prov-app/config.yaml --verbose 3
@@ -174,9 +183,9 @@ oem-prov-app --online /etc/opt/oem-prov-app/config.yaml --verbose 3
 ## Option Restrictions
 
 * `--online` and `--offline` are mutually exclusive
-* `--storage` and `--lifecycle` must be used independently (cannot be combined with other options except `--verbose`)
+* `--storage` and `--lifecycle` must be used independently (cannot be combined with other options except `--verbose` and `--no-confirm`)
 * `--claim-code` can only be used with `--online` mode (not with `--offline`)
-* `--verbose` can be combined with any other option
+* `--verbose` and `--no-confirm` can be combined with any other option
 
 # Modes of operation
 The OEM Provisioning Application supports two primary modes of operation: __online provisioning__ (__provisioning via cloud__) and __offline provisioning__ (including __device provisioning via proxy with device ID__ and __provisioning via proxy per product type__). Below, we describe each mode and provide example of usage.

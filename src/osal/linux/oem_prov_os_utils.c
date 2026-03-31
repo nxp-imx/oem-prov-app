@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "oem_prov_status.h"
 #include "oem_prov_debug_info.h"
 #include "oem_prov_arithmetic_ops.h"
+#include "oem_prov_os.h"
 
 int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
 				  unsigned int *length, unsigned int offset)
@@ -69,5 +71,45 @@ int oem_prov_get_buffer_from_file(const char *file_name, unsigned char **buffer,
 exit:
 	OEM_PROV_DBG_PRINTF(VERBOSE, "%s returned %d\n", __func__, res);
 	close(fd);
+	return res;
+}
+
+int oem_prov_confirm_operation(const char *const *warning_lines,
+			       unsigned int num_lines)
+{
+	char response[10] = { 0 };
+	unsigned int i = 0;
+	int res = OEM_PROV_STATUS_USER_ABORT;
+
+	/* Check if confirmation is disabled */
+	if (oem_prov_get_no_confirm()) {
+		OEM_PROV_DBG_PRINTF(INFO, "Confirmation bypassed\n");
+		res = OEM_PROV_STATUS_OK;
+		goto exit;
+	}
+
+	OEM_PROV_PRINTF("\n");
+	for (i = 0; i < num_lines; i++)
+		OEM_PROV_PRINTF("%s\n", warning_lines[i]);
+
+	OEM_PROV_PRINTF("\n");
+
+	OEM_PROV_PRINTF("Are you sure you want to proceed? (yes/no): ");
+	(void)fflush(stdout);
+
+	if (!fgets(response, sizeof(response), stdin)) {
+		OEM_PROV_DBG_PRINTF(ERROR, "Failed to read user input\n");
+		goto exit;
+	}
+
+	/* Remove trailing newline */
+	response[strcspn(response, "\n")] = '\0';
+
+	if (strcmp(response, "yes") == 0)
+		res = OEM_PROV_STATUS_OK;
+	else
+		OEM_PROV_PRINTF("Operation aborted by user.\n");
+
+exit:
 	return res;
 }

@@ -1,9 +1,11 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 #ifndef __OEM_PROV_OS_H__
 #define __OEM_PROV_OS_H__
+
+#include <stdbool.h>
 
 /**
  * oem_prov_get_buffer_from_file() - Reads the data from a file
@@ -194,5 +196,46 @@ char *oem_prov_get_server_cert(void);
  * the option from the configuration file
  */
 int oem_prov_get_prov_type(void);
+
+/**
+ * oem_prov_set_no_confirm() - Sets the no-confirm flag
+ * @value: true to bypass confirmation prompts, false to require confirmation
+ *
+ * This function sets the no-confirm flag which controls whether the application
+ * should bypass user confirmation prompts for irreversible operations (such as
+ * lifecycle changes). This is typically set via the --no-confirm command-line option.
+ *
+ * Return:
+ * error code
+ */
+int oem_prov_set_no_confirm(bool value);
+
+/**
+ * oem_prov_get_no_confirm() - Gets the no-confirm flag
+ *
+ * This function retrieves the current state of the no-confirm flag. Functions
+ * that require user confirmation for irreversible operations should check this
+ * flag before prompting the user.
+ *
+ * Return:
+ * 1 if confirmation should be bypassed, 0 if confirmation is required (default)
+ */
+bool oem_prov_get_no_confirm(void);
+
+/**
+ * oem_prov_confirm_operation() - Prompts user for confirmation with warnings
+ * @warning_lines: Array of warning message strings to display
+ * @num_lines: Number of warning lines in the array
+ *
+ * This function displays warning messages and prompts the user for confirmation.
+ * If the --no-confirm flag is set, the prompt is bypassed and the function
+ * returns success immediately.
+ *
+ * Return:
+ * OEM_PROV_STATUS_OK if user confirms or --no-confirm is set
+ * OEM_PROV_STATUS_USER_ABORT if user declines or input fails
+ */
+int oem_prov_confirm_operation(const char *const *warning_lines,
+			       unsigned int num_lines);
 
 #endif /* __OEM_PROV_OS_H__ */

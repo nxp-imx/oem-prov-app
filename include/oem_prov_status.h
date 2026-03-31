@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 #ifndef __OEM_PROV_STATUS_H__
 #define __OEM_PROV_STATUS_H__
@@ -29,6 +29,7 @@
  *
  * @OEM_PROV_STATUS_INCOMPLETE_DATA: The data in the file does not respect the expected format
  * @OEM_PROV_STATUS_PSA_ERROR: A function in the PSA API returned an error
+ * @OEM_PROV_STATUS_USER_ABORT: User aborted the operation
  */
 enum oem_prov_status_code {
 	OEM_PROV_STATUS_OK = 0,
@@ -53,6 +54,7 @@ enum oem_prov_status_code {
 	OEM_PROV_STATUS_INVALID_LIFECYCLE,
 	OEM_PROV_STATUS_INVALID_BLOB,
 	OEM_PROV_STATUS_INVALID_PARAM,
+	OEM_PROV_STATUS_USER_ABORT,
 };
 
 #endif /* __OEM_PROV_STATUS_H__ */

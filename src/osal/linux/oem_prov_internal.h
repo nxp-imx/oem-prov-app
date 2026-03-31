@@ -1,10 +1,12 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024-2025 NXP
+ * Copyright 2024-2026 NXP
  */
 
 #ifndef __OEM_PROV_INTERNAL_H__
 #define __OEM_PROV_INTERNAL_H__
+
+#include <stdbool.h>
 
 struct oem_prov_online {
 	char *hostname;
@@ -35,6 +37,7 @@ struct oem_prov_config {
 
 struct oem_prov_os_ctx {
 	struct oem_prov_config *oem_config;
+	bool no_confirm;
 };
 
 /**
