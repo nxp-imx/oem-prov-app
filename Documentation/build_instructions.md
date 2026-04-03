@@ -175,7 +175,7 @@ Alternatively, you can use the provided script to achieve the same result:
 ./scripts/build.sh yaml toolpath=[tool path] export=[export path] src=[source path]
 ```
 The scripts download the Yaml library into the specified source folder, build it, and then export the resulting binaries to the designated export folder.
-#### 3.1.1 Building Cyaml
+#### 3.1.2 Building Cyaml
 The Cyaml library is a schema-based YAML parsing library used by the OEM Provisioning Application to parse its configuration file.
 The following script can be used to build Cyaml:
 ```sh
@@ -193,7 +193,7 @@ The scripts download the CYaml library into the specified source folder, build i
 The OEM Provisioning Application uses the __Security Middleware (SMW) library__ to execute operations on the EdgeLock Secure Enclave. The SMW library has its own set of dependencies, which are not covered in this document. For detailed instructions on how to build each SMW dependency, please refer to the <a href="https://github.com/nxp-imx/imx-smw">Security Middleware Library (SMW) Documentation</a>
 Alternatively, you can use the provided script to build the SMW library and its dependencies:
 ```sh
-./scripts/build.sh smw toolpath=[tool path] out=[smw build folder path] src=[source path] platform=[imx93evk/imx91evk/imx8ulpevk] export=[smw export path]
+./scripts/build.sh smw toolpath=[tool path] out=[smw build folder path] src=[source path] subsystem=[smw subsystem] export=[smw export path]
 ```
 The scripts assume that the SMW is available in the __[source path]__ together with the needed dependencies (see  <a href="https://github.com/nxp-imx/imx-smw">Security Middleware Library (SMW) Documentation</a>).
 ## 3.3. Building EdgeLock 2GO Agent
@@ -299,9 +299,12 @@ This shell script builds the project dependencies and configures the project. It
 
 Usage:
 ```sh
-./scripts/configure.sh [build directory] [architecture] toolpath=[path/to/toolpath]
+./scripts/configure.sh [build directory] [smw_subsystem] toolpath=[path/to/toolpath]
 ```
 The ```toolpath``` parameter is optional. If not specified, the script will use the default toolchain.
+
+>  **Note:**
+> The `smw_subsystem` parameter determines which SMW subsystem(s) to build. See the SMW documentation for additional details.
 
 <table>
 <caption id="table-dependencies">Dependencies</caption>
@@ -341,8 +344,13 @@ For usage details, run the script with the help flag:
 
 ### 5.3 Example of configuring and building the project
 * configure
-```sh 
-./scripts/configure.sh [build directory] [architecture] toolpath=[path/to/toolpath]
+```sh
+./scripts/configure.sh [build directory] [smw_subsystem] toolpath=[path/to/toolpath]
+```
+
+Example for i.MX93 (ELE + TEE):
+```sh
+./scripts/configure.sh build tee,ele toolpath=/opt/toolchains
 ```
 * build
 ```sh
@@ -354,4 +362,3 @@ For usage details, run the script with the help flag:
 ```
 >  **Note:**
 > To avoid relative path issues, it is advisable to use absolute paths.
-
