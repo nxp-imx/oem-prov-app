@@ -13,6 +13,7 @@ This file briefly describes the list of changes and bug fixes for each OEM Provi
 * Enhanced documentation
 * Retrieve the device lifecycle
 * Add user confirmation for irreversible operations
+* Add support for Yocto wrynose in the example layer
 
 ### **Release 2.2**
 * Updated the Yocto layer example to support whinlatter
